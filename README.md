@@ -2,7 +2,7 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## Getting Started
 
-Copy the sample.env file to .env.local and fill in the required values.
+Copy the `sample.env` file to `.env.local` and fill in the required values.
 
 ```bash
 cp sample.env .env.local
