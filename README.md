@@ -8,6 +8,18 @@ Copy the `sample.env` file to `.env.local` and fill in the required values.
 cp sample.env .env.local
 ```
 
+Install the dependencies:
+
+```bash
+npm install
+# or
+yarn install
+# or
+pnpm install
+# or
+bun install
+```
+
 Then, run the development server:
 
 ```bash
