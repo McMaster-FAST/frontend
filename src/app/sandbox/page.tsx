@@ -1,16 +1,21 @@
 "use client";
 
-import { Navbar } from "@/components/ui/navbar";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 export default function Home() {
   return (
 
     <main>
-      <Navbar username={"Logged in as: wardelp"} />
-
-      <div className="p-8">
-        <h1 className="text-2xl font-semibold">Sandbox</h1>
-        <p className="mt-4">Use this page to preview the navbar and components.</p>
+      <div>
+        <RadioGroup id="radio-group-1" >
+          <RadioGroupItem value="option1" id="option1"/>
+          <Label htmlFor="option1">Check me!</Label>
+          <RadioGroupItem value="option2" id="option2"/>
+          <Label htmlFor="option2">No, check me!</Label>
+        </RadioGroup>
+        
       </div>
     </main>
 
