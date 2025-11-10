@@ -35,6 +35,9 @@
   /* Technically McMaster wants 50% opacity but that looks wonky with the icons 
     so just use the equiv solid assuming a constant BG */
   --disabled-secondary: #959A9E;
+  --input-ring: #DBDBDD;
+  --primary-border: #DBDBDD;
+  --placeholder: #959A9E;
 
   --muted: oklch(0.97 0 0);
   --muted-foreground: oklch(0.556 0 0);
@@ -97,6 +100,10 @@
 
   --color-disabled-primary: var(--disabled-primary);
   --color-disabled-secondary: var(--disabled-secondary);
+
+  --color-input-ring: var(--input-ring);
+  --colour-placeholder: var(--placeholder);
+  --color-primary-border: var(--primary-border);
 
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
