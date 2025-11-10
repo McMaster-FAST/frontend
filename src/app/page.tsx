@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
 import Image from "next/image";
+import {ChevronRight} from "lucide-react";
+import {Header} from "@/components/Header";
 
 type Course = {
   code: string;
@@ -20,63 +21,9 @@ const courses: Course[] = [
 ];
 
 export default function Home() {
-  const [userId] = useState("userid");
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-
   return (
     <div className="flex min-h-screen flex-col bg-white">
-      {/* Header */}
-      <header className="flex h-20 items-center justify-between bg-[#7A003C] px-8 border-b-[3px] border-[#FDBF57]">
-        <div className="flex items-center gap-6">
-          <h1 className="text-white text-base font-semibold leading-[22px] font-['Inter']">
-            MacFAST
-          </h1>
-        </div>
-        
-        <nav className="flex items-center gap-2 flex-1 justify-end">
-          <div className="relative">
-            <button 
-              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-              className="flex items-center justify-center px-2 h-20 text-[#F5F5F5] text-sm font-semibold leading-[18px] font-['Poppins'] hover:bg-[#8a004c]"
-            >
-              My Courses
-              <svg className={`w-5 h-5 ml-1 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
-            </button>
-            
-            {/* Dropdown Menu */}
-            {isDropdownOpen && (
-              <div className="absolute top-full left-0 mt-1 w-64 bg-white border border-[#DBDBDD] rounded-lg shadow-lg z-50">
-                <div className="py-2">
-                  {courses.map((course, index) => (
-                    <button
-                      key={index}
-                      onClick={() => setIsDropdownOpen(false)}
-                      className="w-full text-left px-4 py-2 text-sm text-[#495965] hover:bg-[#F5F5F5] font-['Poppins']"
-                    >
-                      <div className="font-semibold">{course.code}</div>
-                      <div className="text-xs text-[#495965]">{course.name}</div>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-          <button className="flex items-center justify-center px-2 h-20 text-[#F5F5F5] text-sm font-semibold leading-[18px] font-['Poppins'] hover:bg-[#8a004c]">
-            Saved Questions
-          </button>
-          <button className="flex items-center justify-center px-2 h-20 text-[#F5F5F5] text-sm font-semibold leading-[18px] font-['Poppins'] hover:bg-[#8a004c]">
-            My Stats
-          </button>
-          <button className="flex items-center justify-center px-2 h-20 text-[#F5F5F5] text-sm font-semibold leading-[18px] font-['Poppins'] hover:bg-[#8a004c]">
-            Logged in As: {userId}
-          </button>
-          <button className="flex items-center justify-center px-6 py-3 h-11 bg-white border-2 border-[#7A003C] rounded-lg text-[#7A003C] text-base font-semibold leading-5 font-['Poppins'] hover:bg-[#F5F5F5]">
-            Logout
-          </button>
-        </nav>
-      </header>
+      <Header />
 
       {/* Main Content */}
       <main className="flex-1 p-[25px]">
@@ -99,9 +46,9 @@ export default function Home() {
         </h3>
         <div className="flex items-start gap-[10px] pt-2.5">
           {/* McMaster University Logo */}
-          <a 
-            href="https://chemistry.mcmaster.ca/" 
-            target="_blank" 
+          <a
+            href="https://chemistry.mcmaster.ca/"
+            target="_blank"
             rel="noopener noreferrer"
             className="relative w-[297px] h-[69px] flex items-center justify-center hover:opacity-80 transition-opacity"
           >
@@ -114,9 +61,9 @@ export default function Home() {
             />
           </a>
           {/* Paul R. MacPherson Institute Logo */}
-          <a 
-            href="https://mi.mcmaster.ca/" 
-            target="_blank" 
+          <a
+            href="https://mi.mcmaster.ca/"
+            target="_blank"
             rel="noopener noreferrer"
             className="relative w-[388px] h-[69px] flex items-center justify-center hover:opacity-80 transition-opacity"
           >
@@ -181,9 +128,7 @@ function CourseCard({ course }: { course: Course }) {
         </button>
         <button className="flex items-center justify-center px-6 py-3 h-11 bg-[#7A003C] rounded-lg text-white text-base font-semibold leading-5 font-['Poppins'] hover:bg-[#8a004c]">
           Resume
-          <svg className="w-5 h-5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-          </svg>
+          <ChevronRight className="w-5 h-5 ml-1" />
         </button>
       </div>
     </div>
