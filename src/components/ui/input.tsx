@@ -36,7 +36,6 @@ function Input({
         {...props}
         />
         {error && <AlertTriangle className="-translate-x-10 text-primary" />}
-        <Button>Text</Button>
         </div>
         {error && errorMessage && <Label className="text-sm px-1 text-destructive">{errorMessage}</Label>}
       </div>
