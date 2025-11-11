@@ -3,7 +3,6 @@
 import { Label } from "@/components/ui/label";
 import {
   Pagination,
-  PaginationItem,
   PaginationNext,
   PaginationPrevious,
   PaginationLink,
@@ -30,8 +29,8 @@ import { Header } from "@/components/Header";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Card, CardAction, CardContent, CardDescription, CardHeader } from "@/components/ui/card";
 import CourseCard from "@/components/CourseCard";
+import UnitsAccordion from "@/components/UnitsAccordion";
 
 interface QuestionRow {
   question: string;
@@ -158,6 +157,13 @@ export default function Home() {
         </Table>
         <div className="h-[100px]"></div>
         <CourseCard course={{code: "CS101", name: "Introduction to Computer Science", year: 2024, semester: 1}} progress={25} />
+        <div className="h-[100px]"></div>
+        <UnitsAccordion units={
+          [
+            {name: "Introduction", number: "1", unitAbilityScore: -0.1, subtopics: [{name: "What is Computer Science?", attempted: true, abilityScore: -0.1}]},
+            {name: "Programming Basics", number: "2", subtopics: [{name: "Variables"}, {name: "Control Structures"}]}
+          ]
+          }/>
         <div className="h-[100px]"></div>
       </div>
     </main>

@@ -3,6 +3,7 @@ type Course = {
     name: string;
     year: number;
     semester: number;
+    units?: Unit[];
 }
 
 export default Course;

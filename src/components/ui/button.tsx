@@ -35,6 +35,8 @@ interface ButtonProps
   asChild?: boolean;
   leftIcon?: LucideIcon;
   rightIcon?: LucideIcon;
+  leftClasses?: string;
+  rightClasses?: string;
 }
 
 function Button({
@@ -43,6 +45,8 @@ function Button({
   iconOnly,
   asChild = false,
   leftIcon: LeftIcon,
+  leftClasses,
+  rightClasses,
   rightIcon: RightIcon,
   children,
   ...props
@@ -56,9 +60,9 @@ function Button({
         buttonVariants({ variant, iconOnly, className }))}
       {...props}
     >
-      {LeftIcon && <LeftIcon strokeWidth={strokeWidth} />}
+      {LeftIcon && <LeftIcon strokeWidth={strokeWidth} className={leftClasses} />}
       {children}
-      {RightIcon && <RightIcon strokeWidth={strokeWidth} />}
+      {RightIcon && <RightIcon strokeWidth={strokeWidth} className={rightClasses} />}
       {variant === "tertiary" && (
         <ArrowRight
           className={!props.disabled ? "text-tertiary-hover-foreground" : ""}
