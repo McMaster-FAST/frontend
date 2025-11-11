@@ -30,6 +30,8 @@ import { Header } from "@/components/Header";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Card, CardAction, CardContent, CardDescription, CardHeader } from "@/components/ui/card";
+import CourseCard from "@/components/CourseCard";
 
 interface QuestionRow {
   question: string;
@@ -154,6 +156,9 @@ export default function Home() {
           ))}
           </TableBody>
         </Table>
+        <div className="h-[100px]"></div>
+        <CourseCard course={{code: "CS101", name: "Introduction to Computer Science", year: 2024, semester: 1}} progress={25} />
+        <div className="h-[100px]"></div>
       </div>
     </main>
   );
