@@ -6,7 +6,7 @@ import { LucideIcon, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md font-poppins text-md font-medium transition-all hover:cursor-pointer disabled:text-disabled-secondary disabled:pointer-events-none focus-visible:ring-ring/30 focus-visible:ring-primary/50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md font-poppins text-md font-medium transition-all hover:cursor-pointer disabled:text-disabled-secondary disabled:pointer-events-none focus:ring-ring/30 focus:ring-primary/50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus:border-ring focus:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
   {
     variants: {
       variant: {
@@ -15,7 +15,7 @@ const buttonVariants = cva(
         secondary:
           "bg-secondary text-secondary-foreground shadow-[inset_0_0_0_2px_var(--color-secondary-foreground)] hover:bg-secondary-hover hover:text-background disabled:bg-disabled-primary disabled:shadow-[inset_0_0_0_2px_var(--color-disabled-secondary)]",
         tertiary:
-          "hover:bg-tertiary text-tertiary-foreground hover:text-tertiary-hover-foreground focus-visible:ring-0"
+          "hover:bg-tertiary text-tertiary-foreground hover:text-tertiary-hover-foreground focus:ring-0"
       },
       iconOnly: {
         true: "px-3 py-3",
