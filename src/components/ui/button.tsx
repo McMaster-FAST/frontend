@@ -13,14 +13,18 @@ const buttonVariants = cva(
         primary:
           "bg-primary text-primary-foreground hover:bg-primary-hover hover:text-foreground disabled:bg-disabled-primary",
         secondary:
-
           "bg-secondary text-secondary-foreground shadow-[inset_0_0_0_2px_var(--color-secondary-foreground)] hover:bg-secondary-hover hover:text-background disabled:bg-disabled-primary disabled:shadow-[inset_0_0_0_2px_var(--color-disabled-secondary)]",
         tertiary:
           "hover:bg-tertiary text-tertiary-foreground hover:text-tertiary-hover-foreground focus-visible:ring-0"
+      },
+      iconOnly: {
+        true: "px-3 py-3",
+        false: "px-6 py-3"
       }
     },
     defaultVariants: {
       variant: "primary",
+      iconOnly: false
     },
   }
 );
@@ -31,16 +35,15 @@ interface ButtonProps
   asChild?: boolean;
   leftIcon?: LucideIcon;
   rightIcon?: LucideIcon;
-  iconOnly?: boolean;
 }
 
 function Button({
   className,
   variant,
+  iconOnly,
   asChild = false,
   leftIcon: LeftIcon,
   rightIcon: RightIcon,
-  iconOnly = false,
   children,
   ...props
 }: ButtonProps) {
@@ -50,9 +53,7 @@ function Button({
     <Comp
       data-slot="button"
       className={cn(
-          iconOnly ? "p-3" : "px-6 py-3",
-        buttonVariants({ variant, className })
-      )}
+        buttonVariants({ variant, iconOnly, className }))}
       {...props}
     >
       {LeftIcon && <LeftIcon strokeWidth={strokeWidth} />}
