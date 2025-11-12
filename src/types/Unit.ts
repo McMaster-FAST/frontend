@@ -1,4 +1,4 @@
-type Unit = {
+interface Unit {
     name: string;
     number: string;
     unitAbilityScore?: number;

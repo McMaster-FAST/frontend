@@ -6,5 +6,3 @@ enum AbilityLevel {
     PROFICIENT = "Proficient",
     EXEMPLARY = "Exemplary"
 }
-
-export default AbilityLevel;

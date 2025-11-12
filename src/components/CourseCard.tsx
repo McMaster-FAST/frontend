@@ -1,5 +1,4 @@
-import { Card, CardAction, CardContent, CardFooter, CardHeader } from "./ui/card";
-import Course from "@/types/Course";
+import { Card, CardContent, CardFooter, CardHeader } from "./ui/card";
 import { Progress } from "./ui/progress";
 import { ArrowRight } from "lucide-react";
 import { Button } from "./ui/button";
