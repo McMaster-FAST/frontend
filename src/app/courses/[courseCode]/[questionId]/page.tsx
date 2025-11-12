@@ -1,9 +1,9 @@
 "use client";
 
-import {useState} from "react";
-import {useParams, useRouter} from "next/navigation";
-import {ChevronRight, Flag} from "lucide-react";
-import {Header} from "@/components/Header";
+import { useState } from "react";
+import { useParams, useRouter } from "next/navigation";
+import { ChevronRight, Flag, FlagIcon } from "lucide-react";
+import { Header } from "@/components/Header";
 import {
   getQuestionByCourseAndId,
   getNextQuestionId,
@@ -12,6 +12,43 @@ import {
   parseQuestionContent,
   type Question,
 } from "@/lib/temp/questionData";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@radix-ui/react-label";
+import { Button } from "@/components/ui/button";
+
+const courses: Course[] = [
+  {
+    code: "CHEM 1A03",
+    name: "Introductory Chemistry I",
+    year: 2025,
+    semester: 1,
+  },
+  {
+    code: "CHEM 1AA3",
+    name: "Introductory Chemistry II",
+    year: 2025,
+    semester: 2,
+  },
+  {
+    code: "KINESIOL 1AA3",
+    name: "Human Anatomy and Physiology II",
+    year: 2025,
+    semester: 2,
+  },
+  {
+    code: "HISTORY 3XX3",
+    name: "Human Rights in History",
+    year: 2025,
+    semester: 2,
+  },
+  { code: "COMPSCI 2DB3", name: "Databases", year: 2025, semester: 2 },
+  {
+    code: "ECON 1BB3",
+    name: "Introducotry Macroeconomics",
+    year: 2025,
+    semester: 2,
+  },
+];
 
 export default function QuestionPage() {
   const params = useParams();
@@ -39,7 +76,7 @@ export default function QuestionPage() {
   if (!question || !unit || !course) {
     return (
       <div className="flex min-h-screen flex-col bg-white">
-        <Header />
+        <Header userId="exampleUser" userCourses={courses} />
         <main className="flex-1 p-[25px]">
           <p className="text-[#495965]">
             Question not found
@@ -54,7 +91,7 @@ export default function QuestionPage() {
     );
   }
 
-  const {text: questionText, molecularFormulae} = parseQuestionContent(
+  const { text: questionText, molecularFormulae } = parseQuestionContent(
     question.content
   );
 
@@ -81,8 +118,7 @@ export default function QuestionPage() {
 
   return (
     <div className="flex min-h-screen flex-col bg-white pb-24">
-      <Header />
-
+      <Header userId="exampleUser" userCourses={courses} />
       <main className="flex-1 p-[25px]">
         {/* Course Information */}
         <div className="flex items-center gap-2 mb-[10px]">
@@ -109,7 +145,7 @@ export default function QuestionPage() {
                   <span
                     key={index}
                     className="text-black text-base font-normal leading-[16px]"
-                    style={{fontFamily: "'STIX Two Math', serif"}}
+                    style={{ fontFamily: "'STIX Two Math', serif" }}
                   >
                     {formula}
                   </span>
@@ -156,7 +192,7 @@ export default function QuestionPage() {
                     {/* Option Text */}
                     <span
                       className="text-black text-base font-normal leading-[16px]"
-                      style={{fontFamily: "'STIX Two Math', serif"}}
+                      style={{ fontFamily: "'STIX Two Math', serif" }}
                     >
                       {option.content}
                     </span>
@@ -181,7 +217,7 @@ export default function QuestionPage() {
                   </span>
                   <span
                     className="text-black text-base font-normal leading-[16px]"
-                    style={{fontFamily: "'STIX Two Math', serif"}}
+                    style={{ fontFamily: "'STIX Two Math', serif" }}
                   >
                     {correctAnswerOption?.content}
                   </span>
@@ -205,59 +241,31 @@ export default function QuestionPage() {
       {/* Fixed Bottom Action Bar */}
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-[#DBDBDD] px-[25px] py-4 shadow-[0px_-2px_5px_rgba(0,0,0,0.1)]">
         <div className="flex justify-between items-center max-w-[1440px] mx-auto">
-          {/* Left Side - Flag Button */}
-          <div className="w-11 h-11">
-            <button className="flex items-center justify-center w-11 h-11 p-3 bg-[#7A003C] rounded-lg hover:bg-[#8a004c]">
-              <Flag className="w-5 h-5 text-[#F5F5F5]" />
-            </button>
-          </div>
+            <Button variant="primary" iconOnly leftIcon={FlagIcon}/>
 
           {/* Right Side - Save, Skip, Submit / Next Question */}
           <div className="flex items-center gap-2">
             {!isSubmitted ? (
               <>
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={saveForLater}
-                    onChange={(e) => setSaveForLater(e.target.checked)}
-                    className="w-5 h-5 rounded border border-[#495965] bg-white"
-                    style={{borderRadius: "6px"}}
-                  />
-                  <span className="text-black text-base font-semibold leading-5 font-['Poppins']">
-                    Save for Later
-                  </span>
-                </label>
-                <button
-                  disabled={isSubmitted}
-                  className={`flex items-center justify-center px-6 py-3 h-11 rounded-lg text-base font-semibold leading-5 font-['Poppins'] ${
-                    isSubmitted
-                      ? "bg-[#DBDBDD] border-2 border-[rgba(79,89,95,0.5)] text-[rgba(79,89,95,0.5)] cursor-not-allowed"
-                      : "bg-white border-2 border-[#7A003C] text-[#7A003C] hover:bg-[#F5F5F5]"
-                  }`}
-                >
-                  Skip
-                </button>
-                <button
+                <Checkbox
+                  checked={saveForLater}
+                  onCheckedChange={(checked) => setSaveForLater(!!checked)}
+                  id="saveForLater"
+                />
+                <Label htmlFor="saveForLater">Save for later</Label>
+                <Button variant="secondary">Skip</Button>
+                <Button
+                  variant="primary"
                   onClick={handleSubmit}
                   disabled={selectedOptionId === null || isSubmitted}
-                  className={`flex items-center justify-center px-6 py-3 h-11 rounded-lg text-base font-semibold leading-5 font-['Poppins'] ${
-                    selectedOptionId === null || isSubmitted
-                      ? "bg-[#DBDBDD] text-[rgba(79,89,95,0.5)] cursor-not-allowed"
-                      : "bg-[#7A003C] text-white hover:bg-[#8a004c]"
-                  }`}
                 >
                   Submit
-                </button>
+                </Button>
               </>
             ) : (
-              <button
-                onClick={handleNextQuestion}
-                className="flex items-center justify-center px-6 py-3 h-11 bg-[#7A003C] rounded-lg text-white text-base font-semibold leading-5 font-['Poppins'] hover:bg-[#8a004c]"
-              >
+              <Button variant="primary" onClick={handleNextQuestion} rightIcon={ChevronRight}>
                 Next Question
-                <ChevronRight className="w-5 h-5 ml-1" />
-              </button>
+              </Button>
             )}
           </div>
         </div>
