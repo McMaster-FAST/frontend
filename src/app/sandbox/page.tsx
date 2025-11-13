@@ -31,6 +31,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import CourseCard from "@/components/CourseCard";
 import UnitsAccordion from "@/components/UnitsAccordion";
+import { Questions } from "@/components/Questions";
 
 interface QuestionRow {
   question: string;
@@ -165,6 +166,7 @@ export default function Home() {
           ]
           }/>
         <div className="h-[100px]"></div>
+        <Questions />
       </div>
     </main>
   );
