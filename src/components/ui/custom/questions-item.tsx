@@ -5,6 +5,7 @@ import { Progress } from "@/components/ui/progress";
 import { Card, CardAction, CardContent, CardHeader } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { EllipsisIcon } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 import {
   DropdownMenu,
@@ -15,9 +16,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 interface QuestionItemProps extends React.HTMLAttributes<HTMLDivElement> {
-  title: string;
-  difficulty: number;
-  location: string;
+  question: Question;
   onPreview: () => void;
   onEdit: () => void;
   onViewComments: () => void;
@@ -25,9 +24,7 @@ interface QuestionItemProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 function QuestionItem({
-  title,
-  difficulty,
-  location,
+  question,
   onPreview,
   onEdit,
   onViewComments,
@@ -38,18 +35,18 @@ function QuestionItem({
   return (
     <Card className="flex flex-row w-full">
       <div className="flex-1 w-full items-center">
-        <CardHeader className="whitespace-nowrap truncate block">{title}</CardHeader>
-        <CardContent className="flex flex-row gap-4">
-          <div className="flex-1">
-            <Progress value={difficulty} />
-            <span className="text-sm text-dark-gray ml-2">
-              Rating: {(difficulty / 100).toFixed(2)}
-            </span>
+        <CardHeader className="whitespace-nowrap truncate block">{question.content}</CardHeader>
+        <CardContent className="flex flex-col gap-1">
+          <Progress value={question.difficulty} />
+          <div className="flex flex-row gap-2">
+            <Badge variant="secondary">Rating: {question.difficulty}</Badge>
+            {question.is_flagged && <Badge variant="default">Flagged</Badge>}
+            {!question.is_verified && <Badge variant="default">Unverified</Badge>}
           </div>
         </CardContent>
       </div>
       <div className="flex flex-1 justify-center items-center">
-        <Label>{location}</Label>
+        <Label>{question.unit + " - " + question.subtopic}</Label>
       </div>
       
 

@@ -10,49 +10,80 @@ import { ArrowRight, FilterIcon } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
 
-const mockQuestions = [
+const mockQuestions: Question[] = [
   {
-    id: "1",
-    title: "What is your favourite flavour of ice cream",
+    content: "What is your favourite flavour of ice cream",
     difficulty: 95,
     unit: "Unit 1",
     subtopic: "Chapter 1",
+    options:[],
+    course: "",
+    serial_number: "1",
+    is_active: true,
+    is_flagged: false,
+    is_verified: true,
   },
   {
-    id: "2",
-    title:
+    content:
       "This is a super long question that has a lot of text in it and will get truncated with ellipses if it is long enough",
     difficulty: 95,
     unit: "Unit 1",
     subtopic: "Chapter 1",
+    options:[],
+    course: "",
+    serial_number: "2",
+    is_active: true,
+    is_flagged: true,
+    is_verified: true,
+
   },
   {
-    id: "3",
-    title: "Question #",
+    content: "Another one",
     difficulty: 95,
     unit: "Unit 1",
     subtopic: "Chapter 2",
+    options:[],
+    course: "",
+    serial_number: "3",
+    is_active: true,
+    is_flagged: true,
+    is_verified: false,
   },
   {
-    id: "4",
-    title: "Question #",
+    content: "Question #",
     difficulty: 95,
     unit: "Unit 1",
     subtopic: "Chapter 2",
+    options:[],
+    course: "",
+    serial_number: "4",
+    is_active: true,
+    is_flagged: false,
+    is_verified: false,
   },
   {
-    id: "5",
-    title: "Question #",
+    content: "More",
     difficulty: 95,
     unit: "Unit 1",
     subtopic: "Chapter 2",
+    options:[],
+    course: "",
+    serial_number: "5",
+    is_active: true,
+    is_flagged: false,
+    is_verified: true,
   },
   {
-    id: "6",
-    title: "Question #",
+    content: "Not real",
     difficulty: 95,
     unit: "Unit 1",
     subtopic: "Chapter 2",
+    options:[],
+    course: "",
+    serial_number: "6",
+    is_active: true,
+    is_flagged: false,
+    is_verified: true,
   },
 ];
 
@@ -159,16 +190,14 @@ export function Questions() {
             <div className="flex flex-col gap-4">
               {mockQuestions.map((question) => (
                 <QuestionItem
-                  key={question.id}
-                  title={question.title}
-                  difficulty={question.difficulty}
-                  location={`${question.unit} - ${question.subtopic}`}
-                  onPreview={() => console.log("Preview:", question.id)}
-                  onEdit={() => console.log("Edit:", question.id)}
+                  key={question.serial_number}
+                  question={question}
+                  onPreview={() => console.log("Preview:", question.serial_number)}
+                  onEdit={() => console.log("Edit:", question.serial_number)}
                   onViewComments={() =>
-                    console.log("View Comments:", question.id)
+                    console.log("View Comments:", question.serial_number)
                   }
-                  onDelete={() => console.log("Delete:", question.id)}
+                  onDelete={() => console.log("Delete:", question.serial_number)}
                 />
               ))}
             </div>
