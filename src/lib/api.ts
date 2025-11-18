@@ -15,20 +15,12 @@ export async function ping() {
 
 // TODO: Update endpoint URL when backend is ready
 export async function uploadQuestions(file: File) {
-  // TODO: Remove this block when backend is ready
-  if (USE_MOCK) {
-    console.log("Mock upload:", file.name);
-    // Simulate upload delay
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    return { success: true, message: "Mock upload successful" };
-  }
-
-  // TODO Uncomment when backend is ready
   const formData = new FormData();
   formData.append("file", file);
+  formData.append("group_name", "testing");
 
-  const response = await fetch(`${API_BASE_URL}/api/questions/upload/`, {
-    method: "POST",
+  const response = await fetch(`${API_BASE_URL}/api/core/upload/`, {
+    method: "PUT",
     body: formData,
   });
 

@@ -7,16 +7,16 @@ import {
   NavigationMenuLink,
   NavigationMenuList,
   NavigationMenuTrigger,
-} from "./ui/navigation-menu";
-import { Button } from "./ui/button";
-import { Label } from "./ui/label";
+} from "@/components/ui/navigation-menu";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 
-interface HeaderProps {
+interface MacFastHeaderProps {
   userId?: string;
   userCourses?: Course[];
 }
 
-export function Header({ userId, userCourses }: HeaderProps) {
+export function MacFastHeader({ userId, userCourses }: MacFastHeaderProps) {
   return (
     <header className="w-full h-[80px] flex border-b-3 border-gold items-center justify-end px-8 bg-primary text-white">
       <div>

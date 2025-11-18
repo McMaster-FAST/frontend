@@ -1,7 +1,7 @@
-import { Card, CardContent, CardFooter, CardHeader } from "./ui/card";
-import { Progress } from "./ui/progress";
+import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
 import { ArrowRight } from "lucide-react";
-import { Button } from "./ui/button";
+import { Button } from "@/components/ui/button";
 
 type CourseCardProps = {
     course: Course;

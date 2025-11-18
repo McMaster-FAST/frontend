@@ -1,8 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import {Header} from "@/components/Header";
-import CourseCard from "@/components/CourseCard";
+import {MacFastHeader} from "@/components/ui/custom/macfast-header";
+import CourseCard from "@/components/ui/custom/course-card";
 
 const courses: Course[] = [
   { code: "CHEM 1A03", name: "Introductory Chemistry I", year: 2025, semester: 1},
@@ -16,7 +16,7 @@ const courses: Course[] = [
 export default function Home() {
   return (
     <div className="flex min-h-screen flex-col bg-white">
-      <Header />
+      <MacFastHeader />
 
       {/* Main Content */}
       <main className="flex-1 p-[25px]">

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { ChevronRight, Flag, FlagIcon } from "lucide-react";
-import { Header } from "@/components/Header";
+import { MacFastHeader } from "@/components/ui/custom/macfast-header";
 import {
   getQuestionByCourseAndId,
   getNextQuestionId,
@@ -76,7 +76,7 @@ export default function QuestionPage() {
   if (!question || !unit || !course) {
     return (
       <div className="flex min-h-screen flex-col bg-white">
-        <Header userId="exampleUser" userCourses={courses} />
+        <MacFastHeader userId="exampleUser" userCourses={courses} />
         <main className="flex-1 p-[25px]">
           <p className="text-[#495965]">
             Question not found
@@ -118,7 +118,7 @@ export default function QuestionPage() {
 
   return (
     <div className="flex min-h-screen flex-col bg-white pb-24">
-      <Header userId="exampleUser" userCourses={courses} />
+      <MacFastHeader userId="exampleUser" userCourses={courses} />
       <main className="flex-1 p-[25px]">
         {/* Course Information */}
         <div className="flex items-center gap-2 mb-[10px]">

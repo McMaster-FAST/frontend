@@ -6,4 +6,7 @@ interface Question {
   is_active: boolean;
   is_verified: boolean;
   options: QuestionOption[];
+  course: string;
+  unit: string;
+  subtopic: string;
 };

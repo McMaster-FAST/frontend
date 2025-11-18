@@ -25,13 +25,13 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
-import { Header } from "@/components/Header";
+import { MacFastHeader } from "@/components/ui/custom/macfast-header";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import CourseCard from "@/components/CourseCard";
-import UnitsAccordion from "@/components/UnitsAccordion";
-import { Questions } from "@/components/Questions";
+import CourseCard from "@/components/ui/custom/course-card";
+import UnitsAccordion from "@/components/ui/custom/unit-accordion";
+import { Questions } from "@/app/courses/[courseCode]/dashboard/tabs/questions-tab";
 
 interface QuestionRow {
   question: string;
@@ -63,7 +63,7 @@ export default function Home() {
   return (
     <main>
       <div>
-        <Header userId="wardelp" userCourses={[{ code: "MATH101", name: "Calculus I", year: 2025, semester: 1}]} />
+        <MacFastHeader userId="wardelp" userCourses={[{ code: "MATH101", name: "Calculus I", year: 2025, semester: 1}]} />
         <Button variant="primary">Primary</Button>
         <Button variant="secondary">Secondary</Button>
         <Button variant="tertiary">Tertiary</Button>

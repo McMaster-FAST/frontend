@@ -1,12 +1,11 @@
-import AbilityLevel from "@/types/AbilityLevel";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "./ui/accordion";
-import { Button } from "./ui/button";
-import { Progress } from "./ui/progress";
+} from "@/components/ui/accordion";
+import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
 
 interface UnitsAccordionProps {
   units?: Unit[];
