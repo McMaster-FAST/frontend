@@ -37,7 +37,7 @@ function QuestionItem({
       <div className="flex-1 w-full items-center">
         <CardHeader className="whitespace-nowrap truncate block">{question.content}</CardHeader>
         <CardContent className="flex flex-col gap-1">
-          <Progress value={question.difficulty} />
+          <Progress value={question.difficulty * 100} />
           <div className="flex flex-row gap-2">
             <Badge variant="secondary">Rating: {question.difficulty}</Badge>
             {question.is_flagged && <Badge variant="default">Flagged</Badge>}

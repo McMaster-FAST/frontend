@@ -5,7 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 function InstructorDashboardPage() {
     return (
         <>
-        <MacFastHeader userId="wardelp" userCourses={[{ code: "MATH101", name: "Calculus I", year: 2025, semester: 1}]} />
+        <MacFastHeader />
         <h2 className="text-2xl font-bold text-foreground m-5">Hello, Peter</h2>
         <main className="flex-1 m-5">
             <Tabs className="w-full" defaultValue="questions">

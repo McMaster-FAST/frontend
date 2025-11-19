@@ -1,7 +1,7 @@
 "use client";
 
 import { getAllQuestions, uploadQuestions } from "@/lib/api";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Progress } from "@/components/ui/progress";
 import { QuestionItem } from "@/components/ui/custom/questions-item";
@@ -10,89 +10,12 @@ import { ArrowRight, FilterIcon } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
 
-const mockQuestions: Question[] = [
-  {
-    content: "What is your favourite flavour of ice cream",
-    difficulty: 95,
-    unit: "Unit 1",
-    subtopic: "Chapter 1",
-    options:[],
-    course: "",
-    serial_number: "1",
-    is_active: true,
-    is_flagged: false,
-    is_verified: true,
-  },
-  {
-    content:
-      "This is a super long question that has a lot of text in it and will get truncated with ellipses if it is long enough",
-    difficulty: 95,
-    unit: "Unit 1",
-    subtopic: "Chapter 1",
-    options:[],
-    course: "",
-    serial_number: "2",
-    is_active: true,
-    is_flagged: true,
-    is_verified: true,
-
-  },
-  {
-    content: "Another one",
-    difficulty: 95,
-    unit: "Unit 1",
-    subtopic: "Chapter 2",
-    options:[],
-    course: "",
-    serial_number: "3",
-    is_active: true,
-    is_flagged: true,
-    is_verified: false,
-  },
-  {
-    content: "Question #",
-    difficulty: 95,
-    unit: "Unit 1",
-    subtopic: "Chapter 2",
-    options:[],
-    course: "",
-    serial_number: "4",
-    is_active: true,
-    is_flagged: false,
-    is_verified: false,
-  },
-  {
-    content: "More",
-    difficulty: 95,
-    unit: "Unit 1",
-    subtopic: "Chapter 2",
-    options:[],
-    course: "",
-    serial_number: "5",
-    is_active: true,
-    is_flagged: false,
-    is_verified: true,
-  },
-  {
-    content: "Not real",
-    difficulty: 95,
-    unit: "Unit 1",
-    subtopic: "Chapter 2",
-    options:[],
-    course: "",
-    serial_number: "6",
-    is_active: true,
-    is_flagged: false,
-    is_verified: true,
-  },
-];
-
 export function Questions() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [error, setError] = useState<string | null>(null);
-  const [uploadedQuestions, setUploadedQuestions] = useState<Question[]>([]);
+  const [questions, setQuestions] = useState<Question[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleUploadClick = () => {
@@ -120,12 +43,12 @@ export function Questions() {
       }, 100);
 
       await uploadQuestions(file);
+      setTimeout(async () => {await fetchQuestions()}, 2000); 
+
       setUploadProgress(100);
       clearInterval(progressInterval);
-
-      // After upload, fetch all questions
-      const questions = await getAllQuestions();
-      setUploadedQuestions(questions);
+      
+      console.log(questions);
     } catch (error) {
       console.error("Upload failed:", error);
       setError(
@@ -140,6 +63,23 @@ export function Questions() {
       }
     }
   };
+
+  async function fetchQuestions() {
+      getAllQuestions()
+      .then((data) => {
+        setQuestions(data.questions);
+      })
+      .catch((error) => {
+          console.error("Failed to fetch questions:", error);
+          setError(
+            error instanceof Error ? error.message : "Failed to fetch questions"
+          );
+      });
+  }
+  
+  useEffect(() => {
+    fetchQuestions();
+  }, []);
 
   return (
     <div className="flex flex-col max-h-full">
@@ -188,7 +128,7 @@ export function Questions() {
       <div className="flex-1">
         <ScrollArea className="h-full">
             <div className="flex flex-col gap-4">
-              {mockQuestions.map((question) => (
+              {questions.map((question) => (
                 <QuestionItem
                   key={question.serial_number}
                   question={question}
