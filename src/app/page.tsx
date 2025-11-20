@@ -3,14 +3,45 @@
 import Image from "next/image";
 import {MacFastHeader} from "@/components/ui/custom/macfast-header";
 import CourseCard from "@/components/ui/custom/course-card";
+import {Course} from "@/types";
 
-const courses: Course[] = [
-  { code: "CHEM 1A03", name: "Introductory Chemistry I", year: 2025, semester: 1},
-  { code: "CHEM 1AA3", name: "Introductory Chemistry II", year: 2025, semester: 2},
-  { code: "KINESIOL 1AA3", name: "Human Anatomy and Physiology II", year: 2025, semester: 2},
-  { code: "HISTORY 3XX3", name: "Human Rights in History", year: 2025, semester: 1},
-  { code: "COMPSCI 2DB3", name: "Databases", year: 2025, semester: 1},
-  { code: "ECON 1BB3", name: "Introducotry Macroeconomics", year: 2025, semester: 1},
+export const courses: Course[] = [
+  {
+    code: "CHEM 1A03",
+    name: "Introductory Chemistry I",
+    year: 2025,
+    semester: 1,
+  },
+  {
+    code: "CHEM 1AA3",
+    name: "Introductory Chemistry II",
+    year: 2025,
+    semester: 2,
+  },
+  {
+    code: "KINESIOL 1AA3",
+    name: "Human Anatomy and Physiology II",
+    year: 2025,
+    semester: 2,
+  },
+  {
+    code: "HISTORY 3XX3",
+    name: "Human Rights in History",
+    year: 2025,
+    semester: 1,
+  },
+  {
+    code: "COMPSCI 2DB3",
+    name: "Databases",
+    year: 2025,
+    semester: 1,
+  },
+  {
+    code: "ECON 1BB3",
+    name: "Introducotry Macroeconomics",
+    year: 2025,
+    semester: 1,
+  },
 ];
 
 export default function Home() {

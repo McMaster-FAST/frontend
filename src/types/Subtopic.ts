@@ -1,5 +1,5 @@
-interface Subtopic {
-    attempted?: boolean;
-    name: string;
-    abilityScore?: number;
+export interface Subtopic {
+  attempted?: boolean;
+  name: string;
+  abilityScore?: number;
 }

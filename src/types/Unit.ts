@@ -1,6 +1,8 @@
-interface Unit {
-    name: string;
-    number: string;
-    unitAbilityScore?: number;
-    subtopics?: Subtopic[];
+import { Subtopic } from "./Subtopic";
+
+export interface Unit {
+  name: string;
+  number: string;
+  unitAbilityScore?: number;
+  subtopics?: Subtopic[];
 }

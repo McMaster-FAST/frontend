@@ -1,4 +1,6 @@
-interface Question {
+import { QuestionOption } from "./QuestionOption";
+
+export interface Question {
   serial_number: string;
   content: string;
   difficulty: number;
@@ -9,4 +11,4 @@ interface Question {
   course: string;
   unit: string;
   subtopic: string;
-};
+}

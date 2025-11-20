@@ -1,20 +1,20 @@
 "use client";
 
-import { Label } from "@/components/ui/label";
+import {Label} from "@/components/ui/label";
 import {
   Pagination,
   PaginationNext,
   PaginationPrevious,
   PaginationLink,
 } from "@/components/ui/pagination";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Textarea } from "@/components/ui/textarea";
+import {RadioGroup, RadioGroupItem} from "@/components/ui/radio-group";
+import {Textarea} from "@/components/ui/textarea";
 import {
   DropdownMenuGroup,
   DropdownMenuLabel,
 } from "@radix-ui/react-dropdown-menu";
-import { Progress } from "@/components/ui/progress";
-import { AlertCircle, ChevronDown } from "lucide-react";
+import {Progress} from "@/components/ui/progress";
+import {AlertCircle, ChevronDown} from "lucide-react";
 import React from "react";
 import {
   Table,
@@ -24,14 +24,19 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Input } from "@/components/ui/input";
-import { MacFastHeader } from "@/components/ui/custom/macfast-header";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
+import {Input} from "@/components/ui/input";
+import {MacFastHeader} from "@/components/ui/custom/macfast-header";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {Button} from "@/components/ui/button";
+import {Checkbox} from "@/components/ui/checkbox";
 import CourseCard from "@/components/ui/custom/course-card";
 import UnitsAccordion from "@/components/ui/custom/unit-accordion";
-import { Questions } from "@/app/courses/[courseCode]/dashboard/tabs/questions-tab";
+import {Questions} from "@/app/courses/[courseCode]/dashboard/tabs/questions-tab";
 
 interface QuestionRow {
   question: string;
@@ -63,7 +68,12 @@ export default function Home() {
   return (
     <main>
       <div>
-        <MacFastHeader userId="wardelp" userCourses={[{ code: "MATH101", name: "Calculus I", year: 2025, semester: 1}]} />
+        <MacFastHeader
+          userId="wardelp"
+          userCourses={[
+            {code: "MATH101", name: "Calculus I", year: 2025, semester: 1},
+          ]}
+        />
         <Button variant="primary">Primary</Button>
         <Button variant="secondary">Secondary</Button>
         <Button variant="tertiary">Tertiary</Button>
@@ -71,7 +81,7 @@ export default function Home() {
 
         <Checkbox id="checkbox-1" />
         <Label htmlFor="checkbox-1">Check me!</Label>
-        
+
         <RadioGroup id="radio-group-1">
           <RadioGroupItem value="option1" id="option1" />
           <Label htmlFor="option1">Check me!</Label>
@@ -145,26 +155,49 @@ export default function Home() {
             </TableRow>
           </TableHeader>
           <TableBody>
-          {questionsData.map((question, index) => (
-            <TableRow key={index}>
-              <TableCell>{question.question}</TableCell>
-              <TableCell>{question.difficulty}</TableCell>
-              <TableCell>{question.usage}</TableCell>
-              <TableCell>{question.flagged ? "Yes" : "No"}</TableCell>
-              <TableCell>{question.verified ? "Yes" : "No"}</TableCell>
-            </TableRow>
-          ))}
+            {questionsData.map((question, index) => (
+              <TableRow key={index}>
+                <TableCell>{question.question}</TableCell>
+                <TableCell>{question.difficulty}</TableCell>
+                <TableCell>{question.usage}</TableCell>
+                <TableCell>{question.flagged ? "Yes" : "No"}</TableCell>
+                <TableCell>{question.verified ? "Yes" : "No"}</TableCell>
+              </TableRow>
+            ))}
           </TableBody>
         </Table>
         <div className="h-[100px]"></div>
-        <CourseCard course={{code: "CS101", name: "Introduction to Computer Science", year: 2024, semester: 1}} progress={25} />
+        <CourseCard
+          course={{
+            code: "CS101",
+            name: "Introduction to Computer Science",
+            year: 2024,
+            semester: 1,
+          }}
+          progress={25}
+        />
         <div className="h-[100px]"></div>
-        <UnitsAccordion units={
-          [
-            {name: "Introduction", number: "1", unitAbilityScore: -0.1, subtopics: [{name: "What is Computer Science?", attempted: true, abilityScore: -0.1}]},
-            {name: "Programming Basics", number: "2", subtopics: [{name: "Variables"}, {name: "Control Structures"}]}
-          ]
-          }/>
+        <UnitsAccordion
+          units={[
+            {
+              name: "Introduction",
+              number: "1",
+              unitAbilityScore: -0.1,
+              subtopics: [
+                {
+                  name: "What is Computer Science?",
+                  attempted: true,
+                  abilityScore: -0.1,
+                },
+              ],
+            },
+            {
+              name: "Programming Basics",
+              number: "2",
+              subtopics: [{name: "Variables"}, {name: "Control Structures"}],
+            },
+          ]}
+        />
         <div className="h-[100px]"></div>
         <Questions />
       </div>
