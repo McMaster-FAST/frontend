@@ -54,16 +54,6 @@ export function MacFastHeader({ userId, userCourses }: MacFastHeaderProps) {
                   </NavigationMenuContent>
                 </NavigationMenuItem>
 
-                <NavigationMenuItem>
-                  <NavigationMenuLink href="#">
-                    Saved Questions
-                  </NavigationMenuLink>
-                </NavigationMenuItem>
-
-                <NavigationMenuItem>
-                  <NavigationMenuLink href="#">My Stats</NavigationMenuLink>
-                </NavigationMenuItem>
-
                 <NavigationMenuItem className="gap-2">
                   <Label>Signed in as: {userId}</Label>
                   <Button variant="primary">Logout</Button>
