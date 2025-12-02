@@ -76,7 +76,7 @@ export default function QuestionPage() {
   if (!question || !unit || !course) {
     return (
       <div className="flex min-h-screen flex-col bg-white">
-        <MacFastHeader userId="exampleUser" userCourses={courses} />
+        <MacFastHeader userCourses={courses} />
         <main className="flex-1 p-[25px]">
           <p className="text-[#495965]">
             Question not found
@@ -118,7 +118,7 @@ export default function QuestionPage() {
 
   return (
     <div className="flex min-h-screen flex-col bg-white pb-24">
-      <MacFastHeader userId="exampleUser" userCourses={courses} />
+      <MacFastHeader userCourses={courses} />
       <main className="flex-1 p-[25px]">
         {/* Course Information */}
         <div className="flex items-center gap-2 mb-[10px]">
@@ -241,7 +241,7 @@ export default function QuestionPage() {
       {/* Fixed Bottom Action Bar */}
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-[#DBDBDD] px-[25px] py-4 shadow-[0px_-2px_5px_rgba(0,0,0,0.1)]">
         <div className="flex justify-between items-center max-w-[1440px] mx-auto">
-            <Button variant="primary" iconOnly leftIcon={FlagIcon}/>
+          <Button variant="primary" iconOnly leftIcon={FlagIcon} />
 
           {/* Right Side - Save, Skip, Submit / Next Question */}
           <div className="flex items-center gap-2">
@@ -263,7 +263,11 @@ export default function QuestionPage() {
                 </Button>
               </>
             ) : (
-              <Button variant="primary" onClick={handleNextQuestion} rightIcon={ChevronRight}>
+              <Button
+                variant="primary"
+                onClick={handleNextQuestion}
+                rightIcon={ChevronRight}
+              >
                 Next Question
               </Button>
             )}
