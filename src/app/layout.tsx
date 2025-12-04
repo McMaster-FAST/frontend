@@ -2,6 +2,10 @@ import type { Metadata } from "next";
 import { Inter, Poppins } from "next/font/google";
 import "../styles/globals.css";
 
+import { authOptions } from "@/lib/auth";
+import { getServerSession } from "next-auth";
+import { Providers } from "./providers";
+
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
@@ -18,18 +22,20 @@ export const metadata: Metadata = {
   description: "MacFAST online course platform",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const session = await getServerSession(authOptions);
+
   return (
     <html lang="en">
-      <body
-        className={`${inter.variable} ${poppins.variable} antialiased`}
-      >
-        {children}
-      </body>
+      <Providers session={session}>
+        <body className={`${inter.variable} ${poppins.variable} antialiased`}>
+          {children}
+        </body>
+      </Providers>
     </html>
   );
 }
