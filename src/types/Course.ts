@@ -1,7 +1,8 @@
 interface Course {
     code: string;
     name: string;
+    description: string;
     year: number;
-    semester: number;
-    units?: Unit[];
+    semester: string;
+    units: Unit[];
 }

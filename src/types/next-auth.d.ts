@@ -9,6 +9,8 @@ declare module "next-auth" {
 
     user: {
       roles: string[];
+      // Attach courses to the session user when available
+      courses?: Course[];
     } & DefaultSession["user"];
   }
 }
@@ -19,5 +21,7 @@ declare module "next-auth/jwt" {
     // Tells JWT it can handle an accessToken
     accessToken?: string;
     roles: string[];
+    // Persist courses on the JWT so they can be exposed via the session
+    courses?: Course[];
   }
 }
