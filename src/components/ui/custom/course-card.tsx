@@ -12,19 +12,20 @@ type CourseCardProps = {
   course: Course;
   progress: number;
   onResume?: () => void;
+  onCoursePage?: () => void;
 };
 
-function CourseCard({ course, progress, onResume }: CourseCardProps) {
+function CourseCard({ course, progress, onResume, onCoursePage }: CourseCardProps) {
   return (
     <Card className="min-w-[345px]">
       <CardHeader>{course.code}</CardHeader>
       <CardContent>{course.name}</CardContent>
       <CardContent className="flex flex-col">
+        {/* TODO: Get this data from the backend */}
         <Progress className="max-w-3/4" value={progress} />
-        <p>{progress}/100</p>
       </CardContent>
       <CardFooter className="gap-2">
-        <Button variant="secondary">Course Page</Button>
+        <Button variant="secondary" onClick={onCoursePage}>Course Page</Button>
         <Button variant="primary" rightIcon={ArrowRight} onClick={onResume}>
           Resume
         </Button>

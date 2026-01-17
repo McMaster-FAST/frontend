@@ -1,9 +1,35 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { useAuthFetch } from "@/hooks/fetch_with_auth";
-import { TestTube } from "lucide-react";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+
+function getJson(response: Response) {
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+  return response.json();
+}
+
+export async function getLastStudiedSubtopicForCourse(
+  course_code: string,
+  authFetch: ReturnType<typeof useAuthFetch>
+) {
+  const response = await authFetch(
+    `/api/test-sessions/${course_code}`
+  );
+  return getJson(response);
+}
+
+export async function getUserCourses(
+  authFetch: ReturnType<typeof useAuthFetch>
+): Promise<Course[]> {
+  return authFetch(`/api/courses/`)
+    .then(getJson)
+    .then((data) => {
+      return data as Course[];
+    });
+}
 
 export async function getNextQuestion(
   courseCode: string,
@@ -19,13 +45,8 @@ export async function getNextQuestion(
       subtopic_name: subtopicName,
     }),
   })
-    .then((res) => { // Check for errors, if none get JSON
-      if (!res.ok) {
-        throw new Error(`HTTP error! status: ${res.status}`);
-      }
-      return res.json();
-    })
-    .then((response) => { // Parse question from repsonse JSON
+    .then(getJson)
+    .then((response) => {
       const question_data = response.question;
       const options = question_data.options.map((option: any) => {
         return {
@@ -108,20 +129,10 @@ export async function uploadQuestions(file: File) {
     method: "PUT",
     body: formData,
   });
-
-  if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
-  }
-
-  return response.json();
+  return getJson(response);
 }
 
 export async function getAllQuestions() {
   const response = await fetch(`${API_BASE_URL}/api/core/questions/`);
-
-  if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
-  }
-
-  return response.json();
+  return getJson(response);
 }

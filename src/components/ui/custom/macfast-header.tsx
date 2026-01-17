@@ -11,15 +11,11 @@ import {
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { signIn, signOut, useSession } from "next-auth/react";
-import { Course } from "@/lib/temp/questionData";
 
-interface MacFastHeaderProps {
-  userCourses?: Course[];
-}
 
-export function MacFastHeader({ userCourses }: MacFastHeaderProps) {
+export function MacFastHeader() {
   const { data: session, status } = useSession();
-
+  const courses: Course[] = [];
   const isLoading = status === "loading";
   const isAuthenticated = status === "authenticated";
 
@@ -36,7 +32,7 @@ export function MacFastHeader({ userCourses }: MacFastHeaderProps) {
 
       <div className="flex-1 flex items-center justify-end gap-2 h-full">
         <NavigationMenu>
-          <NavigationMenuList className="gap-4">
+          <NavigationMenuList>
             {/* Hide all user related links if not signed in */}
             {isAuthenticated && (
               <NavigationMenuItem>
@@ -45,8 +41,8 @@ export function MacFastHeader({ userCourses }: MacFastHeaderProps) {
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
                   <div className="flex flex-col gap-2 p-4 w-[200px]">
-                    {userCourses && userCourses.length > 0 ? (
-                      userCourses.map((course) => (
+                    {courses && courses.length > 0 ? (
+                      courses.map((course) => (
                         <NavigationMenuLink
                           key={course.code}
                           href={`/courses/${course.code}/dashboard`}
