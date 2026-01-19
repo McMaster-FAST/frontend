@@ -24,11 +24,11 @@ export function MacFastHeader({ userCourses }: MacFastHeaderProps) {
   const isAuthenticated = status === "authenticated";
 
   return (
-    <header className="w-full h-[80px] flex border-b-[3px] border-gold items-center justify-end px-8 bg-primary text-white">
+    <header className="w-full h-[80px] flex border-b-[3px] border-gold items-center justify-end px-8 bg-primary text-white flex-none">
       <div>
         <a
           href="/"
-          className="font-bold text-xl hover:opacity-80 transition-opacity"
+          className="font-bold font-poppins text-xl hover:opacity-80 transition-opacity"
         >
           MacFAST
         </a>
