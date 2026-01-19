@@ -3,6 +3,7 @@
 import Image from "next/image";
 import {MacFastHeader} from "@/components/ui/custom/macfast-header";
 import CourseCard from "@/components/ui/custom/course-card";
+import { redirect } from 'next/navigation';
 
 const courses: Course[] = [
   { code: "CHEM 1A03", name: "Introductory Chemistry I", year: 2025, semester: 1},
@@ -28,7 +29,7 @@ export default function Home() {
         <div className="grid grid-cols-3 gap-3 w-fit">
           {courses.map((course, index) => (
             // TODO: Link this to actual course progress
-            <CourseCard key={index} course={course} progress={75} />
+            <CourseCard key={index} course={course} progress={75}/>
           ))}
         </div>
       </main>
