@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -8,9 +9,19 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { signIn, signOut, useSession } from "next-auth/react";
+import { LogOut, User, ChevronDown } from "lucide-react"; // Removed BookOpen icon import
 import { Course } from "@/lib/temp/questionData";
 
 interface MacFastHeaderProps {
@@ -19,87 +30,127 @@ interface MacFastHeaderProps {
 
 export function MacFastHeader({ userCourses }: MacFastHeaderProps) {
   const { data: session, status } = useSession();
-
   const isLoading = status === "loading";
   const isAuthenticated = status === "authenticated";
 
   return (
-    <header className="w-full h-[80px] flex border-b-[3px] border-gold items-center justify-end px-8 bg-primary text-white">
-      <div>
-        <a
-          href="/"
-          className="font-bold text-xl hover:opacity-80 transition-opacity"
-        >
-          MacFAST
-        </a>
-      </div>
+    <header className="z-50 sticky top-0 w-full border-b-3 border-gold bg-primary text-primary-foreground shadow-md">
+      <div className="flex h-16 items-center justify-between px-20 w-full">
+        <div className="flex items-center gap-2">
+          <Link
+            href="/"
+            className="font-poppins text-xl font-bold tracking-tight hover:opacity-90 transition-opacity"
+          >
+            MacFAST
+          </Link>
+        </div>
 
-      <div className="flex-1 flex items-center justify-end gap-2 h-full">
-        <NavigationMenu>
-          <NavigationMenuList className="gap-4">
-            {/* Hide all user related links if not signed in */}
-            {isAuthenticated && (
-              <NavigationMenuItem>
-                <NavigationMenuTrigger className="bg-transparent text-base text-white hover:text-primary">
-                  My Courses
-                </NavigationMenuTrigger>
-                <NavigationMenuContent>
-                  <div className="flex flex-col gap-2 p-4 w-[200px]">
-                    {userCourses && userCourses.length > 0 ? (
-                      userCourses.map((course) => (
-                        <NavigationMenuLink
-                          key={course.code}
-                          href={`/courses/${course.code}/dashboard`}
-                          className="block p-2 hover:bg-slate-100 rounded-md"
-                        >
-                          <p className="text-sm font-bold text-foreground">
-                            {course.code}
-                          </p>
-                          <p className="text-sm text-muted-foreground">
-                            {course.name}
-                          </p>
-                        </NavigationMenuLink>
-                      ))
-                    ) : (
-                      <p className="text-sm text-muted-foreground p-2">
-                        No courses found
-                      </p>
-                    )}
-                  </div>
-                </NavigationMenuContent>
-              </NavigationMenuItem>
-            )}
+        <div className="flex items-center gap-4 w-full justify-end">
+          {isAuthenticated && (
+            <NavigationMenu>
+              <NavigationMenuList>
+                <NavigationMenuItem>
+                  <NavigationMenuTrigger className="h-9 bg-transparent text-primary-foreground hover:bg-white/10 hover:text-white focus:bg-white/10 focus:text-white data-[active]:bg-white/10 data-[state=open]:bg-white/10">
+                    My Courses
+                  </NavigationMenuTrigger>
+                  <NavigationMenuContent>
+                    <div className="flex w-[85vw] flex-col gap-1 p-2 md:w-[240px]">
+                      <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                        Active Courses
+                      </div>
+                      {userCourses && userCourses.length > 0 ? (
+                        userCourses.map((course) => (
+                          <NavigationMenuLink key={course.code} asChild>
+                            <Link
+                              href={`/courses/${course.code}/dashboard`}
+                              className="flex flex-col gap-1 rounded-md p-2 hover:bg-accent hover:text-accent-foreground transition-colors"
+                            >
+                              <div className="text-sm font-semibold leading-none">
+                                {course.code}
+                              </div>
+                              <div className="line-clamp-1 text-xs text-muted-foreground">
+                                {course.name}
+                              </div>
+                            </Link>
+                          </NavigationMenuLink>
+                        ))
+                      ) : (
+                        <div className="p-4 text-center text-sm text-muted-foreground">
+                          No courses enrolled.
+                        </div>
+                      )}
+                    </div>
+                  </NavigationMenuContent>
+                </NavigationMenuItem>
+              </NavigationMenuList>
+            </NavigationMenu>
+          )}
 
-            <NavigationMenuItem className="flex items-center gap-4">
-              {isLoading ? (
-                // State 1: Loading
-                <Skeleton className="w-[100px] h-[40px] rounded-md bg-slate-200/20" />
-              ) : isAuthenticated ? (
-                // State 2: Logged In
-                <>
-                  <span className="text-base hidden md:inline-block">
-                    Signed in as,&nbsp;
-                    <span className="font-bold">{session.user?.name}</span>
-                  </span>
-                  <Button
-                    onClick={() => signOut({ callbackUrl: "/" })}
-                    variant="secondary"
-                  >
-                    Sign Out
-                  </Button>
-                </>
-              ) : (
-                // State 3: Logged Out
+          {/* User Profile / Auth State */}
+          {isLoading ? (
+            <div className="flex items-center gap-2">
+              <Skeleton className="h-8 w-8 rounded-full bg-white/20" />
+              <Skeleton className="hidden md:block h-4 w-24 bg-white/20" />
+            </div>
+          ) : isAuthenticated ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
                 <Button
-                  onClick={() => signIn("auth0")}
-                  variant="secondary" // Changed to secondary so it pops against the primary header (it still doesn't really)
+                  variant="secondary"
+                  className="relative h-9 w-9 rounded-full p-0 ring-offset-background hover:bg-white/10 focus:ring-2 focus:ring-ring focus:ring-offset-2 ml-2"
                 >
-                  Sign In
+                  <Avatar className="h-9 w-9 border border-white/20">
+                    <AvatarImage
+                      src={session?.user?.image || ""}
+                      alt={session?.user?.name || ""}
+                      className="object-cover"
+                    />
+                    <AvatarFallback className="bg-primary-foreground text-primary font-bold">
+                      {session?.user?.name}
+                    </AvatarFallback>
+                  </Avatar>
                 </Button>
-              )}
-            </NavigationMenuItem>
-          </NavigationMenuList>
-        </NavigationMenu>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56" align="end" forceMount>
+                <DropdownMenuLabel className="font-normal">
+                  <div className="flex flex-col space-y-1">
+                    <p className="text-sm font-medium leading-none">
+                      {session?.user?.name}
+                    </p>
+                    <p className="text-xs leading-none text-muted-foreground">
+                      {session?.user?.email}
+                    </p>
+                  </div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+
+                {/* Profile Link */}
+                <DropdownMenuItem asChild>
+                  <Link href="/profile" className="cursor-pointer">
+                    <User className="mr-2 h-4 w-4" />
+                    <span>Profile</span>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  className="text-red-600 focus:text-red-600 cursor-pointer"
+                  onClick={() => signOut({ callbackUrl: "/" })}
+                >
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Log out</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <Button
+              onClick={() => signIn("auth0")}
+              variant="secondary"
+              className="ml-2 font-semibold shadow-sm"
+            >
+              Sign In
+            </Button>
+          )}
+        </div>
       </div>
     </header>
   );

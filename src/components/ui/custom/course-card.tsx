@@ -8,6 +8,7 @@ import { Progress } from "@/components/ui/progress";
 import { ArrowRight, BookOpen, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import Link from "next/link";
 
 export type Course = {
   code: string;
@@ -43,7 +44,7 @@ function CourseCard({ course, progress }: CourseCardProps) {
 
       <CardHeader className="pb-2 pt-4">
         <h3 className="line-clamp-2 min-h-[3.5rem] font-poppins text-lg font-bold leading-tight text-primary group-hover:text-primary-hover">
-          <a>{course.name}</a>
+          <Link href={`/courses/${course.code}/dashboard`}>{course.name}</Link>
         </h3>
       </CardHeader>
 
@@ -67,10 +68,10 @@ function CourseCard({ course, progress }: CourseCardProps) {
       </CardContent>
 
       <CardFooter className="flex gap-2 border-t border-dark-gray-50 bg-dark-gray-50/50 p-4">
-        <Button variant="secondary" className="flex-1 text-xs">
+        <Button variant="secondary" className="flex-1 text-xs font-bold">
           Details
         </Button>
-        <Button className="flex-1 gap-2 text-xs shadow-sm">
+        <Button className="flex-1 gap-2 text-xs shadow-sm font-bold">
           Resume <ArrowRight className="h-3 w-3" />
         </Button>
       </CardFooter>
