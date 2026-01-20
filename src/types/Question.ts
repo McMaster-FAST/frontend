@@ -1,4 +1,5 @@
 interface Question {
+  public_id: string;
   serial_number: string;
   content: string;
   difficulty: number;
@@ -10,3 +11,9 @@ interface Question {
   unit: string;
   subtopic: string;
 };
+
+interface TestQuestion {
+  public_id: string;
+  content: string;
+  options: TestQuestionOption[];
+}
