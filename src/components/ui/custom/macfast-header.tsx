@@ -2,14 +2,6 @@
 
 import Link from "next/link";
 import {
-  NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-  NavigationMenuTrigger,
-} from "@/components/ui/navigation-menu";
-import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -21,21 +13,19 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { signIn, signOut, useSession } from "next-auth/react";
-import { LogOut, User, ChevronDown } from "lucide-react"; // Removed BookOpen icon import
-import { Course } from "@/lib/temp/questionData";
+import { ChevronDown, Loader2, LogOut, User } from "lucide-react";
+import { useUserCourses } from "@/hooks/courses";
 
-interface MacFastHeaderProps {
-  userCourses?: Course[];
-}
-
-export function MacFastHeader({ userCourses }: MacFastHeaderProps) {
+export function MacFastHeader() {
+  const { courses: userCourses, isLoading: isLoadingCourses } =
+    useUserCourses();
   const { data: session, status } = useSession();
   const isLoading = status === "loading";
   const isAuthenticated = status === "authenticated";
 
   return (
     <header className="z-50 sticky top-0 w-full border-b-3 border-gold bg-primary text-primary-foreground shadow-md">
-      <div className="flex h-16 items-center justify-between px-20 w-full">
+      <div className="flex h-16 items-center justify-between mx-auto px-24 w-full">
         <div className="flex items-center gap-2">
           <Link
             href="/"
@@ -47,43 +37,53 @@ export function MacFastHeader({ userCourses }: MacFastHeaderProps) {
 
         <div className="flex items-center gap-4 w-full justify-end">
           {isAuthenticated && (
-            <NavigationMenu>
-              <NavigationMenuList>
-                <NavigationMenuItem>
-                  <NavigationMenuTrigger className="h-9 bg-transparent text-primary-foreground hover:bg-white/10 hover:text-white focus:bg-white/10 focus:text-white data-[active]:bg-white/10 data-[state=open]:bg-white/10">
-                    My Courses
-                  </NavigationMenuTrigger>
-                  <NavigationMenuContent>
-                    <div className="flex w-[85vw] flex-col gap-1 p-2 md:w-[240px]">
-                      <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                        Active Courses
-                      </div>
-                      {userCourses && userCourses.length > 0 ? (
-                        userCourses.map((course) => (
-                          <NavigationMenuLink key={course.code} asChild>
-                            <Link
-                              href={`/courses/${course.code}/dashboard`}
-                              className="flex flex-col gap-1 rounded-md p-2 hover:bg-accent hover:text-accent-foreground transition-colors"
-                            >
-                              <div className="text-sm font-semibold leading-none">
-                                {course.code}
-                              </div>
-                              <div className="line-clamp-1 text-xs text-muted-foreground">
-                                {course.name}
-                              </div>
-                            </Link>
-                          </NavigationMenuLink>
-                        ))
-                      ) : (
-                        <div className="p-4 text-center text-sm text-muted-foreground">
-                          No courses enrolled.
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="primary"
+                  className="h-9 gap-1 text-primary-foreground hover:bg-white/10 hover:text-white focus:bg-white/10 focus:text-white"
+                >
+                  My Courses
+                  <ChevronDown className="h-4 w-4 opacity-50" />
+                </Button>
+              </DropdownMenuTrigger>
+
+              <DropdownMenuContent className="w-[280px]" align="center">
+                <DropdownMenuLabel className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                  Active Courses
+                </DropdownMenuLabel>
+
+                {isLoadingCourses ? (
+                  <div className="flex h-20 items-center justify-center">
+                    <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+                  </div>
+                ) : userCourses && userCourses.length > 0 ? (
+                  userCourses.map((course) => (
+                    <DropdownMenuItem
+                      key={course.code}
+                      asChild
+                      className="focus:bg-primary-hover"
+                    >
+                      <Link
+                        href={`/courses/${course.code}/coursePage`}
+                        className="flex cursor-pointer flex-col items-start gap-1 p-2"
+                      >
+                        <div className="text-sm font-semibold leading-none">
+                          {course.code}
                         </div>
-                      )}
-                    </div>
-                  </NavigationMenuContent>
-                </NavigationMenuItem>
-              </NavigationMenuList>
-            </NavigationMenu>
+                        <div className="line-clamp-1 text-xs text-muted-foreground">
+                          {course.name}
+                        </div>
+                      </Link>
+                    </DropdownMenuItem>
+                  ))
+                ) : (
+                  <div className="p-4 text-center text-sm text-muted-foreground">
+                    No courses enrolled.
+                  </div>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
           )}
 
           {/* User Profile / Auth State */}

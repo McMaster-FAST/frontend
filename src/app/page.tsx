@@ -3,88 +3,52 @@
 import Image from "next/image";
 import { MacFastHeader } from "@/components/ui/custom/macfast-header";
 import CourseCard from "@/components/ui/custom/course-card";
-
-const courses: Course[] = [
-  {
-    code: "CHEM 1A03",
-    name: "Introductory Chemistry I",
-    year: 2025,
-    semester: "Fall",
-    description:
-      "A discussion of organic chemistry, chemical kinetics and acid-base equilibrium, with emphasis on relevant experimental techniques and solving real problems ranging from drug discovery to environmental chemistry.",
-    units: [],
-  },
-
-  {
-    code: "CHEM 1AA3",
-    name: "Introductory Chemistry II",
-    year: 2025,
-    semester: "Winter",
-    description:
-      "A discussion of organic chemistry, chemical kinetics and acid-base equilibrium, with emphasis on relevant experimental techniques and solving real problems ranging from drug discovery to environmental chemistry.",
-    units: [],
-  },
-
-  {
-    code: "KINESIOL 1AA3",
-    name: "Human Anatomy and Physiology II",
-    year: 2025,
-    semester: "Winter",
-    description:
-      "A discussion of organic chemistry, chemical kinetics and acid-base equilibrium, with emphasis on relevant experimental techniques and solving real problems ranging from drug discovery to environmental chemistry.",
-    units: [],
-  },
-
-  {
-    code: "HISTORY 3XX3",
-    name: "Human Rights in History",
-    year: 2025,
-    semester: "Fall",
-    description:
-      "A discussion of organic chemistry, chemical kinetics and acid-base equilibrium, with emphasis on relevant experimental techniques and solving real problems ranging from drug discovery to environmental chemistry.",
-    units: [],
-  },
-
-  {
-    code: "COMPSCI 2DB3",
-    name: "Databases",
-    year: 2025,
-    semester: "Fall",
-    description:
-      "A discussion of organic chemistry, chemical kinetics and acid-base equilibrium, with emphasis on relevant experimental techniques and solving real problems ranging from drug discovery to environmental chemistry.",
-    units: [],
-  },
-
-  {
-    code: "ECON 1BB3",
-    name: "Introducotry Macroeconomics",
-    year: 2025,
-    semester: "Fall",
-    description:
-      "A discussion of organic chemistry, chemical kinetics and acid-base equilibrium, with emphasis on relevant experimental techniques and solving real problems ranging from drug discovery to environmental chemistry.",
-    units: [],
-  },
-];
+import { useUserCourses } from "@/hooks/courses";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
 
 export default function Home() {
+  const { courses: userCourses, isLoading, error } = useUserCourses();
+
+  console.log("Error:", error);
+
+  if (error && (error as any).status === 403) {
+    return (
+      <div className="flex min-h-screen flex-col bg-slate-50/50">
+        <MacFastHeader />
+        <main className="flex-1 px-6 py-10 md:px-12">
+          <div className="mx-auto max-w-7xl">
+            <Alert variant="destructive" className="bg-red-50 border-red-200">
+              <AlertCircle className="h-4 w-4" />
+              <AlertTitle>Access Denied</AlertTitle>
+              <AlertDescription>
+                You do not have permission to access your courses.
+              </AlertDescription>
+            </Alert>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
   return (
-    <div className="flex min-h-screen flex-col bg-slate-50/50">
+    <div className="flex min-h-screen flex-col">
       <MacFastHeader />
 
       {/* Main Content */}
-      <main className="flex-1 px-6 py-10 md:px-12">
-        <div className="mx-auto max-w-9xl">
+      <main className="flex-1 px-6 py-10 md:px-8 lg:px-28">
+        <div className="mx-auto">
           <div className="mb-8 flex items-baseline justify-between">
             <h2 className="font-poppins text-2xl font-bold text-slate-800">
               Your Courses
             </h2>
             <span className="text-md text-primary font-semibold">
-              {courses.length} Active
+              {userCourses.length} Active
             </span>
           </div>
 
-          <div className="grid grid-cols-1 gap-6 pb-10 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
-            {courses.map((course, index) => (
+          <div className="grid grid-cols-1 gap-6 pb-10 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+            {userCourses.map((course, index) => (
               <CourseCard key={index} course={course} progress={50} />
             ))}
           </div>

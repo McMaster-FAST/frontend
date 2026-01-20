@@ -27,11 +27,11 @@ type CourseCardProps = {
 function CourseCard({ course, progress }: CourseCardProps) {
   return (
     <Card className="group relative flex w-full flex-col overflow-hidden border-light-gray bg-white transition-all hover:-translate-y-1 hover:shadow-lg">
-      <div className="h-30 bg-gradient-to-br from-slate-50 to-slate-200 p-4 transition-colors group-hover:from-text-gold group-hover:to-text-maroon">
+      <div className="h-40 bg-gradient-to-br from-slate-50 to-slate-200 p-4 transition-colors group-hover:from-text-gold group-hover:to-text-maroon">
         <div className="flex justify-between items-start">
           <Badge
             variant="secondary"
-            className="bg-white/80 font-poppins text-sm font-extrabold text-slate-600 backdrop-blur-sm"
+            className="bg-white/80 font-poppins text-sm font-extrabold text-dark-gray backdrop-blur-sm"
           >
             {course.code}
           </Badge>
@@ -44,7 +44,7 @@ function CourseCard({ course, progress }: CourseCardProps) {
 
       <CardHeader className="pb-2 pt-4">
         <h3 className="line-clamp-2 min-h-[3.5rem] font-poppins text-lg font-bold leading-tight text-primary group-hover:text-primary-hover">
-          <Link href={`/courses/${course.code}/dashboard`}>{course.name}</Link>
+          <Link href={`/courses/${course.code}/coursePage`}>{course.name}</Link>
         </h3>
       </CardHeader>
 
@@ -69,7 +69,7 @@ function CourseCard({ course, progress }: CourseCardProps) {
 
       <CardFooter className="flex gap-2 border-t border-dark-gray-50 bg-dark-gray-50/50 p-4">
         <Button variant="secondary" className="flex-1 text-xs font-bold">
-          Details
+          <Link href={`/courses/${course.code}/coursePage`}>Details</Link>
         </Button>
         <Button className="flex-1 gap-2 text-xs shadow-sm font-bold">
           Resume <ArrowRight className="h-3 w-3" />
