@@ -60,7 +60,7 @@ export async function submitAnswer(
 
 export async function fetchWithAuth(
   endpoint: string,
-  options: RequestInit = {}
+  options: RequestInit = {},
 ) {
   const session = await getServerSession(authOptions);
   const token = session?.accessToken;
