@@ -4,12 +4,6 @@ import {
   CardFooter,
   CardHeader,
 } from "@/components/ui/card";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-} from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { ArrowRight, BookOpen, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
