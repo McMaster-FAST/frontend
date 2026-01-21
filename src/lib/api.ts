@@ -1,61 +1,21 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { useAuthFetch } from "@/hooks/fetch_with_auth";
-import { TestTube } from "lucide-react";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
-export async function getNextQuestion(
-  courseCode: string,
-  unitName: string,
-  subtopicName: string,
-  authFetch: ReturnType<typeof useAuthFetch>
-) {
-  return authFetch(`/api/core/adaptive-test/next-question`, {
-    method: "POST",
-    body: JSON.stringify({
-      course_code: courseCode,
-      unit_name: unitName,
-      subtopic_name: subtopicName,
-    }),
-  })
-    .then((res) => { // Check for errors, if none get JSON
-      if (!res.ok) {
-        throw new Error(`HTTP error! status: ${res.status}`);
-      }
-      return res.json();
+export async function getJson(response: Response) {
+  return response
+    .json()
+    .catch((error) => {
+      throw new Error(response.status + " " + response.statusText);
     })
-    .then((response) => { // Parse question from repsonse JSON
-      const question_data = response.question;
-      const options = question_data.options.map((option: any) => {
-        return {
-          public_id: option.public_id,
-          content: option.content,
-        } as TestQuestionOption;
-      });
-
-      return {
-        public_id: question_data.public_id,
-        content: question_data.content,
-        options: options,
-      } as TestQuestion;
+    .then((json) => {
+      if (!response.ok) {
+        throw new Error(json.message || "Error fetching data");
+      }
+      return json;
     });
-}
-
-export async function submitAnswer(
-  selected_option_id: string,
-  question_id: string,
-  authFetch: ReturnType<typeof useAuthFetch>
-) {
-  const response = await authFetch(`/api/core/adaptive-test/submit`, {
-    method: "POST",
-    body: JSON.stringify({
-      question_id: question_id,
-      selected_option_id: selected_option_id,
-    }),
-  });
-
-  return response;
 }
 
 export async function fetchWithAuth(
@@ -92,11 +52,7 @@ export async function fetchWithAuth(
 export async function ping() {
   const response = await fetch(`${API_BASE_URL}/api/core/ping/`);
 
-  if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
-  }
-
-  return response.json();
+  return getJson(response);
 }
 
 export async function uploadQuestions(file: File) {
@@ -109,19 +65,11 @@ export async function uploadQuestions(file: File) {
     body: formData,
   });
 
-  if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
-  }
-
-  return response.json();
+  return getJson(response);
 }
 
 export async function getAllQuestions() {
   const response = await fetch(`${API_BASE_URL}/api/core/questions/`);
 
-  if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
-  }
-
-  return response.json();
+  return getJson(response);
 }

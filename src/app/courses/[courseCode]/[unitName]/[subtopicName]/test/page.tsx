@@ -5,14 +5,30 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { MacFastHeader } from "@/components/ui/custom/macfast-header";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { ChevronsRight, Flag } from "lucide-react";
+import { ChevronsRight } from "lucide-react";
 import React, { useState } from "react";
-import { getNextQuestion, submitAnswer } from "@/lib/api";
+import {
+  getNextQuestion,
+  skipQuestion,
+  submitAnswer,
+} from "@/lib/adaptive-test-api";
 import { useEffect } from "react";
 import { useAuthFetch } from "@/hooks/fetch_with_auth";
 import { Skeleton } from "@/components/ui/skeleton";
 import { QuestionFlagDialog } from "@/components/ui/custom/question-flag-dialog";
 import DOMPurify from "dompurify";
+import ErrorMessage from "@/components/ui/custom/error-message";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@radix-ui/react-alert-dialog";
+import {
+  AlertDialogContent,
+  AlertDialogDescription,
+} from "@/components/ui/alert-dialog";
 
 interface QuestionPageProps {
   params: Promise<{
@@ -30,44 +46,54 @@ function QuestionPage({ params: paramsPromise }: QuestionPageProps) {
 
   const [question, setQuestion]: [
     TestQuestion,
-    React.Dispatch<React.SetStateAction<TestQuestion>>
+    React.Dispatch<React.SetStateAction<TestQuestion>>,
   ] = useState({} as TestQuestion);
   const [selectedOption, setSelectedOption] = useState<string>("");
   const [submitSuccess, setSubmitSuccess] = useState<boolean>(false);
   const [correctOptionId, setCorrectOptionId] = useState<string>("");
   const [solution, setSolution] = useState<string>("");
   const [submitted, setSubmitted] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
 
+  const isQuestionLoading = !question && !error;
   const authFetch = useAuthFetch();
 
-  const handleNextQuestion = async () => {
-    getNextQuestion(
-      course,
-      unit,
-      subtopic,
-      authFetch
-    ).then((nextQuestion) => {
-      setQuestion(nextQuestion);
-    });
+  const resetState = () => {
     setSelectedOption("");
     setSubmitSuccess(false);
     setSubmitted(false);
     setCorrectOptionId("");
     setSolution("");
   };
-  
+
+  const handleNextQuestion = async () => {
+    getNextQuestion(course, unit, subtopic, authFetch)
+      .then((nextQuestion) => {
+        setQuestion(nextQuestion);
+        resetState();
+      })
+      .catch((err) => setError(err.message));
+  };
+
   const handleSubmit = async () => {
     setSubmitted(true);
-    const response = await submitAnswer(
-      selectedOption,
-      question.public_id,
-      authFetch
-    );
+    submitAnswer(selectedOption, question.public_id, authFetch)
+      .then((data) => {
+        setSubmitSuccess(true);
+        setCorrectOptionId(data.correct_option_id);
+        setSolution(data.explanation);
+      })
+      .catch((err) => setError(err.message));
+  };
 
-    const data = await response.json();
-    setSubmitSuccess(true);
-    setCorrectOptionId(data.correct_option_id);
-    setSolution(data.explanation);
+  const handleSkip = async () => {
+    setQuestion({} as TestQuestion);
+    skipQuestion(question.public_id, course, authFetch)
+      .then((nextQuestion) => {
+        setQuestion(nextQuestion);
+        resetState();
+      })
+      .catch((err) => setError(err.message));
   };
 
   const handleSaveForLater = async () => {
@@ -97,7 +123,9 @@ function QuestionPage({ params: paramsPromise }: QuestionPageProps) {
         </div>
         <div id="content" className="flex flex-row gap-4 flex-1">
           <div id="question-content" className="flex-2 flex flex-col gap-6">
-            {!question.content && <Skeleton className="w-full h-40" />}
+            {/* TODO Provide actions for errors */}
+            {error && <ErrorMessage message={error} />}
+            {isQuestionLoading && <Skeleton className="w-full h-40" />}
             {question.content && (
               <div
                 id="question-card"
@@ -108,7 +136,7 @@ function QuestionPage({ params: paramsPromise }: QuestionPageProps) {
               ></div>
             )}
             <div id="options-list" className="flex flex-col gap-2">
-              {!question?.options &&
+              {isQuestionLoading &&
                 Array.from({ length: 4 }).map((_, index) => (
                   <Skeleton key={index} className="w-full h-10" />
                 ))}
@@ -155,7 +183,7 @@ function QuestionPage({ params: paramsPromise }: QuestionPageProps) {
                   <p className="font-poppins text-2xl">
                     {
                       question?.options.find(
-                        (option) => option.public_id === correctOptionId
+                        (option) => option.public_id === correctOptionId,
                       )?.content
                     }
                   </p>
@@ -176,50 +204,52 @@ function QuestionPage({ params: paramsPromise }: QuestionPageProps) {
                 Submit an answer to see the solution.
               </h2>
             )}
-            {(!question?.content || (!submitSuccess && submitted)) && (
+            {(isQuestionLoading || (!submitSuccess && submitted)) && (
               <Skeleton className="w-full h-full" />
             )}
           </div>
         </div>
       </div>
       <footer className="flex flex-row gap-4 sticky bottom-0 left-0 w-full p-4 border-t-2 bg-white">
-          <div
-            id="question-section"
-            className="w-full flex flex-row flex-2 justify-between items-center"
-          >
-            <div>
-              <QuestionFlagDialog onSubmit={handleQuestionFlag} />
-            </div>
-            <div className="inline-flex items-center gap-4">
-              <div className="inline-flex gap-2">
-                <Checkbox
-                  id="save-for-later"
-                  onCheckedChange={handleSaveForLater}
-                />
-                <Label htmlFor="save-for-later">
-                  Save for Later
-                </Label>
-              </div>
-              <Button variant="secondary" disabled={submitted}>
-                Skip
-              </Button>
-              <Button
-                variant="primary"
-                disabled={!selectedOption || submitted}
-                onClick={handleSubmit}
-              >
-                Submit
-              </Button>
-            </div>
+        <div
+          id="question-section"
+          className="w-full flex flex-row flex-2 justify-between items-center"
+        >
+          <div>
+            <QuestionFlagDialog onSubmit={handleQuestionFlag} />
           </div>
-          <div id="answer-section" className="flex-1 flex justify-end">
-            {submitSuccess && submitted && (
-              <Button variant="primary" onClick={handleNextQuestion}>
-                Next Question
-              </Button>
-            )}
+          <div className="inline-flex items-center gap-4">
+            <div className="inline-flex gap-2">
+              <Checkbox
+                id="save-for-later"
+                onCheckedChange={handleSaveForLater}
+              />
+              <Label htmlFor="save-for-later">Save for Later</Label>
+            </div>
+            <Button
+              variant="secondary"
+              disabled={submitted}
+              onClick={handleSkip}
+            >
+              Skip
+            </Button>
+            <Button
+              variant="primary"
+              disabled={!selectedOption || submitted}
+              onClick={handleSubmit}
+            >
+              Submit
+            </Button>
           </div>
-        </footer>
+        </div>
+        <div id="answer-section" className="flex-1 flex justify-end">
+          {submitSuccess && submitted && (
+            <Button variant="primary" onClick={handleNextQuestion}>
+              Next Question
+            </Button>
+          )}
+        </div>
+      </footer>
     </div>
   );
 }
