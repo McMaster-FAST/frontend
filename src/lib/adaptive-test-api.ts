@@ -53,7 +53,7 @@ export async function submitAnswer(
 }
 
 /**
- * Skips a question and returns the next question. 
+ * Skips a question and returns the next question.
  * Based on the current subtopic stored in the user's adaptive test session.
  * @param question_id
  * @param course_code
@@ -74,4 +74,17 @@ export async function skipQuestion(
   })
     .then(getJson)
     .then(convertToTestQuestion);
+}
+
+export async function useSkippedQuestions(
+  course_code: string,
+  authFetch: ReturnType<typeof useAuthFetch>,
+) {
+  return authFetch(`/api/test-sessions/${course_code}/`, {
+    method: "PUT",
+    body: JSON.stringify({
+      // Clear excluded questions -> allows them to be added back to the pool
+      excluded_questions: [],
+    }),
+  });
 }

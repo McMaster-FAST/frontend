@@ -11,6 +11,7 @@ import {
   getNextQuestion,
   skipQuestion,
   submitAnswer,
+  useSkippedQuestions,
 } from "@/lib/adaptive-test-api";
 import { useEffect } from "react";
 import { useAuthFetch } from "@/hooks/fetch_with_auth";
@@ -29,6 +30,8 @@ import {
   AlertDialogContent,
   AlertDialogDescription,
 } from "@/components/ui/alert-dialog";
+import { updateTestSession } from "@/lib/api";
+import Link from "next/link";
 
 interface QuestionPageProps {
   params: Promise<{
@@ -125,6 +128,57 @@ function QuestionPage({ params: paramsPromise }: QuestionPageProps) {
           <div id="question-content" className="flex-2 flex flex-col gap-6">
             {/* TODO Provide actions for errors */}
             {error && <ErrorMessage message={error} />}
+            {error && (
+              <AlertDialog open={!!error}>
+                <AlertDialogContent className="w-min">
+                  <AlertDialogTitle>Ran out of questions!</AlertDialogTitle>
+
+                  <AlertDialogDescription>{error}</AlertDialogDescription>
+                  <AlertDialogDescription className="mb-4">
+                    How would you like to proceed?
+                  </AlertDialogDescription>
+                  <div className="flex flex-col w-fit gap-2 justify-center">
+                    <AlertDialogAction asChild>
+                      <Button
+                        onClick={() =>
+                          updateTestSession(
+                            course,
+                            {
+                              use_hard_questions: true,
+                            },
+                            authFetch,
+                          ).then(() => {
+                            setError(null);
+                            handleNextQuestion();
+                          })
+                        }
+                      >
+                        Use hard questions
+                      </Button>
+                    </AlertDialogAction>
+                    <AlertDialogAction asChild>
+                      <Button
+                        onClick={() =>
+                          useSkippedQuestions(course, authFetch).then(() => {
+                            setError(null);
+                            handleNextQuestion();
+                          })
+                        }
+                      >
+                        Use skipped questions
+                      </Button>
+                    </AlertDialogAction>
+                    <AlertDialogCancel asChild>
+                      <Button variant="secondary">
+                        <Link href={`/courses/${course}/coursePage`}>
+                          Return to Course Page
+                        </Link>
+                      </Button>
+                    </AlertDialogCancel>
+                  </div>
+                </AlertDialogContent>
+              </AlertDialog>
+            )}
             {isQuestionLoading && <Skeleton className="w-full h-40" />}
             {question.content && (
               <div
