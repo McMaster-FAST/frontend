@@ -11,7 +11,7 @@ import {
   getNextQuestion,
   skipQuestion,
   submitAnswer,
-  useSkippedQuestions,
+  resetExcludedQuestions,
 } from "@/lib/adaptive-test-api";
 import { useEffect } from "react";
 import { useAuthFetch } from "@/hooks/useFetchWithAuth";
@@ -113,6 +113,24 @@ function QuestionPage({ params: paramsPromise }: QuestionPageProps) {
     // Implement question flagging functionality here
   };
 
+  const useHardQuestions = () => {
+    updateTestSession(
+      course,
+      {
+        use_out_of_range_questions: true,
+      },
+      authFetch,
+    ).then(() => {
+      handleNextQuestion();
+    });
+  };
+
+  const useSkippedQuestions = () => {
+    resetExcludedQuestions(course, authFetch).then(() => {
+      handleNextQuestion();
+    });
+  };
+
   useEffect(() => {
     handleNextQuestion();
   }, [course, unit, subtopic]);
@@ -147,28 +165,14 @@ function QuestionPage({ params: paramsPromise }: QuestionPageProps) {
                 <div className="flex flex-col w-fit gap-2 justify-center">
                   <AlertDialogAction asChild>
                     <Button
-                      onClick={() =>
-                        updateTestSession(
-                          course,
-                          {
-                            use_out_of_range_questions: true,
-                          },
-                          authFetch,
-                        ).then(() => {
-                          handleNextQuestion();
-                        })
-                      }
+                      onClick={useHardQuestions}
                     >
                       Use hard questions
                     </Button>
                   </AlertDialogAction>
                   <AlertDialogAction asChild>
                     <Button
-                      onClick={() =>
-                        useSkippedQuestions(course, authFetch).then(() => {
-                          handleNextQuestion();
-                        })
-                      }
+                      onClick={useSkippedQuestions}
                     >
                       Use skipped questions
                     </Button>

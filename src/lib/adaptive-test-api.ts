@@ -1,5 +1,5 @@
 import { getJson } from "@/lib/api";
-import { useAuthFetch } from "@/hooks/fetch_with_auth";
+import { useAuthFetch } from "@/hooks/useFetchWithAuth";
 
 const API_BASE_URL = "/api/core/adaptive-test";
 
@@ -79,7 +79,7 @@ export async function skipQuestion(
     .then(convertToTestQuestion);
 }
 
-export async function useSkippedQuestions(
+export async function resetExcludedQuestions(
   course_code: string,
   authFetch: ReturnType<typeof useAuthFetch>,
 ) {
