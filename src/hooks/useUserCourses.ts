@@ -2,8 +2,7 @@
 
 import useSWR from "swr";
 import { useCallback } from "react";
-import { useAuthFetch } from "@/hooks/fetch_with_auth";
-import { Course } from "@/components/ui/custom/course-card";
+import { useAuthFetch } from "@/hooks/useFetchWithAuth";
 
 export function useUserCourses() {
   const authFetch = useAuthFetch();

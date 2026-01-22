@@ -9,7 +9,7 @@ import { ChevronsRight, Flag } from "lucide-react";
 import React, { useState } from "react";
 import { getNextQuestion, submitAnswer } from "@/lib/api";
 import { useEffect } from "react";
-import { useAuthFetch } from "@/hooks/fetch_with_auth";
+import { useAuthFetch } from "@/hooks/useFetchWithAuth";
 import { Skeleton } from "@/components/ui/skeleton";
 import { QuestionFlagDialog } from "@/components/ui/custom/question-flag-dialog";
 import DOMPurify from "dompurify";
@@ -30,7 +30,7 @@ function QuestionPage({ params: paramsPromise }: QuestionPageProps) {
 
   const [question, setQuestion]: [
     TestQuestion,
-    React.Dispatch<React.SetStateAction<TestQuestion>>
+    React.Dispatch<React.SetStateAction<TestQuestion>>,
   ] = useState({} as TestQuestion);
   const [selectedOption, setSelectedOption] = useState<string>("");
   const [submitSuccess, setSubmitSuccess] = useState<boolean>(false);
@@ -41,12 +41,7 @@ function QuestionPage({ params: paramsPromise }: QuestionPageProps) {
   const authFetch = useAuthFetch();
 
   const handleNextQuestion = async () => {
-    getNextQuestion(
-      course,
-      unit,
-      subtopic,
-      authFetch
-    ).then((nextQuestion) => {
+    getNextQuestion(course, unit, subtopic, authFetch).then((nextQuestion) => {
       setQuestion(nextQuestion);
     });
     setSelectedOption("");
@@ -55,13 +50,13 @@ function QuestionPage({ params: paramsPromise }: QuestionPageProps) {
     setCorrectOptionId("");
     setSolution("");
   };
-  
+
   const handleSubmit = async () => {
     setSubmitted(true);
     const response = await submitAnswer(
       selectedOption,
       question.public_id,
-      authFetch
+      authFetch,
     );
 
     const data = await response.json();
@@ -155,7 +150,7 @@ function QuestionPage({ params: paramsPromise }: QuestionPageProps) {
                   <p className="font-poppins text-2xl">
                     {
                       question?.options.find(
-                        (option) => option.public_id === correctOptionId
+                        (option) => option.public_id === correctOptionId,
                       )?.content
                     }
                   </p>
@@ -183,43 +178,41 @@ function QuestionPage({ params: paramsPromise }: QuestionPageProps) {
         </div>
       </div>
       <footer className="flex flex-row gap-4 sticky bottom-0 left-0 w-full p-4 border-t-2 bg-white">
-          <div
-            id="question-section"
-            className="w-full flex flex-row flex-2 justify-between items-center"
-          >
-            <div>
-              <QuestionFlagDialog onSubmit={handleQuestionFlag} />
-            </div>
-            <div className="inline-flex items-center gap-4">
-              <div className="inline-flex gap-2">
-                <Checkbox
-                  id="save-for-later"
-                  onCheckedChange={handleSaveForLater}
-                />
-                <Label htmlFor="save-for-later">
-                  Save for Later
-                </Label>
-              </div>
-              <Button variant="secondary" disabled={submitted}>
-                Skip
-              </Button>
-              <Button
-                variant="primary"
-                disabled={!selectedOption || submitted}
-                onClick={handleSubmit}
-              >
-                Submit
-              </Button>
-            </div>
+        <div
+          id="question-section"
+          className="w-full flex flex-row flex-2 justify-between items-center"
+        >
+          <div>
+            <QuestionFlagDialog onSubmit={handleQuestionFlag} />
           </div>
-          <div id="answer-section" className="flex-1 flex justify-end">
-            {submitSuccess && submitted && (
-              <Button variant="primary" onClick={handleNextQuestion}>
-                Next Question
-              </Button>
-            )}
+          <div className="inline-flex items-center gap-4">
+            <div className="inline-flex gap-2">
+              <Checkbox
+                id="save-for-later"
+                onCheckedChange={handleSaveForLater}
+              />
+              <Label htmlFor="save-for-later">Save for Later</Label>
+            </div>
+            <Button variant="secondary" disabled={submitted}>
+              Skip
+            </Button>
+            <Button
+              variant="primary"
+              disabled={!selectedOption || submitted}
+              onClick={handleSubmit}
+            >
+              Submit
+            </Button>
           </div>
-        </footer>
+        </div>
+        <div id="answer-section" className="flex-1 flex justify-end">
+          {submitSuccess && submitted && (
+            <Button variant="primary" onClick={handleNextQuestion}>
+              Next Question
+            </Button>
+          )}
+        </div>
+      </footer>
     </div>
   );
 }

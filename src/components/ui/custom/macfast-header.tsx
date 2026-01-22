@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { signIn, signOut, useSession } from "next-auth/react";
 import { ChevronDown, Loader2, LogOut, User } from "lucide-react";
-import { useUserCourses } from "@/hooks/courses";
+import { useUserCourses } from "@/hooks/useUserCourses";
 
 export function MacFastHeader() {
   const { courses: userCourses, isLoading: isLoadingCourses } =
@@ -41,10 +41,10 @@ export function MacFastHeader() {
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="primary"
-                  className="h-9 gap-1 text-primary-foreground hover:bg-white/10 hover:text-white focus:bg-white/10 focus:text-white"
+                  className="h-9 gap-1 text-primary-foreground hover:bg-white/10 hover:text-white focus:bg-white/10 focus:text-white group"
                 >
                   My Courses
-                  <ChevronDown className="h-4 w-4 opacity-50" />
+                  <ChevronDown className="h-4 w-4 opacity-50 transition-transform duration-200 group-data-[state=open]:rotate-180" />
                 </Button>
               </DropdownMenuTrigger>
 
@@ -65,7 +65,7 @@ export function MacFastHeader() {
                       className="focus:bg-primary-hover"
                     >
                       <Link
-                        href={`/courses/${course.code}/coursePage`}
+                        href={`/courses/${course.code}/coursepage`}
                         className="flex cursor-pointer flex-col items-start gap-1 p-2"
                       >
                         <div className="text-sm font-semibold leading-none">
@@ -86,7 +86,6 @@ export function MacFastHeader() {
             </DropdownMenu>
           )}
 
-          {/* User Profile / Auth State */}
           {isLoading ? (
             <div className="flex items-center gap-2">
               <Skeleton className="h-8 w-8 rounded-full bg-white/20" />
