@@ -10,7 +10,7 @@ import { useState } from "react";
 
 function CoursePage() {
   const { course, isLoading, error } = useCourseData();
-  const [openUnitIds, setOpenUnitIds] = useState<string[]>([]);
+  const [openUnits, setOpenUnits] = useState<string>("");
 
   // While loading should be a Skeleton I think or maybe a spinner
   if (isLoading) return <div>Loading...</div>;
@@ -51,7 +51,7 @@ function CoursePage() {
                 value="practiceProblems"
                 className="group flex gap-2 rounded-full border border-transparent px-6 py-2 data-[state=active]:border-light-gray data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-primary"
               >
-                <BookOpen className="h-4 w-4 text-slate-400 group-data-[state=active]:text-primary-hover" />
+                <BookOpen className="h-4 w-4 text-dark-gray group-data-[state=active]:text-primary-hover" />
                 Practice Problems
               </TabsTrigger>
 
@@ -59,7 +59,7 @@ function CoursePage() {
                 value="learningObjectives"
                 className="group flex gap-2 rounded-full border border-transparent px-6 py-2 data-[state=active]:border-light-gray data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-primary"
               >
-                <ListChecks className="h-4 w-4 text-slate-400 group-data-[state=active]:text-primary-hover" />
+                <ListChecks className="h-4 w-4 text-dark-gray group-data-[state=active]:text-primary-hover" />
                 Learning Objectives
               </TabsTrigger>
 
@@ -67,7 +67,7 @@ function CoursePage() {
                 value="statistics"
                 className="group flex gap-2 rounded-full border border-transparent px-6 py-2 data-[state=active]:border-light-gray data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-primary"
               >
-                <LineChart className="h-4 w-4 text-slate-400 group-data-[state=active]:text-primary-hover" />
+                <LineChart className="h-4 w-4 text-dark-gray group-data-[state=active]:text-primary-hover" />
                 Statistics
               </TabsTrigger>
 
@@ -75,7 +75,7 @@ function CoursePage() {
                 value="savedQuestions"
                 className="group flex gap-2 rounded-full border border-transparent px-6 py-2 data-[state=active]:border-light-gray data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-primary"
               >
-                <GraduationCap className="h-4 w-4 text-slate-400 group-data-[state=active]:text-primary-hover" />
+                <GraduationCap className="h-4 w-4 text-dark-gray group-data-[state=active]:text-primary-hover" />
                 Saved Questions
               </TabsTrigger>
             </TabsList>
@@ -86,18 +86,18 @@ function CoursePage() {
                 <h2 className="text-lg font-semibold text-slate-800">
                   Unit Breakdown
                 </h2>
-                <p className="text-sm text-slate-500">
+                <p className="text-sm text-dark-gray">
                   Select a unit to view practice problems.
                 </p>
               </div>
-              {course.units.map((unit, index) => (
-                <UnitsAccordion
-                  key={index}
-                  units={[unit]}
-                  course={course}
-                  tab="practiceProblems"
-                />
-              ))}
+              <UnitsAccordion
+                key={course.code}
+                units={course.units}
+                course={course}
+                tab="practiceProblems"
+                value={openUnits}
+                setValue={setOpenUnits}
+              />
             </div>
           </TabsContent>
 
@@ -111,25 +111,25 @@ function CoursePage() {
                   Click on a unit to view detailed learning objectives.
                 </p>
               </div>
-              {course.units.map((unit, index) => (
-                <UnitsAccordion
-                  key={index}
-                  units={[unit]}
-                  course={course}
-                  tab="learningObjectives"
-                />
-              ))}
+              <UnitsAccordion
+                key={course.code + "-lo"}
+                units={course.units}
+                course={course}
+                tab="learningObjectives"
+                value={openUnits}
+                setValue={setOpenUnits}
+              />
             </div>
           </TabsContent>
 
           <TabsContent value="statistics">
-            <div className="rounded-lg border border-dashed border-slate-300 p-10 text-center text-slate-500">
+            <div className="rounded-lg border border-dashed border-light-gray p-10 text-center text-dark-gray">
               Statistics Dashboard Coming Soon
             </div>
           </TabsContent>
 
           <TabsContent value="savedQuestions">
-            <div className="rounded-lg border border-dashed border-slate-300 p-10 text-center text-slate-500">
+            <div className="rounded-lg border border-dashed border-light-gray p-10 text-center text-dark-gray">
               No saved questions yet.
             </div>
           </TabsContent>

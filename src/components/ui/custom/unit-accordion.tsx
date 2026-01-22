@@ -26,13 +26,25 @@ interface UnitsAccordionProps {
   units?: Unit[];
   tab?: string;
   course: { code: string };
+  value: string;
+  setValue: (value: string) => void;
 }
 
-function UnitsAccordion({ units, tab, course }: UnitsAccordionProps) {
-  console.log(course);
-
+function UnitsAccordion({
+  units,
+  tab,
+  course,
+  value,
+  setValue,
+}: UnitsAccordionProps) {
   return (
-    <Accordion type="single" collapsible className="w-full">
+    <Accordion
+      type="single"
+      collapsible
+      className="w-full"
+      value={value}
+      onValueChange={setValue}
+    >
       {units?.map((unit, index) => (
         <AccordionItem value={`unit-${index}`} key={index}>
           <AccordionTrigger className="flex justify-between items-center gap-4 py-2">
@@ -65,7 +77,7 @@ function UnitsAccordion({ units, tab, course }: UnitsAccordionProps) {
                   {tab === "practiceProblems" && (
                     <>
                       <span
-                        className={`flex flex-1 text-md justify-center ${
+                        className={`flex flex-1 text-sm justify-center ${
                           subtopic.attempted ? "text-dark-gray" : "text-primary"
                         }`}
                       >
