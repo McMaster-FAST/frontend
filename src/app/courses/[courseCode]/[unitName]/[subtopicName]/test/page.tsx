@@ -24,7 +24,6 @@ import {
   AlertDialogAction,
   AlertDialogCancel,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "@radix-ui/react-alert-dialog";
 import {
   AlertDialogContent,
@@ -60,33 +59,33 @@ function QuestionPage({ params: paramsPromise }: QuestionPageProps) {
   const [solution, setSolution] = useState<string>("");
   const [submitted, setSubmitted] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
-  const [isQuestionLoading, setIsQuestionLoading] = useState<boolean>(false);
+  const [isQuestionLoading, setIsQuestionLoading] = useState<boolean>(true);
 
-  const showNoQuestionsDialog = (!question.public_id && !isQuestionLoading) && !error;
+  const showNoQuestionsDialog =
+    !question?.public_id && !isQuestionLoading && !error;
 
   const resetState = () => {
-    setIsQuestionLoading(false);
+    setIsQuestionLoading(true);
     setSelectedOption("");
     setSubmitSuccess(false);
     setSubmitted(false);
     setCorrectOptionId("");
     setSolution("");
     setError("");
-    
   };
 
   const handleNextQuestion = async () => {
-    setIsQuestionLoading(true);
+    resetState();
+
     getNextQuestion(course, unit, subtopic, authFetch)
       .then((nextQuestion) => {
         setQuestion(nextQuestion);
       })
       .catch((err) => setError(err.message))
-      .finally(() => resetState());
+      .finally(() => setIsQuestionLoading(false));
   };
 
   const handleSubmit = async () => {
-    if (!question.public_id) return;
     setSubmitted(true);
     submitAnswer(selectedOption, question.public_id, authFetch)
       .then((data) => {
@@ -98,13 +97,13 @@ function QuestionPage({ params: paramsPromise }: QuestionPageProps) {
   };
 
   const handleSkip = async () => {
-    if (!question.public_id) return;
     skipQuestion(question.public_id, course, authFetch)
       .then((nextQuestion) => {
         setQuestion(nextQuestion);
+        resetState();
       })
       .catch((err) => setError(err.message))
-      .finally(() => resetState());
+      .finally(() => setIsQuestionLoading(false));
   };
 
   const handleSaveForLater = async () => {
@@ -139,8 +138,8 @@ function QuestionPage({ params: paramsPromise }: QuestionPageProps) {
               <AlertDialogContent className="w-min">
                 <AlertDialogTitle>No available questions</AlertDialogTitle>
                 <AlertDialogDescription>
-                  All questions are inapplicable, have been skipped, or have been
-                  used.
+                  All questions are inapplicable, have been skipped, or have
+                  been used.
                 </AlertDialogDescription>
                 <AlertDialogDescription className="mb-4">
                   How would you like to proceed?
@@ -185,7 +184,7 @@ function QuestionPage({ params: paramsPromise }: QuestionPageProps) {
               </AlertDialogContent>
             </AlertDialog>
             {isQuestionLoading && <Skeleton className="w-full h-40" />}
-            {question.content && (
+            {!isQuestionLoading && question.content && (
               <div
                 id="question-card"
                 className="border p-4 rounded-lg shadow-md"
@@ -199,12 +198,12 @@ function QuestionPage({ params: paramsPromise }: QuestionPageProps) {
                 Array.from({ length: 4 }).map((_, index) => (
                   <Skeleton key={index} className="w-full h-10" />
                 ))}
-              <RadioGroup
-                value={selectedOption}
-                onValueChange={setSelectedOption}
-              >
-                {question?.options &&
-                  question.options.map((option) => (
+              {!isQuestionLoading && question?.options && (
+                <RadioGroup
+                  value={selectedOption}
+                  onValueChange={setSelectedOption}
+                >
+                  {question?.options.map((option) => (
                     <div
                       key={option.public_id}
                       className="flex items-center gap-2 w-full"
@@ -226,7 +225,8 @@ function QuestionPage({ params: paramsPromise }: QuestionPageProps) {
                       ></Label>
                     </div>
                   ))}
-              </RadioGroup>
+                </RadioGroup>
+              )}
             </div>
           </div>
           <div
