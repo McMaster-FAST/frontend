@@ -2,19 +2,25 @@
 
 import { MacFastHeader } from "@/components/ui/custom/macfast-header";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import UnitsAccordion from "@/components/ui/custom/unit-accordion";
+import UnitsAccordion from "@/components/ui/custom/unit-accordion/unit-accordion";
 import { Badge } from "@/components/ui/badge";
-import { BookOpen, GraduationCap, LineChart, ListChecks } from "lucide-react";
+import {
+  AlertCircle,
+  AlertTriangle,
+  BookOpen,
+  GraduationCap,
+  LineChart,
+  ListChecks,
+} from "lucide-react";
 import { useCourseData } from "@/hooks/useCourseData";
 import { useState } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
+import { UnitsAccordionSkeleton } from "@/components/ui/custom/unit-accordion/unit-accordion-skeleton";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 function CoursePage() {
   const { course, isLoading, error } = useCourseData();
   const [openUnits, setOpenUnits] = useState<string>("");
-
-  // While loading should be a Skeleton I think or maybe a spinner
-  if (isLoading) return <div>Loading...</div>;
-  if (error || !course) return <div>Error loading course data.</div>;
 
   return (
     <div className="min-h-screen bg-slate-50/50 font-poppins">
@@ -28,14 +34,33 @@ function CoursePage() {
                   variant="secondary"
                   className="font-poppins font-bold text-dark-gray"
                 >
-                  {course.code}
+                  {isLoading || !course ? (
+                    <Skeleton className="h-4 w-20" />
+                  ) : error ? (
+                    <span>Course unavailable</span>
+                  ) : (
+                    course.code
+                  )}
                 </Badge>
                 <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                  Fall 2025
+                  {isLoading || !course ? (
+                    <Skeleton className="h-4 w-20" />
+                  ) : error ? null : (
+                    course.semester
+                  )}
                 </span>
               </div>
               <h1 className="font-poppins text-3xl font-bold text-foreground">
-                {course.name}
+                {isLoading || !course ? (
+                  <Skeleton className="h-16 w-120" />
+                ) : error ? (
+                  <span className="text-red-900">
+                    <AlertTriangle className="mr-2 inline-block" />
+                    Error loading course
+                  </span>
+                ) : (
+                  course.name
+                )}
               </h1>
             </div>
           </div>
@@ -90,14 +115,32 @@ function CoursePage() {
                   Select a unit to view practice problems.
                 </p>
               </div>
-              <UnitsAccordion
-                key={course.code}
-                units={course.units}
-                course={course}
-                tab="practiceProblems"
-                value={openUnits}
-                setValue={setOpenUnits}
-              />
+              {isLoading || !course ? (
+                <div>
+                  <UnitsAccordionSkeleton />
+                </div>
+              ) : error ? (
+                <Alert
+                  variant="destructive"
+                  className="mt-4 bg-red-50 border-red-200 text-red-900"
+                >
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertTitle>Unable to load units</AlertTitle>
+                  <AlertDescription>
+                    There was a problem retrieving the course content. Please
+                    try refreshing the page.
+                  </AlertDescription>
+                </Alert>
+              ) : (
+                <UnitsAccordion
+                  key={course.code}
+                  units={course.units}
+                  course={course}
+                  tab="practiceProblems"
+                  value={openUnits}
+                  setValue={setOpenUnits}
+                />
+              )}
             </div>
           </TabsContent>
 
@@ -111,14 +154,30 @@ function CoursePage() {
                   Click on a unit to view detailed learning objectives.
                 </p>
               </div>
-              <UnitsAccordion
-                key={course.code + "-lo"}
-                units={course.units}
-                course={course}
-                tab="learningObjectives"
-                value={openUnits}
-                setValue={setOpenUnits}
-              />
+              {isLoading || !course ? (
+                <UnitsAccordionSkeleton />
+              ) : error ? (
+                <Alert
+                  variant="destructive"
+                  className="mt-4 bg-red-50 border-red-200 text-red-900"
+                >
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertTitle>Unable to load units</AlertTitle>
+                  <AlertDescription>
+                    There was a problem retrieving the course content. Please
+                    try refreshing the page.
+                  </AlertDescription>
+                </Alert>
+              ) : (
+                <UnitsAccordion
+                  key={course.code + "-lo"}
+                  units={course.units}
+                  course={course}
+                  tab="learningObjectives"
+                  value={openUnits}
+                  setValue={setOpenUnits}
+                />
+              )}
             </div>
           </TabsContent>
 
