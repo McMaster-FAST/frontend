@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { useAuthFetch } from "@/hooks/fetch_with_auth";
+import { useAuthFetch } from "@/hooks/useFetchWithAuth";
 
 export function PingButton() {
   const authFetch = useAuthFetch();

@@ -1,7 +1,7 @@
 interface Subtopic {
-    attempted?: boolean;
-    name: string;
-    abilityScore?: number;
-    description?: string[];
-    studyAids?: string[];
+  attempted?: boolean;
+  name: string;
+  abilityScore?: number;
+  description?: string[];
+  study_aids?: StudyAid[];
 }
