@@ -14,7 +14,7 @@ import {
   useSkippedQuestions,
 } from "@/lib/adaptive-test-api";
 import { useEffect } from "react";
-import { useAuthFetch } from "@/hooks/fetch_with_auth";
+import { useAuthFetch } from "@/hooks/useFetchWithAuth";
 import { Skeleton } from "@/components/ui/skeleton";
 import { QuestionFlagDialog } from "@/components/ui/custom/question-flag-dialog";
 import DOMPurify from "dompurify";

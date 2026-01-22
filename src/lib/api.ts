@@ -1,6 +1,6 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { useAuthFetch } from "@/hooks/fetch_with_auth";
+import { useAuthFetch } from "@/hooks/useFetchWithAuth";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 

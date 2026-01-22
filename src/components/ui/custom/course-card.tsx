@@ -44,7 +44,7 @@ function CourseCard({ course, progress }: CourseCardProps) {
 
       <CardHeader className="pb-2 pt-4">
         <h3 className="line-clamp-2 min-h-[3.5rem] font-poppins text-lg font-bold leading-tight text-primary group-hover:text-primary-hover">
-          <Link href={`/courses/${course.code}/coursePage`}>{course.name}</Link>
+          <Link href={`/courses/${course.code}/coursepage`}>{course.name}</Link>
         </h3>
       </CardHeader>
 
@@ -69,7 +69,7 @@ function CourseCard({ course, progress }: CourseCardProps) {
 
       <CardFooter className="flex gap-2 border-t border-dark-gray-50 bg-dark-gray-50/50 p-4">
         <Button variant="secondary" className="flex-1 text-xs font-bold">
-          <Link href={`/courses/${course.code}/coursePage`}>Details</Link>
+          <Link href={`/courses/${course.code}/coursepage`}>Details</Link>
         </Button>
         <Button className="flex-1 gap-2 text-xs shadow-sm font-bold">
           Resume <ArrowRight className="h-3 w-3" />
