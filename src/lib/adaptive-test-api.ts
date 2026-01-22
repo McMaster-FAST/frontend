@@ -5,6 +5,9 @@ const API_BASE_URL = "/api/core/adaptive-test";
 
 export function convertToTestQuestion(data: any): TestQuestion {
   const question_data = data.question;
+  if (!question_data) {
+    return {} as TestQuestion;
+  }
   const options = question_data.options.map(
     (option: any) =>
       ({

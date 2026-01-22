@@ -51,11 +51,11 @@ export async function fetchWithAuth(
 
 export async function updateTestSession(
   course_code: string,
-  data: Partial<TestSession>,
+  data: TestSessionOptions,
   authFetch: ReturnType<typeof useAuthFetch>,
 ) {
   return authFetch(`/api/test-sessions/${course_code}/`, {
-    method: "PATCH",
+    method: "PUT",
     body: JSON.stringify(data),
   });
 }

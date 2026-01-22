@@ -40,13 +40,16 @@ interface QuestionPageProps {
     subtopicName: string;
   }>;
 }
-
 function QuestionPage({ params: paramsPromise }: QuestionPageProps) {
+  // Get course info from URI
   const params = React.use(paramsPromise);
   const course = decodeURI(params.courseCode);
   const unit = decodeURI(params.unitName);
   const subtopic = decodeURI(params.subtopicName);
 
+  const authFetch = useAuthFetch();
+
+  // Setup state
   const [question, setQuestion]: [
     TestQuestion,
     React.Dispatch<React.SetStateAction<TestQuestion>>,
@@ -56,29 +59,34 @@ function QuestionPage({ params: paramsPromise }: QuestionPageProps) {
   const [correctOptionId, setCorrectOptionId] = useState<string>("");
   const [solution, setSolution] = useState<string>("");
   const [submitted, setSubmitted] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string>("");
+  const [isQuestionLoading, setIsQuestionLoading] = useState<boolean>(false);
 
-  const isQuestionLoading = !question && !error;
-  const authFetch = useAuthFetch();
+  const showNoQuestionsDialog = (!question.public_id && !isQuestionLoading) && !error;
 
   const resetState = () => {
+    setIsQuestionLoading(false);
     setSelectedOption("");
     setSubmitSuccess(false);
     setSubmitted(false);
     setCorrectOptionId("");
     setSolution("");
+    setError("");
+    
   };
 
   const handleNextQuestion = async () => {
+    setIsQuestionLoading(true);
     getNextQuestion(course, unit, subtopic, authFetch)
       .then((nextQuestion) => {
         setQuestion(nextQuestion);
-        resetState();
       })
-      .catch((err) => setError(err.message));
+      .catch((err) => setError(err.message))
+      .finally(() => resetState());
   };
 
   const handleSubmit = async () => {
+    if (!question.public_id) return;
     setSubmitted(true);
     submitAnswer(selectedOption, question.public_id, authFetch)
       .then((data) => {
@@ -90,13 +98,13 @@ function QuestionPage({ params: paramsPromise }: QuestionPageProps) {
   };
 
   const handleSkip = async () => {
-    setQuestion({} as TestQuestion);
+    if (!question.public_id) return;
     skipQuestion(question.public_id, course, authFetch)
       .then((nextQuestion) => {
         setQuestion(nextQuestion);
-        resetState();
       })
-      .catch((err) => setError(err.message));
+      .catch((err) => setError(err.message))
+      .finally(() => resetState());
   };
 
   const handleSaveForLater = async () => {
@@ -126,59 +134,56 @@ function QuestionPage({ params: paramsPromise }: QuestionPageProps) {
         </div>
         <div id="content" className="flex flex-row gap-4 flex-1">
           <div id="question-content" className="flex-2 flex flex-col gap-6">
-            {/* TODO Provide actions for errors */}
             {error && <ErrorMessage message={error} />}
-            {error && (
-              <AlertDialog open={!!error}>
-                <AlertDialogContent className="w-min">
-                  <AlertDialogTitle>Ran out of questions!</AlertDialogTitle>
-
-                  <AlertDialogDescription>{error}</AlertDialogDescription>
-                  <AlertDialogDescription className="mb-4">
-                    How would you like to proceed?
-                  </AlertDialogDescription>
-                  <div className="flex flex-col w-fit gap-2 justify-center">
-                    <AlertDialogAction asChild>
-                      <Button
-                        onClick={() =>
-                          updateTestSession(
-                            course,
-                            {
-                              use_hard_questions: true,
-                            },
-                            authFetch,
-                          ).then(() => {
-                            setError(null);
-                            handleNextQuestion();
-                          })
-                        }
-                      >
-                        Use hard questions
-                      </Button>
-                    </AlertDialogAction>
-                    <AlertDialogAction asChild>
-                      <Button
-                        onClick={() =>
-                          useSkippedQuestions(course, authFetch).then(() => {
-                            setError(null);
-                            handleNextQuestion();
-                          })
-                        }
-                      >
-                        Use skipped questions
-                      </Button>
-                    </AlertDialogAction>
-                    <AlertDialogCancel asChild>
-                      <Button variant="secondary">
-                        <Link href={`/courses/${course}/coursePage`}>
-                          Return to Course Page
-                        </Link>
-                      </Button>
-                    </AlertDialogCancel>
-                  </div>
-                </AlertDialogContent>
-              </AlertDialog>
-            )}
+            <AlertDialog open={!!showNoQuestionsDialog}>
+              <AlertDialogContent className="w-min">
+                <AlertDialogTitle>No available questions</AlertDialogTitle>
+                <AlertDialogDescription>
+                  All questions are inapplicable, have been skipped, or have been
+                  used.
+                </AlertDialogDescription>
+                <AlertDialogDescription className="mb-4">
+                  How would you like to proceed?
+                </AlertDialogDescription>
+                <div className="flex flex-col w-fit gap-2 justify-center">
+                  <AlertDialogAction asChild>
+                    <Button
+                      onClick={() =>
+                        updateTestSession(
+                          course,
+                          {
+                            use_out_of_range_questions: true,
+                          },
+                          authFetch,
+                        ).then(() => {
+                          handleNextQuestion();
+                        })
+                      }
+                    >
+                      Use hard questions
+                    </Button>
+                  </AlertDialogAction>
+                  <AlertDialogAction asChild>
+                    <Button
+                      onClick={() =>
+                        useSkippedQuestions(course, authFetch).then(() => {
+                          handleNextQuestion();
+                        })
+                      }
+                    >
+                      Use skipped questions
+                    </Button>
+                  </AlertDialogAction>
+                  <AlertDialogCancel asChild>
+                    <Button variant="secondary">
+                      <Link href={`/courses/${course}/coursePage`}>
+                        Return to Course Page
+                      </Link>
+                    </Button>
+                  </AlertDialogCancel>
+                </div>
+              </AlertDialogContent>
+            </AlertDialog>
             {isQuestionLoading && <Skeleton className="w-full h-40" />}
             {question.content && (
               <div
