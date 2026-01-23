@@ -52,6 +52,13 @@ function QuestionItem({
 
         <CardContent className="flex flex-col gap-1">
           <div className="flex flex-row items-center gap-2">
+            {!question.is_verified && (
+              <Badge variant="secondary" className="">
+                <X className="inline-block h-3 w-3 text-primary" />
+                Unverified
+              </Badge>
+            )}
+
             <Badge
               variant="secondary"
               className="text-dark-gray whitespace-nowrap"
@@ -66,23 +73,12 @@ function QuestionItem({
             {question.is_flagged && (
               <Badge variant="destructive">Flagged</Badge>
             )}
-
-            {question.is_verified ? (
-              <Badge variant="default" className="text-primary-hover">
-                <Check className="inline-block h-3 w-3 text-primary-hover" />
-                Verified
-              </Badge>
-            ) : (
-              <Badge variant="secondary" className="">
-                <X className="inline-block h-3 w-3 text-primary" />
-                Unverified
-              </Badge>
-            )}
-
             <span className="text-xs font-medium text-dark-gray truncate max-w-3xl mr-1">
-              <span className="font-semibold">{question.unit}</span>
+              <span className="font-semibold">
+                {question.unit}UNIT PLACEHOLDER
+              </span>
               <span className="font-bold mx-2">-</span>
-              {question.subtopic}
+              {question.subtopic}SUBTOPIC PLACEHOLDER
             </span>
           </div>
         </CardContent>
