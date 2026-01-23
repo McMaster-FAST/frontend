@@ -7,7 +7,7 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 export async function getJson(response: Response) {
   return response
     .json()
-    .catch((error) => {
+    .catch(() => {
       throw new Error(response.status + " " + response.statusText);
     })
     .then((json) => {
@@ -58,6 +58,13 @@ export async function updateTestSession(
     method: "PUT",
     body: JSON.stringify(data),
   });
+}
+
+export function getTestSession(
+  course_code: string,
+  authFetch: ReturnType<typeof useAuthFetch>,
+) {
+  return authFetch(`/api/test-sessions/${course_code}/`).then(getJson);
 }
 
 export async function ping() {

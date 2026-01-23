@@ -29,7 +29,7 @@ import {
   AlertDialogContent,
   AlertDialogDescription,
 } from "@/components/ui/alert-dialog";
-import { updateTestSession } from "@/lib/api";
+import { getTestSession, updateTestSession } from "@/lib/api";
 import Link from "next/link";
 
 interface QuestionPageProps {
@@ -39,6 +39,12 @@ interface QuestionPageProps {
     subtopicName: string;
   }>;
 }
+
+interface ContinueActions {
+  use_hard_questions: boolean;
+  use_skipped_questions: boolean;
+}
+
 function QuestionPage({ params: paramsPromise }: QuestionPageProps) {
   // Get course info from URI
   const params = React.use(paramsPromise);
@@ -60,6 +66,10 @@ function QuestionPage({ params: paramsPromise }: QuestionPageProps) {
   const [submitted, setSubmitted] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
   const [isQuestionLoading, setIsQuestionLoading] = useState<boolean>(true);
+  const [continueActions, setContinueActions] = useState<ContinueActions>({
+    use_hard_questions: false,
+    use_skipped_questions: false,
+  });
 
   const showNoQuestionsDialog =
     !question?.public_id && !isQuestionLoading && !error;
@@ -80,6 +90,7 @@ function QuestionPage({ params: paramsPromise }: QuestionPageProps) {
     getNextQuestion(course, unit, subtopic, authFetch)
       .then((nextQuestion) => {
         setQuestion(nextQuestion);
+        updateContinueActions();
       })
       .catch((err) => setError(err.message))
       .finally(() => setIsQuestionLoading(false));
@@ -97,10 +108,11 @@ function QuestionPage({ params: paramsPromise }: QuestionPageProps) {
   };
 
   const handleSkip = async () => {
+    resetState();
     skipQuestion(question.public_id, course, authFetch)
       .then((nextQuestion) => {
         setQuestion(nextQuestion);
-        resetState();
+        updateContinueActions();
       })
       .catch((err) => setError(err.message))
       .finally(() => setIsQuestionLoading(false));
@@ -131,8 +143,21 @@ function QuestionPage({ params: paramsPromise }: QuestionPageProps) {
     });
   };
 
+  const updateContinueActions = () => {
+    getTestSession(course, authFetch).then((session) => {
+      setContinueActions({
+        use_hard_questions: !session.use_out_of_range_questions,
+        use_skipped_questions: session.excluded_questions.length > 0,
+      });
+    });
+  }
+
   useEffect(() => {
-    handleNextQuestion();
+    (async () => {
+      await handleNextQuestion()
+      updateContinueActions()
+    })();
+    
   }, [course, unit, subtopic]);
 
   return (
@@ -163,20 +188,20 @@ function QuestionPage({ params: paramsPromise }: QuestionPageProps) {
                   How would you like to proceed?
                 </AlertDialogDescription>
                 <div className="flex flex-col w-fit gap-2 justify-center">
-                  <AlertDialogAction asChild>
-                    <Button
-                      onClick={useHardQuestions}
-                    >
-                      Use hard questions
-                    </Button>
-                  </AlertDialogAction>
-                  <AlertDialogAction asChild>
-                    <Button
-                      onClick={useSkippedQuestions}
-                    >
-                      Use skipped questions
-                    </Button>
-                  </AlertDialogAction>
+                  {continueActions.use_hard_questions && (
+                    <AlertDialogAction asChild>
+                      <Button onClick={useHardQuestions}>
+                        Use hard questions
+                      </Button>
+                    </AlertDialogAction>
+                  )}
+                  {continueActions.use_skipped_questions && (
+                    <AlertDialogAction asChild>
+                      <Button onClick={useSkippedQuestions}>
+                        Use skipped questions
+                      </Button>
+                    </AlertDialogAction>
+                  )}
                   <AlertDialogCancel asChild>
                     <Button variant="secondary">
                       <Link href={`/courses/${course}/coursePage`}>
