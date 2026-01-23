@@ -5,6 +5,7 @@ import { Progress } from "@/components/ui/progress";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import {
+  Check,
   EllipsisIcon,
   Eye,
   File,
@@ -13,6 +14,7 @@ import {
   Pencil,
   Star,
   Trash,
+  X,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
@@ -65,18 +67,22 @@ function QuestionItem({
               <Badge variant="destructive">Flagged</Badge>
             )}
 
-            {!question.is_verified && (
+            {question.is_verified ? (
+              <Badge variant="default" className="text-primary-hover">
+                <Check className="inline-block h-3 w-3 text-primary-hover" />
+                Verified
+              </Badge>
+            ) : (
               <Badge variant="secondary" className="">
+                <X className="inline-block h-3 w-3 text-primary" />
                 Unverified
               </Badge>
             )}
 
-            <span className="text-xs font-semibold text-muted-foreground truncate max-w-3xl mr-1">
-              <Layers className="inline-block mr-1 h-4 w-4 text-muted-foreground" />
-              {question.unit}Hazards and Plates
-              <span className="text-slate-300 mx-1.5">•</span>
-              <File className="inline-block mr-1 h-4 w-4 text-muted-foreground" />
-              {question.subtopic}Tectonic Plates
+            <span className="text-xs font-medium text-dark-gray truncate max-w-3xl mr-1">
+              <span className="font-semibold">{question.unit}</span>
+              <span className="font-bold mx-2">-</span>
+              {question.subtopic}
             </span>
           </div>
         </CardContent>
