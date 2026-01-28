@@ -1,6 +1,6 @@
 interface QuestionComment {
     public_id: string;
-    fromUser: string;
+    fromUserName: string;
     question: string;
     commentText: string;
     replyTo: string | null;

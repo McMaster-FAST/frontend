@@ -7,7 +7,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { getTimeString } from "./time-utils";
-import { ChevronUp, CornerDownRight } from "lucide-react";
+import { ChevronUp, CornerDownRight, User } from "lucide-react";
 import { useState } from "react";
 
 interface CommentCardProps {
@@ -35,7 +35,11 @@ export default function CommentCard({
         <Card className="w-full">
           <CardContent>
             <CardTitle className="flex justify-between items-center text-foreground">
-              {comment.fromUser}
+              <div className="inline-flex items-center gap-2">
+                <User className="size-4 text-primary" />
+                {comment.fromUserName || "Unknown"}
+              </div>
+
               <p className="text-sm text-muted-foreground">
                 {getTimeString(comment.timestamp)}
               </p>
@@ -49,7 +53,7 @@ export default function CommentCard({
               {comment.commentText.length > CUTOFF_LENGTH && (
                 <p
                   onClick={() => setIsSeeMore(!isSeeMore)}
-                  className="cursor-pointer text-foreground hover:underline select-none"
+                  className="cursor-pointer text-foreground hover:underline select-none text-primary"
                 >
                   {isSeeMore ? "See less" : "See more"}
                 </p>
@@ -69,7 +73,7 @@ export default function CommentCard({
           <>
             {replies.length > 0 && (
               <Label
-                className="text-sm flex items-center gap-1 cursor-pointer select-none ml-auto"
+                className="text-sm flex items-center gap-1 cursor-pointer select-none ml-auto text-primary"
                 onClick={() => setAreRepliesOpen(!areRepliesOpen)}
               >
                 {areRepliesOpen ? "Hide" : "View"} {replies.length}{" "}
