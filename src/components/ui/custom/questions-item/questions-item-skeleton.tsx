@@ -1,7 +1,7 @@
 "use client";
 
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { EllipsisIcon, NotebookPen, Star, X } from "lucide-react";
+import { EllipsisIcon, Loader2, NotebookPen, Star, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 import {
@@ -45,7 +45,11 @@ function QuestionItemSkeleton() {
           <DropdownMenuTrigger className="opacity-50 hover:opacity-100 transition-opacity">
             <EllipsisIcon className="h-5 w-5 text-foreground" />
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end"></DropdownMenuContent>
+          <DropdownMenuContent align="end">
+            <div className="flex items-center justify-center p-2">
+              <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+            </div>
+          </DropdownMenuContent>
         </DropdownMenu>
       </div>
     </Card>
