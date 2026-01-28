@@ -1,0 +1,27 @@
+x-nextjs-service: &nextjs-service
+  build:
+    context: .
+    dockerfile: Dockerfile
+    target: runner
+    args:
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+      - AUTH_CLIENT_ID=${AUTH_CLIENT_ID}
+      - AUTH_CLIENT_SECRET=${AUTH_CLIENT_SECRET}
+      - AUTH_ISSUER=${AUTH_ISSUER}
+  environment:
+    - NODE_ENV=production
+    - NEXT_TELEMETRY_DISABLED=1
+    - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+    - NEXTAUTH_URL=${NEXTAUTH_URL}
+    - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
+    - AUTH_CLIENT_ID=${AUTH_CLIENT_ID}
+    - AUTH_CLIENT_SECRET=${AUTH_CLIENT_SECRET}
+    - AUTH_ISSUER=${AUTH_ISSUER}
+  restart: unless-stopped
+
+name: mac-fast-frontend-prod
+services:
+  web:
+    <<: *nextjs-service
+    ports:
+      - "3000:3000"
