@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight, FilterIcon } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
+import CommentsSheet from "@/components/ui/custom/comments/comments-sheet";
 
 export function Questions() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -16,6 +17,8 @@ export function Questions() {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [questions, setQuestions] = useState<Question[]>([]);
+  const [commentsSheetOpen, setCommentsSheetOpen] = useState(false);
+  const [questionId, setQuestionId] = useState<string>("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleUploadClick = () => {
@@ -43,16 +46,18 @@ export function Questions() {
       }, 100);
 
       await uploadQuestions(file);
-      setTimeout(async () => {await fetchQuestions()}, 2000); 
+      setTimeout(async () => {
+        await fetchQuestions();
+      }, 2000);
 
       setUploadProgress(100);
       clearInterval(progressInterval);
-      
+
       console.log(questions);
     } catch (error) {
       console.error("Upload failed:", error);
       setError(
-        error instanceof Error ? error.message : "Failed to upload questions"
+        error instanceof Error ? error.message : "Failed to upload questions",
       );
     } finally {
       setIsUploading(false);
@@ -65,18 +70,18 @@ export function Questions() {
   };
 
   async function fetchQuestions() {
-      getAllQuestions()
+    getAllQuestions()
       .then((data) => {
         setQuestions(data.questions);
       })
       .catch((error) => {
-          console.error("Failed to fetch questions:", error);
-          setError(
-            error instanceof Error ? error.message : "Failed to fetch questions"
-          );
+        console.error("Failed to fetch questions:", error);
+        setError(
+          error instanceof Error ? error.message : "Failed to fetch questions",
+        );
       });
   }
-  
+
   useEffect(() => {
     fetchQuestions();
   }, []);
@@ -105,7 +110,9 @@ export function Questions() {
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
         />
-        <Button variant="primary" iconOnly leftIcon={ArrowRight} />
+        <Button variant="primary">
+          <ArrowRight />
+        </Button>
         <div className="flex flex-1 gap-3 justify-end ">
           <input
             type="file"
@@ -121,28 +128,32 @@ export function Questions() {
           >
             {isUploading ? "Uploading..." : "Upload Questions"}
           </Button>
-          <Button variant="secondary" iconOnly leftIcon={FilterIcon} />
+          <Button variant="secondary">
+            <FilterIcon />
+          </Button>
         </div>
       </div>
 
       <div className="flex-1">
         <ScrollArea className="h-full">
-            <div className="flex flex-col gap-4">
-              {questions.map((question) => (
-                <QuestionItem
-                  key={question.serial_number}
-                  question={question}
-                  onPreview={() => console.log("Preview:", question.serial_number)}
-                  onEdit={() => console.log("Edit:", question.serial_number)}
-                  onViewComments={() =>
-                    console.log("View Comments:", question.serial_number)
-                  }
-                  onDelete={() => console.log("Delete:", question.serial_number)}
-                />
-              ))}
-            </div>
+          <div className="flex flex-col gap-4">
+            {questions.map((question) => (
+              <QuestionItem
+                key={question.serial_number}
+                question={question}
+                onPreview={() => {}}
+                onEdit={() => {}}
+                onViewComments={() => {
+                  setQuestionId(question.public_id);
+                  setCommentsSheetOpen(true);
+                }}
+                onDelete={() => {}}
+              />
+            ))}
+          </div>
         </ScrollArea>
       </div>
+      <CommentsSheet open={commentsSheetOpen} onOpenChange={setCommentsSheetOpen} forQuestionId={questionId} />
     </div>
   );
 }
