@@ -72,7 +72,7 @@ export function Questions() {
   };
 
   return (
-    <div className="flex flex-col max-h-full">
+    <div className="flex flex-col h-full">
       {error && (
         <Alert variant="destructive" className="mb-6">
           <AlertTitle>Error</AlertTitle>
@@ -115,11 +115,11 @@ export function Questions() {
         </div>
       </div>
 
-      <div className="flex-1">
+      <div className="flex-1 min-h-0">
         <ScrollArea className="h-full">
           <div className="flex flex-col gap-4 mb-4">
             {isLoading
-              ? [...Array(5)].map((_, i) => <QuestionItemSkeleton key={i} />)
+              ? [...Array(15)].map((_, i) => <QuestionItemSkeleton key={i} />)
               : questions.map((question) => (
                   <QuestionItem
                     key={question.serial_number}

@@ -18,7 +18,7 @@ function InstructorDashboardPage() {
   const { course, isLoading, error } = useCourseData();
 
   return (
-    <div className="min-h-screen bg-slate-50/50 font-poppins">
+    <div className="h-screen flex flex-col overflow-hidden bg-slate-50/50 font-poppins">
       <MacFastHeader />
 
       <div className="border-b border-light-gray bg-white px-6 py-8 shadow-sm">
@@ -69,8 +69,8 @@ function InstructorDashboardPage() {
         </div>
       </div>
 
-      <main className="mx-auto max-w-7xl px-6 py-8">
-        <Tabs className="w-full" defaultValue="questions">
+      <main className="mx-auto w-full max-w-7xl px-6 py-8 flex-1 flex flex-col min-h-0">
+        <Tabs className="w-full flex flex-col h-full" defaultValue="questions">
           <div className="mb-8 overflow-x-auto pb-2 mx-auto">
             <TabsList className="h-12 w-auto justify-start gap-2 bg-transparent p-0">
               <TabsTrigger
@@ -91,7 +91,10 @@ function InstructorDashboardPage() {
             </TabsList>
           </div>
 
-          <TabsContent value="questions" className="mt-0">
+          <TabsContent
+            value="questions"
+            className="flex-1 flex flex-col min-h-0 mt-0"
+          >
             <Questions />
           </TabsContent>
 
