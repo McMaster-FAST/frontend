@@ -4,19 +4,27 @@ import { getAllQuestions, uploadQuestions } from "@/lib/api";
 import { useEffect, useRef, useState } from "react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Progress } from "@/components/ui/progress";
-import { QuestionItem } from "@/components/ui/custom/questions-item";
+import { QuestionItem } from "@/components/ui/custom/questions-item/questions-item";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, FilterIcon } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
+import { useCourseQuestions } from "@/hooks/useCourseQuestions";
+import { QuestionItemSkeleton } from "@/components/ui/custom/questions-item/questions-item-skeleton";
 
 export function Questions() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [error, setError] = useState<string | null>(null);
-  const [questions, setQuestions] = useState<Question[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const {
+    questions,
+    isLoading,
+    error: questionsError,
+    refetch,
+  } = useCourseQuestions();
 
   const handleUploadClick = () => {
     fileInputRef.current?.click();
@@ -43,16 +51,15 @@ export function Questions() {
       }, 100);
 
       await uploadQuestions(file);
-      setTimeout(async () => {await fetchQuestions()}, 2000); 
+
+      await refetch();
 
       setUploadProgress(100);
       clearInterval(progressInterval);
-      
-      console.log(questions);
     } catch (error) {
       console.error("Upload failed:", error);
       setError(
-        error instanceof Error ? error.message : "Failed to upload questions"
+        error instanceof Error ? error.message : "Failed to upload questions",
       );
     } finally {
       setIsUploading(false);
@@ -63,23 +70,6 @@ export function Questions() {
       }
     }
   };
-
-  async function fetchQuestions() {
-      getAllQuestions()
-      .then((data) => {
-        setQuestions(data.questions);
-      })
-      .catch((error) => {
-          console.error("Failed to fetch questions:", error);
-          setError(
-            error instanceof Error ? error.message : "Failed to fetch questions"
-          );
-      });
-  }
-  
-  useEffect(() => {
-    fetchQuestions();
-  }, []);
 
   return (
     <div className="flex flex-col max-h-full">
@@ -127,20 +117,26 @@ export function Questions() {
 
       <div className="flex-1">
         <ScrollArea className="h-full">
-            <div className="flex flex-col gap-4">
-              {questions.map((question) => (
-                <QuestionItem
-                  key={question.serial_number}
-                  question={question}
-                  onPreview={() => console.log("Preview:", question.serial_number)}
-                  onEdit={() => console.log("Edit:", question.serial_number)}
-                  onViewComments={() =>
-                    console.log("View Comments:", question.serial_number)
-                  }
-                  onDelete={() => console.log("Delete:", question.serial_number)}
-                />
-              ))}
-            </div>
+          <div className="flex flex-col gap-4 mb-4">
+            {isLoading
+              ? [...Array(5)].map((_, i) => <QuestionItemSkeleton key={i} />)
+              : questions.map((question) => (
+                  <QuestionItem
+                    key={question.serial_number}
+                    question={question}
+                    onPreview={() =>
+                      console.log("Preview:", question.serial_number)
+                    }
+                    onEdit={() => console.log("Edit:", question.serial_number)}
+                    onViewComments={() =>
+                      console.log("View Comments:", question.serial_number)
+                    }
+                    onDelete={() =>
+                      console.log("Delete:", question.serial_number)
+                    }
+                  />
+                ))}
+          </div>
         </ScrollArea>
       </div>
     </div>

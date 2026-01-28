@@ -1,16 +1,12 @@
 "use client";
 
 import * as React from "react";
-import { Progress } from "@/components/ui/progress";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
 import {
-  Check,
   EllipsisIcon,
   Eye,
-  File,
-  Layers,
   MessagesSquare,
+  NotebookPen,
   Pencil,
   Star,
   Trash,
@@ -73,13 +69,10 @@ function QuestionItem({
             {question.is_flagged && (
               <Badge variant="destructive">Flagged</Badge>
             )}
-            <span className="text-xs font-medium text-dark-gray truncate max-w-3xl mr-1">
-              <span className="font-semibold">
-                {question.unit}UNIT PLACEHOLDER
-              </span>
-              <span className="font-bold mx-2">-</span>
-              {question.subtopic}SUBTOPIC PLACEHOLDER
-            </span>
+            <div className="flex items-center text-xs font-medium text-dark-gray truncate max-w-3xl mr-1">
+              <NotebookPen className="mr-1 h-4 w-4 text-primary" />
+              {question.subtopic_name}
+            </div>
           </div>
         </CardContent>
       </div>

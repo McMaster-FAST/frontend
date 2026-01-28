@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { useCourseData } from "@/hooks/useCourseData";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ClassList } from "./tabs/class-list-tab";
 
 function InstructorDashboardPage() {
   const { course, isLoading, error } = useCourseData();
@@ -95,12 +96,7 @@ function InstructorDashboardPage() {
           </TabsContent>
 
           <TabsContent value="classList" className="mt-0">
-            <div className="rounded-xl border border-light-gray bg-white p-6 shadow-sm">
-              <h2 className="text-lg font-semibold mb-4">Class List</h2>
-              <p className="text-dark-gray">
-                Need to fetch enrolments from backend!!!
-              </p>
-            </div>
+            {course?.code && <ClassList courseCode={course.code} />}
           </TabsContent>
         </Tabs>
       </main>
