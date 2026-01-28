@@ -3,6 +3,11 @@ x-nextjs-service: &nextjs-service
     context: .
     dockerfile: Dockerfile
     target: runner
+    args:
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+      - AUTH_CLIENT_ID=${AUTH_CLIENT_ID}
+      - AUTH_CLIENT_SECRET=${AUTH_CLIENT_SECRET}
+      - AUTH_ISSUER=${AUTH_ISSUER}
   environment:
     - NODE_ENV=production
     - NEXT_TELEMETRY_DISABLED=1

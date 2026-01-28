@@ -7,9 +7,10 @@ WORKDIR ${APP_ROOT}
 
 # libc6-compat: Required for some native dependencies
 RUN apk add --no-cache libc6-compat
+RUN corepack enable
 
-COPY package.json package-lock.json* ./
-RUN npm ci
+COPY package.json pnpm-lock.yaml* ./
+RUN pnpm install --frozen-lockfile
 
 
 # 2nd Stage: Development server.
@@ -24,6 +25,7 @@ WORKDIR ${APP_ROOT}
 
 # libc6-compat: Required for some native dependencies at runtime
 RUN apk add --no-cache libc6-compat
+RUN corepack enable
 
 # Copy dependencies from deps stage
 COPY --from=deps ${APP_ROOT}/node_modules ./node_modules
@@ -32,15 +34,21 @@ COPY . .
 
 EXPOSE 3000
 
-CMD ["npm", "run", "dev"]
+CMD ["pnpm", "dev"]
 
 
 # 3rd Stage: Build for production.
 FROM node:20-alpine AS builder
 
 ARG APP_ROOT=/app
+ARG NEXT_PUBLIC_API_URL
+ARG AUTH_CLIENT_ID
+ARG AUTH_CLIENT_SECRET
+ARG AUTH_ISSUER
 
 WORKDIR ${APP_ROOT}
+
+RUN corepack enable
 
 # Copy dependencies from deps stage
 COPY --from=deps ${APP_ROOT}/node_modules ./node_modules
@@ -50,7 +58,7 @@ COPY . .
 
 ENV NEXT_TELEMETRY_DISABLED=1
 
-RUN NODE_ENV=production npm run build
+RUN NODE_ENV=production pnpm build
 
 
 # 4th Stage: Production server.
