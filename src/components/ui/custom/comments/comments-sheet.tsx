@@ -122,13 +122,11 @@ function generateCommentTree(comments: QuestionComment[]) {
 interface CommentsSheetProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  forQuestionId: string;
 }
 
 export default function CommentsSheet({
   open,
   onOpenChange,
-  forQuestionId,
 }: CommentsSheetProps) {
   // const [comments, setComments] = useState<Comment[]>([]);
   const [replyComment, setReplyComment] = useState<QuestionComment | null>(
@@ -177,7 +175,6 @@ export default function CommentsSheet({
         <SheetContent className="flex flex-col gap-0">
           <SheetHeader>
             <SheetTitle className="text-2xl font-semibold">Comments</SheetTitle>
-            <SheetDescription>Question: {forQuestionId}</SheetDescription>
           </SheetHeader>
           <ScrollArea className="flex-1 overflow-hidden">
             <div className="flex flex-col gap-4 p-4 pt-0 pr-4">

@@ -18,7 +18,6 @@ export function Questions() {
   const [error, setError] = useState<string | null>(null);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [commentsSheetOpen, setCommentsSheetOpen] = useState(false);
-  const [questionId, setQuestionId] = useState<string>("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleUploadClick = () => {
@@ -144,7 +143,6 @@ export function Questions() {
                 onPreview={() => {}}
                 onEdit={() => {}}
                 onViewComments={() => {
-                  setQuestionId(question.public_id);
                   setCommentsSheetOpen(true);
                 }}
                 onDelete={() => {}}
@@ -153,7 +151,7 @@ export function Questions() {
           </div>
         </ScrollArea>
       </div>
-      <CommentsSheet open={commentsSheetOpen} onOpenChange={setCommentsSheetOpen} forQuestionId={questionId} />
+      <CommentsSheet open={commentsSheetOpen} onOpenChange={setCommentsSheetOpen} />
     </div>
   );
 }
