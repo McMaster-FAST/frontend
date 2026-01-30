@@ -7,9 +7,10 @@ interface Question {
   is_active: boolean;
   is_verified: boolean;
   options: QuestionOption[];
-  course: string;
-  unit: string;
-  subtopic: string;
+  course?: string;
+  unit?: string;
+  subtopic?: string;
+  answer_explanation?: string;
 };
 
 interface TestQuestion {

@@ -2,6 +2,7 @@
 
 import { getAllQuestions, uploadQuestions } from "@/lib/api";
 import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Progress } from "@/components/ui/progress";
 import { QuestionItem } from "@/components/ui/custom/questions-item";
@@ -10,7 +11,12 @@ import { ArrowRight, FilterIcon } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
 
-export function Questions() {
+interface QuestionsProps {
+  courseCode: string;
+}
+
+export function Questions({ courseCode }: QuestionsProps) {
+  const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -133,7 +139,11 @@ export function Questions() {
                   key={question.serial_number}
                   question={question}
                   onPreview={() => console.log("Preview:", question.serial_number)}
-                  onEdit={() => console.log("Edit:", question.serial_number)}
+                  onEdit={() =>
+                    router.push(
+                      `/courses/${encodeURIComponent(courseCode)}/dashboard/questions/${encodeURIComponent(question.public_id)}/edit`
+                    )
+                  }
                   onViewComments={() =>
                     console.log("View Comments:", question.serial_number)
                   }

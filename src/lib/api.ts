@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { useAuthFetch } from "@/hooks/useFetchWithAuth";
 import { TestTube } from "lucide-react";
+import type { Question } from "@/types/Question";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
@@ -126,4 +127,22 @@ export async function getAllQuestions() {
   }
 
   return response.json();
+}
+
+/**
+ * Fetch a single question by public_id for the edit page.
+ * GET /api/core/questions/<public_id>/
+ */
+export async function getQuestionByPublicId(
+  publicId: string,
+  authFetch: ReturnType<typeof useAuthFetch>
+): Promise<Question> {
+  const response = await authFetch(`/api/questions/${encodeURIComponent(publicId)}/`);
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch question: ${response.status}`);
+  }
+
+  const data = await response.json();
+  return data as Question;
 }
