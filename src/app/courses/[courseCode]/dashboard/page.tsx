@@ -5,11 +5,16 @@ import { Questions } from "@/app/courses/[courseCode]/dashboard/tabs/questions-t
 import { MacFastHeader } from "@/components/ui/custom/macfast-header";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-async function InstructorDashboardPage() {
+async function InstructorDashboardPage({
+  params,
+}: {
+  params: Promise<{ courseCode: string }>;
+}) {
   const session = await getServerSession(authOptions);
+  const { courseCode } = await params;
 
   // 5. Extract the name (fallback to "Instructor" if missing)
-  const userName = session!.user.name || "Instructor";
+  const userName = session?.user?.name || "Instructor";
 
   return (
     <>
@@ -24,7 +29,7 @@ async function InstructorDashboardPage() {
             <TabsTrigger value="classList">Class List</TabsTrigger>
           </TabsList>
           <TabsContent value="questions">
-            <Questions />
+            <Questions courseCode={courseCode} />
           </TabsContent>
           <TabsContent value="classList">
             <div>Class List Content</div>
