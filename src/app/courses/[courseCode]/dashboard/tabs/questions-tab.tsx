@@ -141,7 +141,7 @@ export function Questions({ courseCode }: QuestionsProps) {
                   onPreview={() => console.log("Preview:", question.serial_number)}
                   onEdit={() =>
                     router.push(
-                      `/courses/${encodeURIComponent(courseCode)}/dashboard/questions/${encodeURIComponent(question.public_id)}/edit`
+                      `/courses/${courseCode}/dashboard/questions/${question.public_id}/edit`
                     )
                   }
                   onViewComments={() =>
