@@ -11,7 +11,8 @@ import {
   getNextQuestion,
   skipQuestion,
   submitAnswer,
-  resetExcludedQuestions,
+  resetSkippedQuestions,
+  getActiveTestSession,
 } from "@/lib/adaptive-test-api";
 import { useEffect } from "react";
 import { useAuthFetch } from "@/hooks/useFetchWithAuth";
@@ -29,7 +30,7 @@ import {
   AlertDialogContent,
   AlertDialogDescription,
 } from "@/components/ui/alert-dialog";
-import { getTestSession, updateTestSession } from "@/lib/api";
+
 import Link from "next/link";
 
 interface QuestionPageProps {
@@ -41,7 +42,6 @@ interface QuestionPageProps {
 }
 
 interface ContinueActions {
-  use_hard_questions: boolean;
   use_skipped_questions: boolean;
 }
 
@@ -67,7 +67,6 @@ function QuestionPage({ params: paramsPromise }: QuestionPageProps) {
   const [error, setError] = useState<string>("");
   const [isQuestionLoading, setIsQuestionLoading] = useState<boolean>(true);
   const [continueActions, setContinueActions] = useState<ContinueActions>({
-    use_hard_questions: false,
     use_skipped_questions: false,
   });
 
@@ -109,7 +108,7 @@ function QuestionPage({ params: paramsPromise }: QuestionPageProps) {
 
   const handleSkip = async () => {
     resetState();
-    skipQuestion(question.public_id, course, authFetch)
+    skipQuestion(question.public_id, authFetch)
       .then((nextQuestion) => {
         setQuestion(nextQuestion);
         updateContinueActions();
@@ -125,39 +124,25 @@ function QuestionPage({ params: paramsPromise }: QuestionPageProps) {
     // Implement question flagging functionality here
   };
 
-  const useHardQuestions = () => {
-    updateTestSession(
-      course,
-      {
-        use_out_of_range_questions: true,
-      },
-      authFetch,
-    ).then(() => {
-      handleNextQuestion();
-    });
-  };
-
   const useSkippedQuestions = () => {
-    resetExcludedQuestions(course, authFetch).then(() => {
+    resetSkippedQuestions(authFetch).then(() => {
       handleNextQuestion();
     });
   };
 
   const updateContinueActions = () => {
-    getTestSession(course, authFetch).then((session) => {
+    getActiveTestSession(authFetch).then((session) => {
       setContinueActions({
-        use_hard_questions: !session.use_out_of_range_questions,
-        use_skipped_questions: session.excluded_questions.length > 0,
+        use_skipped_questions: session.skipped_questions.length > 0,
       });
     });
-  }
+  };
 
   useEffect(() => {
     (async () => {
-      await handleNextQuestion()
-      updateContinueActions()
+      await handleNextQuestion();
+      updateContinueActions();
     })();
-    
   }, [course, unit, subtopic]);
 
   return (
@@ -181,20 +166,12 @@ function QuestionPage({ params: paramsPromise }: QuestionPageProps) {
               <AlertDialogContent className="w-min">
                 <AlertDialogTitle>No available questions</AlertDialogTitle>
                 <AlertDialogDescription>
-                  All questions are inapplicable, have been skipped, or have
-                  been used.
+                  All questions have been skipped.
                 </AlertDialogDescription>
                 <AlertDialogDescription className="mb-4">
                   How would you like to proceed?
                 </AlertDialogDescription>
                 <div className="flex flex-col w-fit gap-2 justify-center">
-                  {continueActions.use_hard_questions && (
-                    <AlertDialogAction asChild>
-                      <Button onClick={useHardQuestions}>
-                        Use hard questions
-                      </Button>
-                    </AlertDialogAction>
-                  )}
                   {continueActions.use_skipped_questions && (
                     <AlertDialogAction asChild>
                       <Button onClick={useSkippedQuestions}>
@@ -204,7 +181,7 @@ function QuestionPage({ params: paramsPromise }: QuestionPageProps) {
                   )}
                   <AlertDialogCancel asChild>
                     <Button variant="secondary">
-                      <Link href={`/courses/${course}/coursePage`}>
+                      <Link href={`/courses/${course}/coursepage`}>
                         Return to Course Page
                       </Link>
                     </Button>

@@ -59,35 +59,36 @@ export async function submitAnswer(
  * Skips a question and returns the next question.
  * Based on the current subtopic stored in the user's adaptive test session.
  * @param question_id
- * @param course_code
  * @param authFetch
  * @returns
  */
 export async function skipQuestion(
   question_id: string,
-  course_code: string,
   authFetch: ReturnType<typeof useAuthFetch>,
 ) {
   return authFetch(`${API_BASE_URL}/skip-question/`, {
     method: "POST",
     body: JSON.stringify({
       question_id: question_id,
-      course_code: course_code,
     }),
   })
     .then(getJson)
     .then(convertToTestQuestion);
 }
 
-export async function resetExcludedQuestions(
-  course_code: string,
+export async function resetSkippedQuestions(
   authFetch: ReturnType<typeof useAuthFetch>,
 ) {
-  return authFetch(`/api/test-sessions/${course_code}/`, {
-    method: "PUT",
-    body: JSON.stringify({
-      // Clear excluded questions -> allows them to be added back to the pool
-      excluded_questions: [],
-    }),
-  });
+  return authFetch("/api/core/test-sessions/active/", {
+    method: "PATCH",
+    body: JSON.stringify({ skipped_questions: [] }),
+  }).then(getJson);
+}
+
+export async function getActiveTestSession(
+  authFetch: ReturnType<typeof useAuthFetch>,
+) {
+  return authFetch(`/api/core/test-sessions/active/`, {
+    method: "GET",
+  }).then(getJson);
 }

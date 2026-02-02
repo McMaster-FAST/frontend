@@ -49,24 +49,6 @@ export async function fetchWithAuth(
   return response;
 }
 
-export async function updateTestSession(
-  course_code: string,
-  data: TestSessionOptions,
-  authFetch: ReturnType<typeof useAuthFetch>,
-) {
-  return authFetch(`/api/test-sessions/${course_code}/`, {
-    method: "PUT",
-    body: JSON.stringify(data),
-  });
-}
-
-export function getTestSession(
-  course_code: string,
-  authFetch: ReturnType<typeof useAuthFetch>,
-) {
-  return authFetch(`/api/test-sessions/${course_code}/`).then(getJson);
-}
-
 export async function ping() {
   const response = await fetch(`${API_BASE_URL}/api/core/ping/`);
 
