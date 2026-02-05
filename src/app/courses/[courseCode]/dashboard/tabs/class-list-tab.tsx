@@ -11,11 +11,11 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { AlertCircle, Search, User, Download } from "lucide-react";
-import { Input } from "@/components/ui/input";
+import { AlertCircle, User } from "lucide-react";
 import { useState } from "react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { SearchBar } from "@/components/ui/custom/saerch-bar";
 
 interface ClassListProps {
   courseCode: string;
@@ -43,7 +43,6 @@ export function ClassList({ courseCode }: ClassListProps) {
   return (
     <div className="w-full">
       <Card className="w-full border-light-gray shadow-sm">
-        {/* 1. Header Section: Title & Search included inside the Card */}
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
           <div className="flex flex-col gap-1">
             <CardTitle className="text-lg font-bold text-slate-800">
@@ -54,17 +53,11 @@ export function ClassList({ courseCode }: ClassListProps) {
             </p>
           </div>
 
-          <div className="flex items-center gap-3">
-            <div className="relative w-64">
-              <Search className="absolute left-2 top-2.5 h-4 w-4 text-slate-400" />
-              <Input
-                placeholder="Search by name..."
-                className="pl-8 text-sm"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-              />
-            </div>
-          </div>
+          <SearchBar
+            className="w-64"
+            placeholder="Search by name..."
+            onSearch={setSearch}
+          />
         </CardHeader>
 
         <CardContent className="p-0 border-t border-slate-100">
@@ -116,10 +109,6 @@ export function ClassList({ courseCode }: ClassListProps) {
                           <p className="text-sm font-semibold text-slate-900">
                             {student.user_name}
                           </p>
-                          <p className="text-xs text-muted-foreground">
-                            student@mcmaster.ca
-                          </p>{" "}
-                          {/* Placeholder email */}
                         </div>
                       </div>
                     </TableCell>
@@ -148,7 +137,6 @@ export function ClassList({ courseCode }: ClassListProps) {
           </Table>
         </CardContent>
 
-        {/* Footer with Count */}
         <div className="flex items-center justify-between border-t border-slate-100 px-6 py-4 bg-slate-50/50">
           <p className="text-xs text-muted-foreground">
             Showing {filteredStudents.length} of {enrolments?.length || 0}{" "}

@@ -95,7 +95,7 @@ function InstructorDashboardPage() {
             value="questions"
             className="flex-1 flex flex-col min-h-0 mt-0"
           >
-            <Questions />
+            <Questions course={course} />
           </TabsContent>
 
           <TabsContent value="classList" className="mt-0">

@@ -1,10 +1,10 @@
 "use client";
 
-import * as React from "react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import {
   EllipsisIcon,
   Eye,
+  Flag,
   MessagesSquare,
   NotebookPen,
   Pencil,
@@ -67,7 +67,13 @@ function QuestionItem({
             </Badge>
 
             {question.is_flagged && (
-              <Badge variant="destructive">Flagged</Badge>
+              <Badge variant="destructive">
+                <Flag
+                  fill="currentColor"
+                  className="inline-block mr-1 h-3 w-3"
+                />
+                Flagged
+              </Badge>
             )}
             <div className="flex items-center text-xs font-medium text-dark-gray truncate max-w-3xl mr-1">
               <NotebookPen className="mr-1 h-4 w-4 text-primary" />
