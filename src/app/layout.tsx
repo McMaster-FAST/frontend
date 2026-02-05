@@ -30,9 +30,11 @@ export default async function RootLayout({
   const session = await getServerSession(authOptions);
 
   return (
-    <html lang="en">
+    <html lang="en" className="h-full">
       <Providers session={session}>
-        <body className={`${inter.variable} ${poppins.variable} antialiased`}>
+        <body
+          className={`${inter.variable} ${poppins.variable} antialiased h-full`}
+        >
           {children}
         </body>
       </Providers>

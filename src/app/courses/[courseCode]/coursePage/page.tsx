@@ -23,9 +23,9 @@ function CoursePage() {
   const [openUnits, setOpenUnits] = useState<string>("");
 
   return (
-    <div className="min-h-screen bg-slate-50/50 font-poppins">
+    <div className="h-screen flex flex-col overflow-hidden bg-slate-50/50 font-poppins">
       <MacFastHeader />
-      <div className="border-b border-light-gray bg-white px-6 py-8 shadow-sm">
+      <div className="border-b border-light-gray bg-white px-6 py-8 shadow-sm shrink-0">
         <div className="mx-auto max-w-7xl">
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div>
@@ -67,11 +67,14 @@ function CoursePage() {
         </div>
       </div>
 
-      <main className="mx-auto max-w-7xl px-6 py-8">
-        <Tabs className="w-full" defaultValue="practiceProblems">
-          <div className="mb-8 overflow-x-auto pb-2 mx-auto">
+      <main className="mx-auto w-full max-w-7xl px-6 py-8 flex-1 flex flex-col min-h-0">
+        <Tabs
+          className="w-full flex flex-col h-full"
+          defaultValue="practiceProblems"
+        >
+          <div className="mb-8 overflow-x-auto pb-2 mx-auto shrink-0 w-full flex justify-start md:justify-center">
             {" "}
-            <TabsList className="h-12 mx-auto justify-start gap-2 bg-transparent md:w-auto p-0 max-w-5xl border-dark-gray">
+            <TabsList className="h-12 gap-2 bg-transparent p-0 border-dark-gray">
               <TabsTrigger
                 value="practiceProblems"
                 className="group flex gap-2 rounded-full border border-transparent px-6 py-2 data-[state=active]:border-light-gray data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-primary"
@@ -105,7 +108,10 @@ function CoursePage() {
               </TabsTrigger>
             </TabsList>
           </div>
-          <TabsContent value="practiceProblems" className="mt-0">
+          <TabsContent
+            value="practiceProblems"
+            className="mt-0 flex-1 overflow-y-auto min-h-0 pr-2"
+          >
             <div className="flex flex-col gap-4">
               <div className="mb-2">
                 <h2 className="text-lg font-semibold text-slate-800">
@@ -144,7 +150,10 @@ function CoursePage() {
             </div>
           </TabsContent>
 
-          <TabsContent value="learningObjectives" className="mt-0">
+          <TabsContent
+            value="learningObjectives"
+            className="mt-0 flex-1 overflow-y-auto min-h-0 pr-2"
+          >
             <div className="flex flex-col gap-4">
               <div className="mb-2">
                 <h2 className="text-lg font-semibold text-slate-800">
@@ -181,13 +190,19 @@ function CoursePage() {
             </div>
           </TabsContent>
 
-          <TabsContent value="statistics">
+          <TabsContent
+            value="statistics"
+            className="mt-0 flex-1 overflow-y-auto min-h-0 pr-2"
+          >
             <div className="rounded-lg border border-dashed border-light-gray p-10 text-center text-dark-gray">
               Statistics Dashboard Coming Soon
             </div>
           </TabsContent>
 
-          <TabsContent value="savedQuestions">
+          <TabsContent
+            value="savedQuestions"
+            className="mt-0 flex-1 overflow-y-auto min-h-0 pr-2"
+          >
             <div className="rounded-lg border border-dashed border-light-gray p-10 text-center text-dark-gray">
               No saved questions yet.
             </div>

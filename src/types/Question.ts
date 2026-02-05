@@ -9,8 +9,8 @@ interface Question {
   options: QuestionOption[];
   course: string;
   unit: string;
-  subtopic: string;
-};
+  subtopic_name: string;
+}
 
 interface TestQuestion {
   public_id: string;
