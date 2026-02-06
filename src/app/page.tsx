@@ -6,6 +6,7 @@ import CourseCard from "@/components/ui/custom/course-card";
 import { useUserCourses } from "@/hooks/useUserCourses";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
+import ErrorMessage from "@/components/ui/custom/error-message";
 
 export default function Home() {
   const { courses: userCourses, isLoading, error } = useUserCourses();
@@ -18,13 +19,7 @@ export default function Home() {
         <MacFastHeader />
         <main className="flex-1 px-6 py-10 md:px-12">
           <div className="mx-auto max-w-7xl">
-            <Alert variant="destructive" className="bg-red-50 border-red-200">
-              <AlertCircle className="h-4 w-4" />
-              <AlertTitle>Access Denied</AlertTitle>
-              <AlertDescription>
-                You do not have permission to access your courses.
-              </AlertDescription>
-            </Alert>
+            <ErrorMessage title="Access Denied" message="You do not have permission to access your courses."/>
           </div>
         </main>
       </div>
