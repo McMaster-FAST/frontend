@@ -1,12 +1,12 @@
 "use client";
 
 import { getAllQuestions, uploadQuestions } from "@/lib/api";
+import type { Question } from "@/types/Question";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Progress } from "@/components/ui/progress";
 import { QuestionItem } from "@/components/ui/custom/questions-item";
-import { QuestionCommentsPanel } from "@/components/ui/custom/question-comments-panel";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, FilterIcon } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -23,26 +23,7 @@ export function Questions({ courseCode }: QuestionsProps) {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [questions, setQuestions] = useState<Question[]>([]);
-  const [commentsOpen, setCommentsOpen] = useState(false);
-  const [commentsQuestionId, setCommentsQuestionId] = useState<string | null>(null);
-  const [commentsQuestionSnippet, setCommentsQuestionSnippet] = useState<string>("");
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const openComments = (question: Question) => {
-    setCommentsQuestionId(question.public_id);
-    setCommentsQuestionSnippet(
-      typeof question.content === "string"
-        ? question.content.replace(/<[^>]*>/g, "").slice(0, 120) + (question.content.length > 120 ? "..." : "")
-        : ""
-    );
-    setCommentsOpen(true);
-  };
-
-  const closeComments = () => {
-    setCommentsOpen(false);
-    setCommentsQuestionId(null);
-    setCommentsQuestionSnippet("");
-  };
 
   const handleUploadClick = () => {
     fileInputRef.current?.click();
@@ -168,20 +149,15 @@ export function Questions({ courseCode }: QuestionsProps) {
                       `/courses/${courseCode}/dashboard/questions/${question.public_id}/edit`
                     )
                   }
-                  onViewComments={() => openComments(question)}
+                  onViewComments={() =>
+                    console.log("View Comments:", question.serial_number)
+                  }
                   onDelete={() => console.log("Delete:", question.serial_number)}
                 />
               ))}
             </div>
         </ScrollArea>
       </div>
-
-      <QuestionCommentsPanel
-        open={commentsOpen}
-        onClose={closeComments}
-        questionId={commentsQuestionId ?? ""}
-        questionSnippet={commentsQuestionSnippet || undefined}
-      />
     </div>
   );
 }

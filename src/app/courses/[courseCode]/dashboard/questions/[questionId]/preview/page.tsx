@@ -12,6 +12,7 @@ import { getQuestionByPublicId } from "@/lib/api";
 import { Skeleton } from "@/components/ui/skeleton";
 import DOMPurify from "dompurify";
 import type { Question } from "@/types/Question";
+import type { QuestionOption } from "@/types/QuestionOption";
 
 export default function QuestionPreviewPage() {
   const params = useParams();
@@ -71,7 +72,7 @@ export default function QuestionPreviewPage() {
       <div className="flex flex-col h-screen">
         <MacFastHeader />
         <div className="flex flex-col gap-4 p-8 flex-1">
-          <p className="font-poppins text-red-600">{fetchError}</p>
+          <p className="font-poppins text-destructive">{fetchError}</p>
         </div>
       </div>
     );
@@ -112,7 +113,7 @@ export default function QuestionPreviewPage() {
           {question.content && (
             <div
               id="question-card"
-              className="border p-4 rounded-lg shadow-md bg-white"
+              className="border p-4 rounded-lg shadow-md bg-background"
               dangerouslySetInnerHTML={{
                 __html: DOMPurify.sanitize(question.content),
               }}
@@ -126,7 +127,7 @@ export default function QuestionPreviewPage() {
               onValueChange={setSelectedOption}
             >
               {question.options &&
-                question.options.map((option) => (
+                question.options.map((option: QuestionOption) => (
                   <div
                     key={option.public_id}
                     className="flex items-center gap-2 w-full"
@@ -136,7 +137,7 @@ export default function QuestionPreviewPage() {
                       className="cursor-pointer"
                     />
                     <Label
-                      className="border-2 p-6 rounded-md items-center flex gap-2 w-full bg-white cursor-pointer"
+                      className="border-2 p-6 rounded-md items-center flex gap-2 w-full bg-background cursor-pointer"
                       dangerouslySetInnerHTML={{
                         __html: DOMPurify.sanitize(option.content),
                       }}
@@ -152,7 +153,6 @@ export default function QuestionPreviewPage() {
           <Button
             onClick={() => router.push(`/courses/${courseCode}/dashboard`)}
             variant="primary"
-            className="px-6 py-3 h-11 bg-[#7A003C] rounded-lg font-poppins font-semibold text-base leading-5 text-[#F5F5F5]"
           >
             Back
           </Button>

@@ -53,11 +53,11 @@ export default function QuestionEditPage() {
         if (cancelled) return;
         setQuestionText(question.content ?? "");
         const padded = padOptions(
-          (question.options ?? []).map((o) => ({ content: o.content, public_id: o.public_id })),
+          (question.options ?? []).map((o: { content: string; public_id: string }) => ({ content: o.content, public_id: o.public_id })),
           OPTION_COUNT
         );
         setOptionList(padded);
-        const correct = question.options?.find((o) => o.is_answer);
+        const correct = question.options?.find((o: { is_answer?: boolean }) => o.is_answer);
         setCorrectAnswer(correct?.public_id ?? "");
         setExplanation(question.answer_explanation ?? "");
         setCourseInfo({
@@ -96,24 +96,24 @@ export default function QuestionEditPage() {
 
   if (isLoading) {
     return (
-      <div className="flex flex-col w-full min-h-screen bg-white">
+      <div className="flex flex-col w-full min-h-screen bg-background">
         <MacFastHeader />
-        <div className="flex flex-col items-start p-[25px] gap-4 flex-1">
+        <div className="flex flex-col items-start p-6 gap-4 flex-1">
           <div className="flex flex-row items-center gap-2">
             <Skeleton className="h-8 w-32" />
             <Skeleton className="h-5 w-5" />
             <Skeleton className="h-8 w-48" />
           </div>
-          <div className="flex flex-row gap-0 w-full max-w-[1390px]">
+          <div className="flex flex-row gap-0 w-full max-w-7xl">
             <div className="flex flex-col gap-3 flex-1">
-              <Skeleton className="h-[124px] w-full rounded-lg" />
+              <Skeleton className="h-32 w-full rounded-lg" />
               {[1, 2, 3, 4].map((i) => (
-                <Skeleton key={i} className="h-[100px] w-full rounded-lg" />
+                <Skeleton key={i} className="min-h-24 w-full rounded-lg" />
               ))}
             </div>
-            <div className="flex flex-col gap-3 flex-1 border-l border-[rgba(73,89,101,0.5)] pl-4">
-              <Skeleton className="h-10 w-[75%] rounded-lg" />
-              <Skeleton className="h-[200px] w-full rounded-lg" />
+            <div className="flex flex-col gap-3 flex-1 border-l border-dark-gray/50 pl-4">
+              <Skeleton className="h-10 w-3/4 rounded-lg" />
+              <Skeleton className="min-h-48 w-full rounded-lg" />
             </div>
           </div>
         </div>
@@ -123,11 +123,11 @@ export default function QuestionEditPage() {
 
   if (fetchError) {
     return (
-      <div className="flex flex-col w-full min-h-screen bg-white">
+      <div className="flex flex-col w-full min-h-screen bg-background">
         <MacFastHeader />
-        <div className="flex flex-col items-start p-[25px] gap-4 flex-1">
-          <p className="font-poppins text-red-600">{fetchError}</p>
-          <Button variant="outline" onClick={() => router.back()}>
+        <div className="flex flex-col items-start p-6 gap-4 flex-1">
+          <p className="font-poppins text-destructive">{fetchError}</p>
+          <Button variant="secondary" onClick={() => router.back()}>
             Go back
           </Button>
         </div>
@@ -136,25 +136,25 @@ export default function QuestionEditPage() {
   }
 
   return (
-    <div className="flex flex-col w-full min-h-screen bg-white">
+    <div className="flex flex-col w-full min-h-screen bg-background">
       {/* Header */}
       <MacFastHeader />
 
       {/* Body */}
-      <div className="flex flex-col items-start p-[25px] gap-[10px] flex-1">
+      <div className="flex flex-col items-start p-6 gap-2.5 flex-1">
         {/* Course Information */}
         <div className="flex flex-row justify-center items-center gap-2">
-          <h1 className="font-inter font-semibold text-2xl leading-8 text-[#495965]">
+          <h1 className="font-inter font-semibold text-2xl leading-8 text-dark-gray">
             {courseInfo.courseCode}
           </h1>
-          <ChevronsRight className="w-5 h-5 text-[#495965]" />
-          <h1 className="font-inter font-semibold text-2xl leading-8 text-[#495965]">
+          <ChevronsRight className="w-5 h-5 text-dark-gray" />
+          <h1 className="font-inter font-semibold text-2xl leading-8 text-dark-gray">
             {courseInfo.unit}
           </h1>
         </div>
 
         {/* Content - Two Column Layout (50/50 split, same height so Save aligns with last option) */}
-        <div className="flex flex-row items-stretch gap-0 w-full max-w-[1390px]">
+        <div className="flex flex-row items-stretch gap-0 w-full max-w-7xl">
           {/* Left Panel - Question Area */}
           <div className="flex flex-col items-start p-2 gap-2 flex-1 min-w-0">
             {/* Question Text Input */}
@@ -163,7 +163,7 @@ export default function QuestionEditPage() {
                 value={questionText}
                 onChange={(e) => setQuestionText(e.target.value)}
                 placeholder="This is question text that you can edit when you highlight this field"
-                className="w-full h-[124px] p-[10px_16px] bg-white border border-[#DBDBDD] rounded-lg font-poppins font-semibold text-base leading-5 text-[#1E1E1E] placeholder:text-[rgba(73,89,101,0.5)] resize-none"
+                className="w-full min-h-32 p-4 bg-background border border-input rounded-lg font-poppins font-semibold text-base text-foreground placeholder:text-muted-foreground resize-none"
               />
             </div>
 
@@ -172,16 +172,16 @@ export default function QuestionEditPage() {
               {optionList.map((option, index) => (
                 <div
                   key={option.public_id || index}
-                  className="flex flex-row items-center p-5 gap-[10px] w-full bg-white border-2 border-[#DBDBDD] rounded-lg min-h-[100px]"
+                  className="flex flex-row items-center p-5 gap-2.5 w-full bg-background border-2 border-input rounded-lg min-h-24"
                 >
                   {/* Radio Button - Visual Only */}
-                  <div className="w-5 h-5 flex-shrink-0 rounded-full bg-[#DBDBDD] border border-[#495965]"></div>
+                  <div className="w-5 h-5 flex-shrink-0 rounded-full bg-muted border border-dark-gray" />
                   {/* Option Input */}
                   <Input
                     value={option.content}
                     onChange={(e) => handleOptionChange(index, e.target.value)}
                     placeholder="Placeholder"
-                    className="flex-1 h-12 min-h-12 p-[12px_16px] bg-white border border-[#DBDBDD] rounded-lg font-poppins font-semibold text-base leading-5 text-[#1E1E1E] placeholder:text-[rgba(73,89,101,0.5)]"
+                    className="flex-1 min-h-12 p-3 bg-background border border-input rounded-lg font-poppins font-semibold text-base text-foreground placeholder:text-muted-foreground"
                   />
                 </div>
               ))}
@@ -189,22 +189,21 @@ export default function QuestionEditPage() {
           </div>
 
           {/* Right Panel - Correct Answer and Explanation (equal width) */}
-          <div className="flex flex-col flex-1 min-w-0 min-h-[537px] bg-white border-l border-[rgba(73,89,101,0.5)]">
-            <div className="flex flex-col items-start gap-[10px] w-full flex-1 min-h-0">
+          <div className="flex flex-col flex-1 min-w-0 min-h-0 bg-background border-l border-dark-gray/50">
+            <div className="flex flex-col items-start gap-2.5 w-full flex-1 min-h-0">
               {/* Title Section */}
-              <div className="flex flex-row items-center gap-[10px] w-full flex-shrink-0">
-                {/* Correct Answer Dropdown - full width of panel */}
-                <div className="flex flex-col items-start p-[10px] gap-[10px] w-full">
+              <div className="flex flex-row items-center gap-2.5 w-full flex-shrink-0">
+                <div className="flex flex-col items-start p-2.5 gap-2.5 w-full">
                   <div className="flex flex-col items-start gap-2 w-full">
-                    <Label className="font-poppins font-semibold text-base leading-5 text-black">
+                    <Label className="font-poppins font-semibold text-base text-foreground">
                       Correct Answer
                     </Label>
                     {/* Dropdown Field - 75% width */}
-                    <div className="flex flex-row items-start w-[75%] min-w-0 bg-white border border-[#DBDBDD] rounded-lg overflow-hidden">
+                    <div className="flex flex-row items-start w-3/4 min-w-0 bg-background border border-input rounded-lg overflow-hidden">
                       <select
                         value={correctAnswer}
                         onChange={(e) => setCorrectAnswer(e.target.value)}
-                        className="flex-1 h-10 px-4 py-[10px] bg-white rounded-l-lg font-poppins font-semibold text-base leading-5 text-[#1E1E1E] placeholder:text-[rgba(73,89,101,0.5)] outline-none border-0 appearance-none cursor-pointer"
+                        className="flex-1 h-10 px-4 py-2 bg-background rounded-l-lg font-poppins font-semibold text-base text-foreground placeholder:text-muted-foreground outline-none border-0 appearance-none cursor-pointer"
                       >
                         <option value="" disabled>
                           Placeholder
@@ -215,8 +214,8 @@ export default function QuestionEditPage() {
                           </option>
                         ))}
                       </select>
-                      <div className="w-11 h-10 bg-[#7A003C] rounded-r-lg flex items-center justify-center pointer-events-none">
-                        <ChevronDown className="w-5 h-5 text-[#F5F5F5]" strokeWidth={2} />
+                      <div className="w-11 h-10 bg-primary rounded-r-lg flex items-center justify-center pointer-events-none">
+                        <ChevronDown className="w-5 h-5 text-primary-foreground" strokeWidth={2} />
                       </div>
                     </div>
                   </div>
@@ -224,25 +223,21 @@ export default function QuestionEditPage() {
               </div>
 
               {/* Answer Explanation - label only inside box as placeholder, same font size */}
-              <div className="flex flex-col items-stretch p-[10px] gap-[10px] w-full flex-1 min-h-0 overflow-hidden">
+              <div className="flex flex-col items-stretch p-2.5 gap-2.5 w-full flex-1 min-h-0 overflow-hidden">
                 <div className="w-full min-w-0 flex-1 min-h-0 [&>*]:w-full [&>*>*]:w-full">
                   <Textarea
                     value={explanation}
                     onChange={(e) => setExplanation(e.target.value)}
                     placeholder="Answer explanation"
-                    className="w-full min-w-0 min-h-[180px] max-h-[280px] p-[10px_16px] bg-white border border-[#DBDBDD] rounded-lg font-poppins font-semibold text-base leading-5 text-[#1E1E1E] placeholder:font-semibold placeholder:text-base placeholder:leading-5 placeholder:text-[#757575] resize-y overflow-auto box-border"
+                    className="w-full min-w-0 min-h-44 max-h-72 p-4 bg-background border border-input rounded-lg font-poppins font-semibold text-base text-foreground placeholder:text-muted-foreground resize-y overflow-auto box-border"
                   />
                 </div>
               </div>
             </div>
 
             {/* Save button - at bottom right, bottom aligned with last option on left */}
-            <div className="flex flex-row justify-end items-center p-[10px] pt-4 flex-shrink-0 mt-auto">
-              <Button
-                onClick={handleSave}
-                variant="primary"
-                className="px-6 py-3 h-11 bg-[#7A003C] rounded-lg font-poppins font-semibold text-base leading-5 text-[#F5F5F5]"
-              >
+            <div className="flex flex-row justify-end items-center p-2.5 pt-4 flex-shrink-0 mt-auto">
+              <Button onClick={handleSave} variant="primary">
                 Save
               </Button>
             </div>

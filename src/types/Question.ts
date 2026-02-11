@@ -1,4 +1,6 @@
-interface Question {
+import type { QuestionOption, TestQuestionOption } from "./QuestionOption";
+
+export interface Question {
   public_id: string;
   serial_number: string;
   content: string;
@@ -11,9 +13,9 @@ interface Question {
   unit?: string;
   subtopic?: string;
   answer_explanation?: string;
-};
+}
 
-interface TestQuestion {
+export interface TestQuestion {
   public_id: string;
   content: string;
   options: TestQuestionOption[];
