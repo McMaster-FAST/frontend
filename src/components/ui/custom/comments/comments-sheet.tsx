@@ -17,75 +17,75 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useEffect, useState } from "react";
 import { XIcon } from "lucide-react";
 
-const comments: QuestionComment[] = [];
-//   {
-//     public_id: "1",
-//     fromUserName: "Alice",
-//     question: "What is the capital of France?",
-//     commentText: "I think it's Paris.",
-//     replyTo: null,
-//     timestamp: new Date(Date.now() - 1000 * 24 * 60 * 60 * 1000),
-//   },
-//   {
-//     public_id: "2",
-//     fromUserName: "Bob",
-//     question: "What is the capital of France?",
-//     commentText: "Yes, it's Paris.",
-//     replyTo: "1",
-//     timestamp: new Date(Date.now() - 366 * 500 * 24 * 60 * 60 * 1000 + 60000),
-//   },
-//   {
-//     public_id: "3",
-//     fromUserName: "Charlie",
-//     question: "What is the capital of France?",
-//     commentText: "I thought it was London.",
-//     replyTo: "1",
-//     timestamp: new Date(Date.now() - 364 * 24 * 60 * 60 * 1000 + 120000),
-//   },
-//   {
-//     public_id: "4",
-//     fromUserName: "Dave",
-//     question: "What is the capital of France?",
-//     commentText: "No, it's definitely Paris.",
-//     replyTo: null,
-//     timestamp: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000),
-//   },
-//   {
-//     public_id: "5",
-//     fromUserName: "Dave",
-//     question: "What is the capital of France?",
-//     commentText: "No, it's definitely Paris.",
-//     replyTo: null,
-//     timestamp: new Date(Date.now() - 9 * 24 * 60 * 60 * 1000),
-//   },
-//   {
-//     public_id: "6",
-//     fromUserName: "Dave",
-//     question: "What is the capital of France?",
-//     commentText: "No, it's definitely Paris.",
-//     replyTo: null,
-//     timestamp: new Date(Date.now() - 9 * 24 * 60 * 60 * 1000),
-//   },
-//   {
-//     public_id: "7",
-//     fromUserName: "Dave",
-//     question:
-//       "What is the capital of France? Super long question to test wrapping behavior in the comments sheet UI component.",
-//     commentText:
-//       "No, it's definitely Paris. Super long comment to test wrapping behavior in the comments sheet UI component. No, it's definitely Paris. Super long comment to test wrapping behavior in the comments sheet UI component. No, it's definitely Paris. Super long comment to test wrapping behavior in the comments sheet UI component.",
-//     replyTo: null,
-//     timestamp: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000),
-//   },
-//   {
-//     public_id: "8",
-//     fromUserName: "Dave",
-//     question: "What is the capital of France?",
-//     commentText:
-//       "No, it's definitely Paris. Super long comment to test wrapping behavior in the comments sheet UI component.",
-//     replyTo: null,
-//     timestamp: new Date(Date.now() - 240000),
-//   },
-// ];
+const comments: QuestionComment[] = [
+  {
+    public_id: "1",
+    fromUserName: "Alice",
+    question: "What is the capital of France?",
+    commentText: "I think it's Paris.",
+    replyTo: null,
+    timestamp: new Date(Date.now() - 1000 * 24 * 60 * 60 * 1000),
+  },
+  {
+    public_id: "2",
+    fromUserName: "Bob",
+    question: "What is the capital of France?",
+    commentText: "Yes, it's Paris.",
+    replyTo: "1",
+    timestamp: new Date(Date.now() - 366 * 500 * 24 * 60 * 60 * 1000 + 60000),
+  },
+  {
+    public_id: "3",
+    fromUserName: "Charlie",
+    question: "What is the capital of France?",
+    commentText: "I thought it was London.",
+    replyTo: "1",
+    timestamp: new Date(Date.now() - 364 * 24 * 60 * 60 * 1000 + 120000),
+  },
+  {
+    public_id: "4",
+    fromUserName: "Dave",
+    question: "What is the capital of France?",
+    commentText: "No, it's definitely Paris.",
+    replyTo: null,
+    timestamp: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000),
+  },
+  {
+    public_id: "5",
+    fromUserName: "Dave",
+    question: "What is the capital of France?",
+    commentText: "No, it's definitely Paris.",
+    replyTo: null,
+    timestamp: new Date(Date.now() - 9 * 24 * 60 * 60 * 1000),
+  },
+  {
+    public_id: "6",
+    fromUserName: "Dave",
+    question: "What is the capital of France?",
+    commentText: "No, it's definitely Paris.",
+    replyTo: null,
+    timestamp: new Date(Date.now() - 9 * 24 * 60 * 60 * 1000),
+  },
+  {
+    public_id: "7",
+    fromUserName: "Dave",
+    question:
+      "What is the capital of France? Super long question to test wrapping behavior in the comments sheet UI component.",
+    commentText:
+      "No, it's definitely Paris. Super long comment to test wrapping behavior in the comments sheet UI component. No, it's definitely Paris. Super long comment to test wrapping behavior in the comments sheet UI component. No, it's definitely Paris. Super long comment to test wrapping behavior in the comments sheet UI component.",
+    replyTo: null,
+    timestamp: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000),
+  },
+  {
+    public_id: "8",
+    fromUserName: "Dave",
+    question: "What is the capital of France?",
+    commentText:
+      "No, it's definitely Paris. Super long comment to test wrapping behavior in the comments sheet UI component.",
+    replyTo: null,
+    timestamp: new Date(Date.now() - 240000),
+  },
+];
 
 /**
  * Generates a tree structure of comments and their replies. To avoid super nesting
