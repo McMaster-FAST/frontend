@@ -17,77 +17,75 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useEffect, useState } from "react";
 import { XIcon } from "lucide-react";
 
-import { User } from "next-auth";
-
-const comments: QuestionComment[] = [
-  {
-    public_id: "1",
-    fromUserName: "Alice",
-    question: "What is the capital of France?",
-    commentText: "I think it's Paris.",
-    replyTo: null,
-    timestamp: new Date(Date.now() - 1000 * 24 * 60 * 60 * 1000),
-  },
-  {
-    public_id: "2",
-    fromUserName: "Bob",
-    question: "What is the capital of France?",
-    commentText: "Yes, it's Paris.",
-    replyTo: "1",
-    timestamp: new Date(Date.now() - 366 * 500 * 24 * 60 * 60 * 1000 + 60000),
-  },
-  {
-    public_id: "3",
-    fromUserName: "Charlie",
-    question: "What is the capital of France?",
-    commentText: "I thought it was London.",
-    replyTo: "1",
-    timestamp: new Date(Date.now() - 364 * 24 * 60 * 60 * 1000 + 120000),
-  },
-  {
-    public_id: "4",
-    fromUserName: "Dave",
-    question: "What is the capital of France?",
-    commentText: "No, it's definitely Paris.",
-    replyTo: null,
-    timestamp: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000),
-  },
-  {
-    public_id: "5",
-    fromUserName: "Dave",
-    question: "What is the capital of France?",
-    commentText: "No, it's definitely Paris.",
-    replyTo: null,
-    timestamp: new Date(Date.now() - 9 * 24 * 60 * 60 * 1000),
-  },
-  {
-    public_id: "6",
-    fromUserName: "Dave",
-    question: "What is the capital of France?",
-    commentText: "No, it's definitely Paris.",
-    replyTo: null,
-    timestamp: new Date(Date.now() - 9 * 24 * 60 * 60 * 1000),
-  },
-  {
-    public_id: "7",
-    fromUserName: "Dave",
-    question:
-      "What is the capital of France? Super long question to test wrapping behavior in the comments sheet UI component.",
-    commentText:
-      "No, it's definitely Paris. Super long comment to test wrapping behavior in the comments sheet UI component. No, it's definitely Paris. Super long comment to test wrapping behavior in the comments sheet UI component. No, it's definitely Paris. Super long comment to test wrapping behavior in the comments sheet UI component.",
-    replyTo: null,
-    timestamp: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000),
-  },
-  {
-    public_id: "8",
-    fromUserName: "Dave",
-    question: "What is the capital of France?",
-    commentText:
-      "No, it's definitely Paris. Super long comment to test wrapping behavior in the comments sheet UI component.",
-    replyTo: null,
-    timestamp: new Date(Date.now() - 240000),
-  },
-];
+const comments: QuestionComment[] = [];
+//   {
+//     public_id: "1",
+//     fromUserName: "Alice",
+//     question: "What is the capital of France?",
+//     commentText: "I think it's Paris.",
+//     replyTo: null,
+//     timestamp: new Date(Date.now() - 1000 * 24 * 60 * 60 * 1000),
+//   },
+//   {
+//     public_id: "2",
+//     fromUserName: "Bob",
+//     question: "What is the capital of France?",
+//     commentText: "Yes, it's Paris.",
+//     replyTo: "1",
+//     timestamp: new Date(Date.now() - 366 * 500 * 24 * 60 * 60 * 1000 + 60000),
+//   },
+//   {
+//     public_id: "3",
+//     fromUserName: "Charlie",
+//     question: "What is the capital of France?",
+//     commentText: "I thought it was London.",
+//     replyTo: "1",
+//     timestamp: new Date(Date.now() - 364 * 24 * 60 * 60 * 1000 + 120000),
+//   },
+//   {
+//     public_id: "4",
+//     fromUserName: "Dave",
+//     question: "What is the capital of France?",
+//     commentText: "No, it's definitely Paris.",
+//     replyTo: null,
+//     timestamp: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000),
+//   },
+//   {
+//     public_id: "5",
+//     fromUserName: "Dave",
+//     question: "What is the capital of France?",
+//     commentText: "No, it's definitely Paris.",
+//     replyTo: null,
+//     timestamp: new Date(Date.now() - 9 * 24 * 60 * 60 * 1000),
+//   },
+//   {
+//     public_id: "6",
+//     fromUserName: "Dave",
+//     question: "What is the capital of France?",
+//     commentText: "No, it's definitely Paris.",
+//     replyTo: null,
+//     timestamp: new Date(Date.now() - 9 * 24 * 60 * 60 * 1000),
+//   },
+//   {
+//     public_id: "7",
+//     fromUserName: "Dave",
+//     question:
+//       "What is the capital of France? Super long question to test wrapping behavior in the comments sheet UI component.",
+//     commentText:
+//       "No, it's definitely Paris. Super long comment to test wrapping behavior in the comments sheet UI component. No, it's definitely Paris. Super long comment to test wrapping behavior in the comments sheet UI component. No, it's definitely Paris. Super long comment to test wrapping behavior in the comments sheet UI component.",
+//     replyTo: null,
+//     timestamp: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000),
+//   },
+//   {
+//     public_id: "8",
+//     fromUserName: "Dave",
+//     question: "What is the capital of France?",
+//     commentText:
+//       "No, it's definitely Paris. Super long comment to test wrapping behavior in the comments sheet UI component.",
+//     replyTo: null,
+//     timestamp: new Date(Date.now() - 240000),
+//   },
+// ];
 
 /**
  * Generates a tree structure of comments and their replies. To avoid super nesting
@@ -185,18 +183,27 @@ export default function CommentsSheet({
           <SheetHeader>
             <SheetTitle className="text-2xl font-semibold">Comments</SheetTitle>
           </SheetHeader>
-          <ScrollArea className="flex-1 overflow-hidden border-t-2">
-            <div className="flex flex-col gap-4 p-4 pt-0 pr-4">
-              {commentTree.map((comment) => (
-                <CommentCard
-                  key={comment.public_id}
-                  comment={comment}
-                  replies={comment.replies}
-                  onReply={onReply}
-                />
-              ))}
-            </div>
-          </ScrollArea>
+          {comments && comments.length > 0 && (
+            <ScrollArea className="flex-1 overflow-hidden border-t-2">
+              <div className="flex flex-col gap-4 p-4 pr-4">
+                {commentTree.map((comment) => (
+                  <CommentCard
+                    key={comment.public_id}
+                    comment={comment}
+                    replies={comment.replies}
+                    onReply={onReply}
+                  />
+                ))}
+              </div>
+            </ScrollArea>
+          )}
+          {!comments ||
+            (comments.length === 0 && (
+              <p className="p-4 h-full text-muted-foreground text-lg">
+                There are no comments on this question. <br />
+                Be the first!
+              </p>
+            ))}
           <SheetFooter className="flex flex-row flex-0 gap-2 border-t-4 border-gold mt-0">
             <Field>
               <FieldTitle>
@@ -210,7 +217,7 @@ export default function CommentsSheet({
                   </div>
                 )}
               </FieldTitle>
-              <InputGroup className="bg-background">
+              <InputGroup className="bg-background items-start">
                 <InputGroupTextarea
                   placeholder={
                     replyComment
