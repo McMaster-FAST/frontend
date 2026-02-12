@@ -18,8 +18,7 @@ function Tabs({
   }
   useEffect(() => {
     const tabFromHash = window.location.hash.substring(1);
-    if (!tabFromHash) updateTab(props.defaultValue || "");
-    setCurrentTab(tabFromHash);
+    updateTab(tabFromHash || props.defaultValue || "");
   }, []);
 
   return (
