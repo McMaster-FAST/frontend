@@ -177,76 +177,74 @@ export default function CommentsSheet({
   }, [open, onOpenChange]);
 
   return (
-    <div className="h-screen">
-      <Sheet open={open} onOpenChange={onOpenChange}>
-        <SheetContent className="flex flex-col gap-0">
-          <SheetHeader>
-            <SheetTitle className="text-2xl font-semibold">Comments</SheetTitle>
-          </SheetHeader>
-          {comments && comments.length > 0 && (
-            <ScrollArea className="flex-1 overflow-hidden border-t-2">
-              <div className="flex flex-col gap-4 p-4 pr-4">
-                {commentTree.map((comment) => (
-                  <CommentCard
-                    key={comment.public_id}
-                    comment={comment}
-                    replies={comment.replies}
-                    onReply={onReply}
-                  />
-                ))}
-              </div>
-            </ScrollArea>
-          )}
-          {!comments ||
-            (comments.length === 0 && (
-              <p className="p-4 h-full text-muted-foreground text-lg">
-                There are no comments on this question. <br />
-                Be the first!
-              </p>
-            ))}
-          <SheetFooter className="flex flex-row flex-0 gap-2 border-t-4 border-gold mt-0">
-            <Field>
-              <FieldTitle>
-                {replyComment && (
-                  <div className="animate-in slide-in-from-right duration-300 flex items-center gap-2 w-full">
-                    <XIcon
-                      className="size-4 text-primary hover:cursor-pointer"
-                      onClick={() => setReplyComment(null)}
-                    />
-                    <CommentCard comment={replyComment} replies={[]} />
-                  </div>
-                )}
-              </FieldTitle>
-              <InputGroup className="bg-background items-start">
-                <InputGroupTextarea
-                  placeholder={
-                    replyComment
-                      ? `Reply to ${replyComment.fromUserName}...`
-                      : "Add a comment..."
-                  }
-                  rows={2}
-                  value={newCommentText}
-                  onChange={(e) => setNewCommentText(e.target.value)}
+    <Sheet open={open} onOpenChange={onOpenChange}>
+      <SheetContent className="flex flex-col gap-0">
+        <SheetHeader>
+          <SheetTitle className="text-2xl font-semibold">Comments</SheetTitle>
+        </SheetHeader>
+        {comments && comments.length > 0 && (
+          <ScrollArea className="flex-1 overflow-hidden border-t-2">
+            <div className="flex flex-col gap-4 p-4 pr-4">
+              {commentTree.map((comment) => (
+                <CommentCard
+                  key={comment.public_id}
+                  comment={comment}
+                  replies={comment.replies}
+                  onReply={onReply}
                 />
-                <InputGroupAddon align="block-end">
-                  <InputGroupButton
-                    size="sm"
-                    variant="primary"
-                    className="ml-auto"
-                    disabled={newCommentText.trim() === ""}
-                    onClick={() => {}}
-                  >
-                    {replyComment ? "Reply" : "Comment"}
-                  </InputGroupButton>
-                </InputGroupAddon>
-              </InputGroup>
-              <FieldDescription className="text-xs text-muted-foreground">
-                Shift + Enter for new line
-              </FieldDescription>
-            </Field>
-          </SheetFooter>
-        </SheetContent>
-      </Sheet>
-    </div>
+              ))}
+            </div>
+          </ScrollArea>
+        )}
+        {!comments ||
+          (comments.length === 0 && (
+            <p className="p-4 h-full text-muted-foreground text-lg">
+              There are no comments on this question. <br />
+              Be the first!
+            </p>
+          ))}
+        <SheetFooter className="flex flex-row flex-0 gap-2 border-t-4 border-gold mt-0">
+          <Field>
+            <FieldTitle>
+              {replyComment && (
+                <div className="animate-in slide-in-from-right duration-300 flex items-center gap-2 w-full">
+                  <XIcon
+                    className="size-4 text-primary hover:cursor-pointer"
+                    onClick={() => setReplyComment(null)}
+                  />
+                  <CommentCard comment={replyComment} replies={[]} />
+                </div>
+              )}
+            </FieldTitle>
+            <InputGroup className="bg-background items-start">
+              <InputGroupTextarea
+                placeholder={
+                  replyComment
+                    ? `Reply to ${replyComment.fromUserName}...`
+                    : "Add a comment..."
+                }
+                rows={2}
+                value={newCommentText}
+                onChange={(e) => setNewCommentText(e.target.value)}
+              />
+              <InputGroupAddon align="block-end">
+                <InputGroupButton
+                  size="sm"
+                  variant="primary"
+                  className="ml-auto"
+                  disabled={newCommentText.trim() === ""}
+                  onClick={() => {}}
+                >
+                  {replyComment ? "Reply" : "Comment"}
+                </InputGroupButton>
+              </InputGroupAddon>
+            </InputGroup>
+            <FieldDescription className="text-xs text-muted-foreground">
+              Shift + Enter for new line
+            </FieldDescription>
+          </Field>
+        </SheetFooter>
+      </SheetContent>
+    </Sheet>
   );
 }

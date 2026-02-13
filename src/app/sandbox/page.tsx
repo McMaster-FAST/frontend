@@ -37,6 +37,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import CourseCard from "@/components/ui/custom/course-card";
 import UnitsAccordion from "@/components/ui/custom/unit-accordion/unit-accordion";
 import { Questions } from "@/app/courses/[courseCode]/dashboard/tabs/questions-tab";
+import CommentsSheet from "@/components/ui/custom/comments/comments-sheet";
 
 interface QuestionRow {
   question: string;
@@ -68,12 +69,7 @@ export default function Home() {
   return (
     <main>
       <div>
-        <MacFastHeader
-          userId="wardelp"
-          userCourses={[
-            { code: "MATH101", name: "Calculus I", year: 2025, semester: 1 },
-          ]}
-        />
+        <CommentsSheet open={true} onOpenChange={(open) => console.log("Comments sheet open:", open)} />
         <Button variant="primary">Primary</Button>
         <Button variant="secondary">Secondary</Button>
         <Button variant="tertiary">Tertiary</Button>
