@@ -1,29 +1,41 @@
 "use client";
 
-import { getAllQuestions, uploadQuestions } from "@/lib/api";
-import type { Question } from "@/types/Question";
-import { useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
+import { uploadQuestions } from "@/lib/api";
+import { useRef, useState } from "react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Progress } from "@/components/ui/progress";
-import { QuestionItem } from "@/components/ui/custom/questions-item";
+import { QuestionItem } from "@/components/ui/custom/questions-item/questions-item";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, FilterIcon } from "lucide-react";
+import { AlertCircle } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Input } from "@/components/ui/input";
+import { useCourseQuestions } from "@/hooks/useCourseQuestions";
+import { QuestionItemSkeleton } from "@/components/ui/custom/questions-item/questions-item-skeleton";
+import { SearchBar } from "@/components/ui/custom/saerch-bar";
+import { QuestionsFilter } from "@/components/ui/custom/questions-filter";
+import { useRouter } from "next/navigation";
 
 interface QuestionsProps {
-  courseCode: string;
+  course?: Course | null;
 }
 
-export function Questions({ courseCode }: QuestionsProps) {
-  const router = useRouter();
+export function Questions({ course }: QuestionsProps) {
   const [searchQuery, setSearchQuery] = useState("");
+  const [filters, setFilters] = useState<QuestionFilters>({});
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [error, setError] = useState<string | null>(null);
-  const [questions, setQuestions] = useState<Question[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const router = useRouter();
+
+  const allSubtopics =
+    course?.units.flatMap((unit) => unit.subtopics ?? []) || [];
+
+  const {
+    questions,
+    isLoading,
+    error: questionsError,
+    refetch,
+  } = useCourseQuestions({ searchQuery, filters });
 
   const handleUploadClick = () => {
     fileInputRef.current?.click();
@@ -50,16 +62,15 @@ export function Questions({ courseCode }: QuestionsProps) {
       }, 100);
 
       await uploadQuestions(file);
-      setTimeout(async () => {await fetchQuestions()}, 2000); 
+
+      await refetch();
 
       setUploadProgress(100);
       clearInterval(progressInterval);
-      
-      console.log(questions);
     } catch (error) {
       console.error("Upload failed:", error);
       setError(
-        error instanceof Error ? error.message : "Failed to upload questions"
+        error instanceof Error ? error.message : "Failed to upload questions",
       );
     } finally {
       setIsUploading(false);
@@ -71,25 +82,18 @@ export function Questions({ courseCode }: QuestionsProps) {
     }
   };
 
-  async function fetchQuestions() {
-      getAllQuestions()
-      .then((data) => {
-        setQuestions(data.questions);
-      })
-      .catch((error) => {
-          console.error("Failed to fetch questions:", error);
-          setError(
-            error instanceof Error ? error.message : "Failed to fetch questions"
-          );
-      });
-  }
-  
-  useEffect(() => {
-    fetchQuestions();
-  }, []);
+  const getFetchErrorDetails = () => {
+    if (!questionsError) return null;
+    const err = questionsError as any;
+    const status = err.status || "Unknown";
+    const message = err.message || "Failed to load questions";
+    return { status, message };
+  };
+
+  const fetchError = getFetchErrorDetails();
 
   return (
-    <div className="flex flex-col max-h-full">
+    <div className="flex flex-col h-full">
       {error && (
         <Alert variant="destructive" className="mb-6">
           <AlertTitle>Error</AlertTitle>
@@ -107,12 +111,11 @@ export function Questions({ courseCode }: QuestionsProps) {
       )}
 
       <div className="flex flex-row flex-0 gap-4 mb-6 items-center">
-        <Input
-          placeholder="Search"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
+        <SearchBar
+          className=""
+          placeholder="Search questions..."
+          onSearch={setSearchQuery}
         />
-        <Button variant="primary" iconOnly leftIcon={ArrowRight} />
         <div className="flex flex-1 gap-3 justify-end ">
           <input
             type="file"
@@ -123,39 +126,63 @@ export function Questions({ courseCode }: QuestionsProps) {
           />
           <Button
             variant="secondary"
+            size="default"
             onClick={handleUploadClick}
             disabled={isUploading}
           >
             {isUploading ? "Uploading..." : "Upload Questions"}
           </Button>
-          <Button variant="secondary" iconOnly leftIcon={FilterIcon} />
+          <QuestionsFilter
+            subtopics={allSubtopics}
+            filters={filters}
+            onFilterChange={setFilters}
+          />
         </div>
       </div>
 
-      <div className="flex-1">
+      {fetchError && (
+        <Alert variant="destructive" className="mb-6">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>
+            Error {fetchError.status}: Unable to load questions
+          </AlertTitle>
+          <AlertDescription>
+            {fetchError.message}. Please try refreshing the page.
+          </AlertDescription>
+        </Alert>
+      )}
+
+      <div className="flex-1 min-h-0">
         <ScrollArea className="h-full">
-            <div className="flex flex-col gap-4">
-              {questions.map((question) => (
-                <QuestionItem
-                  key={question.serial_number}
-                  question={question}
-                  onPreview={() =>
+          <div className="flex flex-col gap-4 mb-4">
+            {isLoading
+              ? [...Array(3)].map((_, i) => <QuestionItemSkeleton key={i} />)
+              : questions.map((question) => (
+                  <QuestionItem
+                    key={question.serial_number}
+                    question={question}
+                    onPreview={() =>
                     router.push(
-                      `/courses/${courseCode}/dashboard/questions/${question.public_id}/preview`
+                      `/courses/${course?.code}/dashboard/questions/${question.public_id}/preview`
                     )
                   }
                   onEdit={() =>
                     router.push(
-                      `/courses/${courseCode}/dashboard/questions/${question.public_id}/edit`
+                      `/courses/${course?.code}/dashboard/questions/${question.public_id}/edit`
                     )
                   }
-                  onViewComments={() =>
-                    console.log("View Comments:", question.serial_number)
-                  }
-                  onDelete={() => console.log("Delete:", question.serial_number)}
-                />
-              ))}
-            </div>
+                    onViewComments={() =>
+                      console.log("View Comments:", question.serial_number)
+                    }
+                    onDelete={() =>
+                      console.log("Delete:", question.serial_number)
+                    }
+                  />
+                ))}
+            <span className="text-sm mx-auto text-muted-foreground">
+              End of questions
+            </span>
+          </div>
         </ScrollArea>
       </div>
     </div>
