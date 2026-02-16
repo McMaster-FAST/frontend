@@ -29,5 +29,5 @@ export default withAuth(
 
 // Do not block public assets and auth pages
 export const config = {
-  matcher: ["/((?!api|_next/static|_next/image|auth|favicon.ico|images).*)"],
+  matcher: ["/((?!api|_next/static|_next/image|auth|favicon.ico|images|ping).*)"],
 };
