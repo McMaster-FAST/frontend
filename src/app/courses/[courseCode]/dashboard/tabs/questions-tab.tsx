@@ -92,6 +92,17 @@ export function Questions({ course }: QuestionsProps) {
 
   const fetchError = getFetchErrorDetails();
 
+  const navigateToPreview = (questionId: string) => {
+    router.push(
+      `/courses/${course?.code}/dashboard/questions/${questionId}/preview`,
+    );
+  };
+
+  const navigateToEdit = (questionId: string) => {
+    router.push(
+      `/courses/${course?.code}/dashboard/questions/${questionId}/edit`,
+    );
+  };
   return (
     <div className="flex flex-col h-full">
       {error && (
@@ -161,16 +172,8 @@ export function Questions({ course }: QuestionsProps) {
                   <QuestionItem
                     key={question.serial_number}
                     question={question}
-                    onPreview={() =>
-                    router.push(
-                      `/courses/${course?.code}/dashboard/questions/${question.public_id}/preview`
-                    )
-                  }
-                  onEdit={() =>
-                    router.push(
-                      `/courses/${course?.code}/dashboard/questions/${question.public_id}/edit`
-                    )
-                  }
+                    onPreview={() => navigateToPreview(question.public_id)}
+                    onEdit={() => navigateToEdit(question.public_id)}
                     onViewComments={() =>
                       console.log("View Comments:", question.serial_number)
                     }

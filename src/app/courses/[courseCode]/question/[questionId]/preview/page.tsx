@@ -11,8 +11,7 @@ import { useAuthFetch } from "@/hooks/useFetchWithAuth";
 import { getQuestionByPublicId } from "@/lib/api";
 import { Skeleton } from "@/components/ui/skeleton";
 import DOMPurify from "dompurify";
-import type { Question } from "@/types/Question";
-import type { QuestionOption } from "@/types/QuestionOption";
+import { QuestionPage } from "@/components/ui/custom/question-page";
 
 export default function QuestionPreviewPage() {
   const params = useParams();
@@ -35,7 +34,9 @@ export default function QuestionPreviewPage() {
       })
       .catch((err) => {
         if (!cancelled) {
-          setFetchError(err instanceof Error ? err.message : "Failed to load question");
+          setFetchError(
+            err instanceof Error ? err.message : "Failed to load question",
+          );
         }
       })
       .finally(() => {
@@ -66,50 +67,22 @@ export default function QuestionPreviewPage() {
       </div>
     );
   }
-
-  if (fetchError) {
-    return (
-      <div className="flex flex-col h-screen">
-        <MacFastHeader />
-        <div className="flex flex-col gap-4 p-8 flex-1">
-          <p className="font-poppins text-destructive">{fetchError}</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!question) {
-    return (
-      <div className="flex flex-col h-screen">
-        <MacFastHeader />
-        <div className="flex flex-col gap-4 p-8 flex-1">
-          <p className="font-poppins">Question not found</p>
-        </div>
-      </div>
-    );
-  }
-
+  if (!question) return;
+  console.log(question);
   return (
-    <div className="flex flex-col h-screen">
-      <MacFastHeader />
-      <div id="content" className="flex flex-col gap-4 p-8 flex-1">
-        {/* Breadcrumb Navigation */}
-        <div
-          id="header"
-          className="flex flex-row font-poppins font-semibold text-xl items-center gap-2 text-dark-gray"
-        >
-          <h1>{question.course || courseCode}</h1>
-          <ChevronsRight />
-          <h1>
-            {question.unit && question.subtopic
-              ? `${question.unit} - ${question.subtopic}`
-              : question.unit || question.subtopic || ""}
-          </h1>
-        </div>
+    <QuestionPage>
+      <QuestionPage.Title>
+        <h1>{question.course || courseCode}</h1>
+        <ChevronsRight />
+        <h1>
+          {question.unit && question.subtopic
+            ? `${question.unit} - ${question.subtopic}`
+            : question.unit || question.subtopic || ""}
+        </h1>
+      </QuestionPage.Title>
 
-        {/* Question Content */}
-        <div id="content" className="flex flex-col gap-6">
-          {/* Question Card */}
+      <QuestionPage.Content>
+        <QuestionPage.QuestionBody error={fetchError || ""}>
           {question.content && (
             <div
               id="question-card"
@@ -120,8 +93,7 @@ export default function QuestionPreviewPage() {
             ></div>
           )}
 
-          {/* Options List */}
-          <div id="options-list" className="flex flex-col gap-2">
+          <QuestionPage.Options>
             <RadioGroup
               value={selectedOption}
               onValueChange={setSelectedOption}
@@ -145,19 +117,39 @@ export default function QuestionPreviewPage() {
                   </div>
                 ))}
             </RadioGroup>
-          </div>
-        </div>
+          </QuestionPage.Options>
+        </QuestionPage.QuestionBody>
+        <QuestionPage.Answer>
+          <QuestionPage.AnswerTitle>
+            <p
+              className="font-poppins text-2xl"
+              dangerouslySetInnerHTML={{
+                __html: DOMPurify.sanitize(
+                  question?.options.find((option) => option.is_answer)
+                    ?.content || "",
+                ),
+              }}
+            />
+          </QuestionPage.AnswerTitle>
 
-        {/* Back Button */}
-        <div className="flex flex-row justify-end items-center mt-auto pt-4">
-          <Button
-            onClick={() => router.push(`/courses/${courseCode}/dashboard`)}
-            variant="primary"
-          >
-            Back
-          </Button>
-        </div>
-      </div>
-    </div>
+          <QuestionPage.AnswerBody>
+            <p
+              dangerouslySetInnerHTML={{
+                __html: DOMPurify.sanitize(question.answer_explanation || ""),
+              }}
+            />
+          </QuestionPage.AnswerBody>
+        </QuestionPage.Answer>
+      </QuestionPage.Content>
+
+      <QuestionPage.Actions>
+        <Button
+          onClick={() => router.push(`/courses/${courseCode}/dashboard`)}
+          variant="primary"
+        >
+          Back
+        </Button>
+      </QuestionPage.Actions>
+    </QuestionPage>
   );
 }

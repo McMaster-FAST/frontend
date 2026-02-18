@@ -1,6 +1,4 @@
-import type { QuestionOption, TestQuestionOption } from "./QuestionOption";
-
-export interface Question {
+interface Question {
   public_id: string;
   serial_number: string;
   content: string;
@@ -9,13 +7,14 @@ export interface Question {
   is_active: boolean;
   is_verified: boolean;
   options: QuestionOption[];
-  course?: string;
-  unit?: string;
-  subtopic?: string;
-  answer_explanation?: string;
+  course: string;
+  unit: string;
+  subtopic: string;
+  // TODO: Get this from the backend
+  answer_explanation: string;
 }
 
-export interface TestQuestion {
+interface TestQuestion {
   public_id: string;
   content: string;
   options: TestQuestionOption[];
