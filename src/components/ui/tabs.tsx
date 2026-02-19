@@ -4,15 +4,29 @@ import * as React from "react"
 import * as TabsPrimitive from "@radix-ui/react-tabs"
 
 import { cn } from "@/lib/utils"
+import { useEffect, useState } from "react"
 
 function Tabs({
   className,
   ...props
 }: React.ComponentProps<typeof TabsPrimitive.Root>) {
+  const [currentTab, setCurrentTab] = useState("");
+
+  const updateTab = (value: string) => {
+    window.location.hash = value;
+    setCurrentTab(value);
+  }
+  useEffect(() => {
+    const tabFromHash = window.location.hash.substring(1);
+    updateTab(tabFromHash || props.defaultValue || "");
+  }, []);
+
   return (
     <TabsPrimitive.Root
       data-slot="tabs"
       className={cn("flex flex-col gap-2", className)}
+      value={currentTab}
+      onValueChange={updateTab}
       {...props}
     />
   )

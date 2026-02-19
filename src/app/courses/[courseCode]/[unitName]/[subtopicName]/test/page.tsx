@@ -19,6 +19,7 @@ import { useAuthFetch } from "@/hooks/useFetchWithAuth";
 import { Skeleton } from "@/components/ui/skeleton";
 import { QuestionFlagDialog } from "@/components/ui/custom/question-flag-dialog";
 import DOMPurify from "dompurify";
+import debounce from "lodash/debounce";
 import ErrorMessage from "@/components/ui/custom/error-message";
 import {
   AlertDialog,
@@ -32,6 +33,7 @@ import {
 } from "@/components/ui/alert-dialog";
 
 import Link from "next/link";
+import { setSavedForLater } from "@/lib/api";
 
 interface QuestionPageProps {
   params: Promise<{
@@ -117,9 +119,11 @@ function QuestionPage({ params: paramsPromise }: QuestionPageProps) {
       .finally(() => setIsQuestionLoading(false));
   };
 
-  const handleSaveForLater = async () => {
-    // Implement save for later functionality here
-  };
+  const handleSaveForLater = debounce(
+    (checked: boolean) =>
+      setSavedForLater(question.public_id, checked, authFetch),
+    500,
+  );
   const handleQuestionFlag = async () => {
     // Implement question flagging functionality here
   };
@@ -287,6 +291,7 @@ function QuestionPage({ params: paramsPromise }: QuestionPageProps) {
             <div className="inline-flex gap-2">
               <Checkbox
                 id="save-for-later"
+                checked={question.saved_for_later}
                 onCheckedChange={handleSaveForLater}
               />
               <Label htmlFor="save-for-later">Save for Later</Label>

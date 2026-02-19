@@ -21,6 +21,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { SafeHtmlInline } from "@/components/ui/custom/safe-html";
 
 interface QuestionItemProps extends React.HTMLAttributes<HTMLDivElement> {
   question: Question;
@@ -42,8 +43,8 @@ function QuestionItem({
   return (
     <Card className="flex flex-row w-full items-center">
       <div className="flex-1 min-w-0">
-        <CardHeader className="whitespace-nowrap truncate block">
-          {question.content}
+        <CardHeader className="whitespace-nowrap overflow-ellipsis block">
+          <SafeHtmlInline html={question.content} />
         </CardHeader>
 
         <CardContent className="flex flex-col gap-1">
