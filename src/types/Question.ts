@@ -9,7 +9,9 @@ interface Question {
   options: QuestionOption[];
   course: string;
   unit: string;
-  subtopic_name: string;
+  subtopic: string;
+  // TODO: Get this from the backend
+  answer_explanation: string;
 }
 
 interface TestQuestion {

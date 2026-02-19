@@ -73,3 +73,21 @@ export async function getAllQuestions() {
 
   return getJson(response);
 }
+
+/**
+ * Fetch a single question by public_id for the edit page.
+ * GET /api/core/questions/<public_id>/
+ */
+export async function getQuestionByPublicId(
+  publicId: string,
+  authFetch: ReturnType<typeof useAuthFetch>
+): Promise<Question> {
+  const response = await authFetch(`/api/questions/${encodeURIComponent(publicId)}/`);
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch question: ${response.status}`);
+  }
+
+  const data = await response.json();
+  return data as Question;
+}
