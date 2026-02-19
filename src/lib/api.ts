@@ -127,3 +127,46 @@ export async function getAllQuestions() {
 
   return response.json();
 }
+
+export async function getSavedQuestions(courseCode: string, authFetch: ReturnType<typeof useAuthFetch>) {
+  const response = await authFetch(`/api/core/saved-for-later/${courseCode}/`, {
+    method: "GET",
+  });
+
+  if (!response.ok) {
+    throw new Error(""+response.status);
+  }
+  
+  return response.json();
+
+}
+
+export async function setSavedForLater(questionId: string, save: boolean, authFetch: ReturnType<typeof useAuthFetch>) {
+  const response = await authFetch(`/api/core/saved-for-later/`, {
+    method: "POST",
+    body: JSON.stringify({
+      question_id: questionId,
+      save_for_later: save,
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error(""+response.status);
+  }
+  
+  return response.json();
+
+}
+
+export async function getQuestionById(courseCode: string, questionId: string, authFetch: ReturnType<typeof useAuthFetch>) {
+  const response = await authFetch(`/api/courses/${courseCode}/questions/${questionId}/`, {
+    method: "GET"
+  });
+
+  if (!response.ok) {
+    throw new Error(""+response.status);
+  }
+  
+  return response.json();
+
+}

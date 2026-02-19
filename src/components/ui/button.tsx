@@ -16,6 +16,7 @@ const buttonVariants = cva(
           "bg-secondary text-secondary-foreground shadow-[inset_0_0_0_2px_var(--color-secondary-foreground)] hover:bg-secondary-hover hover:text-background disabled:bg-disabled-primary disabled:shadow-[inset_0_0_0_2px_var(--color-disabled-secondary)]",
         tertiary:
           "hover:bg-tertiary text-tertiary-foreground hover:text-tertiary-hover-foreground focus:ring-0",
+        icon: "bg-transparent text-primary p-0",
       },
       size: {
         default:
@@ -30,14 +31,10 @@ const buttonVariants = cva(
           "size-7 rounded-[min(var(--radius-md),12px)] in-data-[slot=button-group]:rounded-lg",
         "icon-lg": "size-9",
       },
-      iconOnly: {
-        true: "px-3 py-3",
-        false: "px-6 py-3",
-      },
     },
     defaultVariants: {
       variant: "primary",
-      iconOnly: false,
+      size: "default",
     },
   },
 );
@@ -54,38 +51,20 @@ interface ButtonProps
 function Button({
   className,
   variant,
-  size = "default",
-  iconOnly,
+  size,
   asChild = false,
-  leftIcon: LeftIcon,
-  leftClasses,
-  rightClasses,
-  rightIcon: RightIcon,
   children,
   ...props
 }: ButtonProps) {
   const Comp = asChild ? Slot : "button";
-  const strokeWidth = 3;
   return (
     <Comp
       data-slot="button"
       data-size={size}
-      className={cn(buttonVariants({ variant, iconOnly, className }))}
+      className={cn(buttonVariants({ variant, size }), className)}
       {...props}
     >
-      {LeftIcon && (
-        <LeftIcon strokeWidth={strokeWidth} className={leftClasses} />
-      )}
       {children}
-      {RightIcon && (
-        <RightIcon strokeWidth={strokeWidth} className={rightClasses} />
-      )}
-      {variant === "tertiary" && (
-        <ArrowRight
-          className={!props.disabled ? "text-tertiary-hover-foreground" : ""}
-          strokeWidth={strokeWidth}
-        />
-      )}
     </Comp>
   );
 }

@@ -14,7 +14,7 @@ import {
   DropdownMenuLabel,
 } from "@radix-ui/react-dropdown-menu";
 import { Progress } from "@/components/ui/progress";
-import { AlertCircle, ChevronDown } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import React from "react";
 import {
   Table,
@@ -37,6 +37,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import CourseCard from "@/components/ui/custom/course-card";
 import UnitsAccordion from "@/components/ui/custom/unit-accordion/unit-accordion";
 import { Questions } from "@/app/courses/[courseCode]/dashboard/tabs/questions-tab";
+import debounce from "lodash/debounce";
 
 interface QuestionRow {
   question: string;
@@ -68,16 +69,14 @@ export default function Home() {
   return (
     <main>
       <div>
-        <MacFastHeader
-          userId="wardelp"
-          userCourses={[
-            { code: "MATH101", name: "Calculus I", year: 2025, semester: 1 },
-          ]}
-        />
+        <Button variant="secondary" className="w-[300px]" onClick={debounce((event) => console.log("Debounced!"), 1000)}>
+          Content
+        </Button>
+
+        <MacFastHeader/>
         <Button variant="primary">Primary</Button>
         <Button variant="secondary">Secondary</Button>
         <Button variant="tertiary">Tertiary</Button>
-        <Button variant="primary" iconOnly leftIcon={AlertCircle} />
 
         <Checkbox id="checkbox-1" />
         <Label htmlFor="checkbox-1">Check me!</Label>

@@ -2,78 +2,44 @@
 
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { MacFastHeader } from "@/components/ui/custom/macfast-header";
+import { QuestionFlagDialog } from "@/components/ui/custom/question-flag-dialog";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { ChevronsRight } from "lucide-react";
-import React, { useState } from "react";
-import { getNextQuestion, setSavedForLater, submitAnswer } from "@/lib/api";
-import { useEffect } from "react";
-import { useAuthFetch } from "@/hooks/useFetchWithAuth";
 import { Skeleton } from "@/components/ui/skeleton";
-import { QuestionFlagDialog } from "@/components/ui/custom/question-flag-dialog";
+import Link from "next/link";
 import DOMPurify from "dompurify";
-import debounce from "lodash/debounce";
+import { MacFastHeader } from "@/components/ui/custom/macfast-header";
+import { useEffect, useState } from "react";
+import { getQuestionById } from "@/lib/api";
+import { useAuthFetch } from "@/hooks/useFetchWithAuth";
+import React from "react";
+import { SafeHtml } from "@/components/ui/custom/safe-html";
 
 interface QuestionPageProps {
   params: Promise<{
     courseCode: string;
-    unitName: string;
-    subtopicName: string;
+    questionId: string;
   }>;
 }
 
-function QuestionPage({ params: paramsPromise }: QuestionPageProps) {
+function SingleQuestionPage({ params: paramsPromise }: QuestionPageProps) {
   const params = React.use(paramsPromise);
-  const course = decodeURI(params.courseCode);
-  const unit = decodeURI(params.unitName);
-  const subtopic = decodeURI(params.subtopicName);
+  const courseCode = decodeURI(params.courseCode);
+  const questionId = decodeURI(params.questionId);
 
-  const [question, setQuestion]: [
-    TestQuestion,
-    React.Dispatch<React.SetStateAction<TestQuestion>>,
-  ] = useState({} as TestQuestion);
-  const [selectedOption, setSelectedOption] = useState<string>("");
-  const [submitSuccess, setSubmitSuccess] = useState<boolean>(false);
-  const [correctOptionId, setCorrectOptionId] = useState<string>("");
-  const [solution, setSolution] = useState<string>("");
-  const [submitted, setSubmitted] = useState<boolean>(false);
-
+  const [question, setQuestion] = useState<TestQuestion>({} as TestQuestion);
+  const [selectedOption, setSelectedOption] = useState<string | null>(null);
+  const [submitted, setSubmitted] = useState(false);
+  const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [solution, setSolution] = useState<string | null>(null);
+  const [correctOptionId, setCorrectOptionId] = useState<string | null>(null);
+  const [courseCodeForLink, setCourseCodeForLink] = useState<string>("");
   const authFetch = useAuthFetch();
 
-  const handleNextQuestion = async () => {
-    getNextQuestion(course, unit, subtopic, authFetch).then((nextQuestion) => {
-      setQuestion(nextQuestion);
-    });
-    setSelectedOption("");
-    setSubmitSuccess(false);
-    setSubmitted(false);
-    setCorrectOptionId("");
-    setSolution("");
-  };
-
-  const handleSubmit = async () => {
-    setSubmitted(true);
-    const response = await submitAnswer(
-      selectedOption,
-      question.public_id,
-      authFetch,
-    );
-
-    const data = await response.json();
-    setSubmitSuccess(true);
-    setCorrectOptionId(data.correct_option_id);
-    setSolution(data.explanation);
-  };
-
-  const handleSaveForLater = debounce((checked: boolean) => setSavedForLater(question.public_id, checked, authFetch), 500);
-  const handleQuestionFlag = async () => {
-    // Implement question flagging functionality here
-  };
-
   useEffect(() => {
-    handleNextQuestion();
-  }, [course, unit, subtopic]);
+    if (!courseCode || !questionId) return;
+    getQuestionById(courseCode, questionId, authFetch).then(setQuestion);
+  }, [courseCode, questionId]);
 
   return (
     <div className="flex flex-col h-screen">
@@ -83,23 +49,15 @@ function QuestionPage({ params: paramsPromise }: QuestionPageProps) {
           id="header"
           className="flex flex-row font-poppins font-semibold text-xl items-center gap-2 text-dark-gray"
         >
-          <h1>{course}</h1>
-          <ChevronsRight />
-          <h1>
-            {unit} - {subtopic}
-          </h1>
+          <h1>{courseCode} - Saved Question</h1>
         </div>
         <div id="content" className="flex flex-row gap-4 flex-1">
           <div id="question-content" className="flex-2 flex flex-col gap-6">
             {!question.content && <Skeleton className="w-full h-40" />}
             {question.content && (
-              <div
-                id="question-card"
-                className="border p-4 rounded-lg shadow-md"
-                dangerouslySetInnerHTML={{
-                  __html: DOMPurify.sanitize(question.content),
-                }}
-              ></div>
+              <div className="border p-4 rounded-lg shadow-md">
+                <SafeHtml html={question.content} />
+              </div>
             )}
             <div id="options-list" className="flex flex-col gap-2">
               {!question?.options &&
@@ -147,21 +105,19 @@ function QuestionPage({ params: paramsPromise }: QuestionPageProps) {
                     The correct answer is:
                   </h1>
                   <p className="font-poppins text-2xl">
-                    {
-                      question?.options.find(
-                        (option) => option.public_id === correctOptionId,
-                      )?.content
-                    }
+                    <SafeHtml
+                      html={
+                        question?.options.find(
+                          (option) => option.public_id === correctOptionId,
+                        )?.content || ""
+                      }
+                    />
                   </p>
                 </div>
 
                 <div>
                   <h2 className="font-poppins font-semibold text-lg">Why?</h2>
-                  <p
-                    dangerouslySetInnerHTML={{
-                      __html: DOMPurify.sanitize(solution),
-                    }}
-                  ></p>
+                  <SafeHtml html={solution || ""} />
                 </div>
               </div>
             )}
@@ -181,40 +137,34 @@ function QuestionPage({ params: paramsPromise }: QuestionPageProps) {
           id="question-section"
           className="w-full flex flex-row flex-2 justify-between items-center"
         >
-          <div>
-            <QuestionFlagDialog onSubmit={handleQuestionFlag} />
-          </div>
+          <QuestionFlagDialog onSubmit={() => {}} />
           <div className="inline-flex items-center gap-4">
             <div className="inline-flex gap-2">
-              <Checkbox
-                id="save-for-later"
-                checked={question.saved_for_later}
-                onCheckedChange={handleSaveForLater}
-              />
+              <Checkbox id="save-for-later" onCheckedChange={() => {}} />
               <Label htmlFor="save-for-later">Save for Later</Label>
             </div>
-            <Button variant="secondary" disabled={submitted}>
+            <Button variant="secondary" size="lg" disabled={submitted}>
               Skip
             </Button>
             <Button
               variant="primary"
               disabled={!selectedOption || submitted}
-              onClick={handleSubmit}
+              onClick={() => {}}
             >
               Submit
             </Button>
           </div>
         </div>
         <div id="answer-section" className="flex-1 flex justify-end">
-          {submitSuccess && submitted && (
-            <Button variant="primary" onClick={handleNextQuestion}>
-              Next Question
-            </Button>
-          )}
+          <Button variant="primary" asChild>
+            <Link href={`../coursepage#savedQuestions`}>
+              Back to saved questions
+            </Link>
+          </Button>
         </div>
       </footer>
     </div>
   );
 }
 
-export default QuestionPage;
+export default SingleQuestionPage;

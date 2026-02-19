@@ -1,11 +1,9 @@
 "use client";
 
 import { MacFastHeader } from "@/components/ui/custom/macfast-header";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import UnitsAccordion from "@/components/ui/custom/unit-accordion/unit-accordion";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import {
-  AlertCircle,
   AlertTriangle,
   BookOpen,
   GraduationCap,
@@ -15,8 +13,10 @@ import {
 import { useCourseData } from "@/hooks/useCourseData";
 import { useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { UnitsAccordionSkeleton } from "@/components/ui/custom/unit-accordion/unit-accordion-skeleton";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import StatisticsTab from "./tabs/statistics";
+import LearningObjectivesTab from "./tabs/learning-objectives";
+import UnitsTab from "./tabs/units";
+import SavedQuestionsTab from "./tabs/saved-questions";
 
 function CoursePage() {
   const { course, isLoading, error } = useCourseData();
@@ -108,105 +108,23 @@ function CoursePage() {
               </TabsTrigger>
             </TabsList>
           </div>
-          <TabsContent
-            value="practiceProblems"
-            className="mt-0 flex-1 overflow-y-auto min-h-0 pr-2"
-          >
-            <div className="flex flex-col gap-4">
-              <div className="mb-2">
-                <h2 className="text-lg font-semibold text-slate-800">
-                  Unit Breakdown
-                </h2>
-                <p className="text-sm text-dark-gray">
-                  Select a unit to view practice problems.
-                </p>
-              </div>
-              {isLoading || !course ? (
-                <div>
-                  <UnitsAccordionSkeleton />
-                </div>
-              ) : error ? (
-                <Alert
-                  variant="destructive"
-                  className="mt-4 bg-red-50 border-red-200 text-red-900"
-                >
-                  <AlertCircle className="h-4 w-4" />
-                  <AlertTitle>Unable to load units</AlertTitle>
-                  <AlertDescription>
-                    There was a problem retrieving the course content. Please
-                    try refreshing the page.
-                  </AlertDescription>
-                </Alert>
-              ) : (
-                <UnitsAccordion
-                  key={course.code}
-                  units={course.units}
-                  course={course}
-                  tab="practiceProblems"
-                  value={openUnits}
-                  setValue={setOpenUnits}
-                />
-              )}
-            </div>
-          </TabsContent>
+          <UnitsTab
+            course={course}
+            isLoading={isLoading}
+            error={error}
+            openUnits={openUnits}
+            setOpenUnits={setOpenUnits}
+          />
+          <LearningObjectivesTab
+            course={course}
+            isLoading={isLoading}
+            error={error}
+            openUnits={openUnits}
+            setOpenUnits={setOpenUnits}
+          />
+          <StatisticsTab />
 
-          <TabsContent
-            value="learningObjectives"
-            className="mt-0 flex-1 overflow-y-auto min-h-0 pr-2"
-          >
-            <div className="flex flex-col gap-4">
-              <div className="mb-2">
-                <h2 className="text-lg font-semibold text-slate-800">
-                  Learning Objectives
-                </h2>
-                <p className="text-sm text-dark-gray">
-                  Click on a unit to view detailed learning objectives.
-                </p>
-              </div>
-              {isLoading || !course ? (
-                <UnitsAccordionSkeleton />
-              ) : error ? (
-                <Alert
-                  variant="destructive"
-                  className="mt-4 bg-red-50 border-red-200 text-red-900"
-                >
-                  <AlertCircle className="h-4 w-4" />
-                  <AlertTitle>Unable to load units</AlertTitle>
-                  <AlertDescription>
-                    There was a problem retrieving the course content. Please
-                    try refreshing the page.
-                  </AlertDescription>
-                </Alert>
-              ) : (
-                <UnitsAccordion
-                  key={course.code + "-lo"}
-                  units={course.units}
-                  course={course}
-                  tab="learningObjectives"
-                  value={openUnits}
-                  setValue={setOpenUnits}
-                />
-              )}
-            </div>
-          </TabsContent>
-
-          <TabsContent
-            value="statistics"
-            className="mt-0 flex-1 overflow-y-auto min-h-0 pr-2"
-          >
-            <div className="rounded-lg border border-dashed border-light-gray p-10 text-center text-dark-gray">
-              Statistics Dashboard Coming Soon
-            </div>
-          </TabsContent>
-
-          <TabsContent
-            value="savedQuestions"
-            className="mt-0 flex-1 overflow-y-auto min-h-0 pr-2"
-          >
-            <div className="rounded-lg border border-dashed border-light-gray p-10 text-center text-dark-gray">
-              No saved questions yet.
-            </div>
-          </TabsContent>
+          <SavedQuestionsTab courseCode={course?.code || ""} />
         </Tabs>
       </main>
     </div>

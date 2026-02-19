@@ -157,17 +157,17 @@ export function Questions({ course }: QuestionsProps) {
               ? [...Array(3)].map((_, i) => <QuestionItemSkeleton key={i} />)
               : questions.map((question) => (
                   <QuestionItem
-                    key={question.serial_number}
+                    key={question.public_id}
                     question={question}
                     onPreview={() =>
-                      console.log("Preview:", question.serial_number)
+                      console.log("Preview:", question.public_id)
                     }
-                    onEdit={() => console.log("Edit:", question.serial_number)}
+                    onEdit={() => console.log("Edit:", question.public_id)}
                     onViewComments={() =>
-                      console.log("View Comments:", question.serial_number)
+                      console.log("View Comments:", question.public_id)
                     }
                     onDelete={() =>
-                      console.log("Delete:", question.serial_number)
+                      console.log("Delete:", question.public_id)
                     }
                   />
                 ))}
