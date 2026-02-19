@@ -25,6 +25,7 @@ export default function QuestionPreviewPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [fetchError, setFetchError] = useState<string | null>(null);
 
+  // Idk what this is
   useEffect(() => {
     let cancelled = false;
     getQuestionByPublicId(questionId, authFetch)
@@ -47,43 +48,24 @@ export default function QuestionPreviewPage() {
     };
   }, [questionId, authFetch]);
 
-  if (isLoading) {
-    return (
-      <div className="flex flex-col h-screen">
-        <MacFastHeader />
-        <div className="flex flex-col gap-4 p-8 flex-1">
-          <div className="flex flex-row font-poppins font-semibold text-xl items-center gap-2 text-dark-gray">
-            <Skeleton className="h-7 w-32" />
-            <Skeleton className="h-5 w-5" />
-            <Skeleton className="h-7 w-48" />
-          </div>
-          <div className="flex flex-col gap-6">
-            <Skeleton className="w-full h-40 rounded-lg" />
-            {[1, 2, 3, 4].map((i) => (
-              <Skeleton key={i} className="w-full h-20 rounded-md" />
-            ))}
-          </div>
-        </div>
-      </div>
-    );
-  }
-  if (!question) return;
-  console.log(question);
   return (
     <QuestionPage>
+      <QuestionPage.Header>
+        <MacFastHeader />
+      </QuestionPage.Header>
       <QuestionPage.Title>
-        <h1>{question.course || courseCode}</h1>
+        <h1>{question?.course || courseCode}</h1>
         <ChevronsRight />
         <h1>
-          {question.unit && question.subtopic
+          {question?.unit && question?.subtopic
             ? `${question.unit} - ${question.subtopic}`
-            : question.unit || question.subtopic || ""}
+            : question?.unit || question?.subtopic || ""}
         </h1>
       </QuestionPage.Title>
 
       <QuestionPage.Content>
-        <QuestionPage.QuestionBody error={fetchError || ""}>
-          {question.content && (
+        <QuestionPage.QuestionBody error={fetchError || ""} isLoading={isLoading}>
+          {question?.content && (
             <div
               id="question-card"
               className="border p-4 rounded-lg shadow-md bg-background"
@@ -93,12 +75,12 @@ export default function QuestionPreviewPage() {
             ></div>
           )}
 
-          <QuestionPage.Options>
+          <QuestionPage.Options isLoading={isLoading}>
             <RadioGroup
               value={selectedOption}
               onValueChange={setSelectedOption}
             >
-              {question.options &&
+              {question?.options &&
                 question.options.map((option: QuestionOption) => (
                   <div
                     key={option.public_id}
@@ -119,7 +101,7 @@ export default function QuestionPreviewPage() {
             </RadioGroup>
           </QuestionPage.Options>
         </QuestionPage.QuestionBody>
-        <QuestionPage.Answer>
+        <QuestionPage.Answer isLoading={isLoading}>
           <QuestionPage.AnswerTitle>
             <p
               className="font-poppins text-2xl"
@@ -135,7 +117,7 @@ export default function QuestionPreviewPage() {
           <QuestionPage.AnswerBody>
             <p
               dangerouslySetInnerHTML={{
-                __html: DOMPurify.sanitize(question.answer_explanation || ""),
+                __html: DOMPurify.sanitize(question?.answer_explanation || ""),
               }}
             />
           </QuestionPage.AnswerBody>

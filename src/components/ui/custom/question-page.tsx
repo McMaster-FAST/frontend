@@ -1,5 +1,6 @@
 import ErrorMessage from "@/components/ui/custom/error-message";
 import React from "react";
+import { Skeleton } from "../skeleton";
 
 function QuestionPage({ children }: { children: React.ReactNode }) {
   let header, content, footer, title;
@@ -44,14 +45,16 @@ function Title({ children }: { children: React.ReactNode }) {
 function QuestionBody({
   children,
   error,
+  isLoading,
 }: {
   children: React.ReactNode;
   error: string;
+  isLoading?: boolean;
 }) {
   return (
     <div className="flex-2 flex flex-col gap-6">
       {error && <ErrorMessage message={error} />}
-      {children}
+      {isLoading ? <Skeleton className="w-full h-40" /> : children}
     </div>
   );
 }
@@ -64,14 +67,34 @@ function Actions({ children }: { children: React.ReactNode }) {
   );
 }
 
-function Options({ children }: { children: React.ReactNode }) {
-  return <div className="flex flex-col gap-2">{children}</div>;
+function Options({
+  children,
+  isLoading,
+}: {
+  children: React.ReactNode;
+  isLoading: boolean;
+}) {
+  return (
+    <div className="flex flex-col gap-2">
+      {isLoading
+        ? Array.from({ length: 4 }).map((_, index) => (
+            <Skeleton key={index} className="w-full h-10" />
+          ))
+        : children}
+    </div>
+  );
 }
 
-function Answer({ children }: { children: React.ReactNode }) {
+function Answer({
+  children,
+  isLoading,
+}: {
+  children: React.ReactNode;
+  isLoading: boolean;
+}) {
   return (
     <div className="border-l-2 border-gray-300 pl-4 flex-1 flex flex-col gap-4">
-      {children}
+      {isLoading ? <Skeleton className="w-full h-40" /> : children}
     </div>
   );
 }

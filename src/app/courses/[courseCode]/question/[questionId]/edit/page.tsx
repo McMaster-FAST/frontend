@@ -3,15 +3,10 @@
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { MacFastHeader } from "@/components/ui/custom/macfast-header";
-import { Textarea } from "@/components/ui/textarea";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
 import { ChevronsRight } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import ErrorMessage from "@/components/ui/custom/error-message";
-import DOMPurify from "dompurify";
 import { getQuestionByPublicId } from "@/lib/api";
 import { useAuthFetch } from "@/hooks/useFetchWithAuth";
 import { QuestionPage } from "@/components/ui/custom/question-page";
@@ -24,7 +19,7 @@ export default function QuestionEditPage() {
   const authFetch = useAuthFetch();
   const courseCode = decodeURIComponent(params.courseCode as string);
   const questionId = decodeURIComponent(params.questionId as string);
-  const [question, setQuestion] = useState<Question | null>(null);
+  const [question, setQuestion] = useState<Question>({} as Question);
   const [isQuestionLoading, setIsQuestionLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [answerOption, setAnswerOption] = useState<string | null>(null);
@@ -54,23 +49,22 @@ export default function QuestionEditPage() {
       <QuestionPage.Title>
         <h1>{courseCode}</h1>
         <ChevronsRight />
-        <h1>TODO - TODO</h1>
+        <h1>{question?.unit} - {question?.subtopic}</h1>
       </QuestionPage.Title>
 
       <QuestionPage.Content>
-        <QuestionPage.QuestionBody error={error || ""}>
-          {isQuestionLoading && <Skeleton className="w-full h-40" />}
-          {!isQuestionLoading && question?.content && (
+        <QuestionPage.QuestionBody error={error || ""} isLoading={isQuestionLoading}>
+          {question?.content && (
             <RichTextarea
               placeholder="Question content..."
               className="border p-4 rounded-lg shadow-md bg-background h-40"
               label={"Question Content"}
               value={question.content}
-              onChange={(html) => setQuestion({ ...question, content: html })}
+              onChange={(html) => setQuestion((prev) => ({ ...prev, content: html }))}
             />
           )}
-          <QuestionPage.Options>
-            {!isQuestionLoading && question?.options && (
+          <QuestionPage.Options isLoading={isQuestionLoading}>
+            {question?.options && (
               <RadioGroup value={answerOption} onValueChange={setAnswerOption}>
                 {question?.options.map((option) => (
                   <div
@@ -97,10 +91,10 @@ export default function QuestionEditPage() {
                               ? { ...opt, content: html }
                               : opt,
                           );
-                          setQuestion({
-                            ...question,
+                          setQuestion((prev) => ({
+                            ...prev,
                             options: updatedOptions,
-                          });
+                          }));
                         }}
                       />
                     </div>
@@ -110,10 +104,10 @@ export default function QuestionEditPage() {
             )}
           </QuestionPage.Options>
         </QuestionPage.QuestionBody>
-        <QuestionPage.Answer>
+        <QuestionPage.Answer isLoading={isQuestionLoading}>
           <QuestionPage.AnswerTitle>
             {
-              question?.options.find(
+              question?.options?.find(
                 (option) => option.public_id === answerOption,
               )?.content
             }
@@ -123,7 +117,7 @@ export default function QuestionEditPage() {
               placeholder="Answer explanation..."
               value={question?.answer_explanation || ""}
               onChange={(html) => {
-                // setQuestion({ ...question, answer_explanation: html });
+                setQuestion((prev) => ({ ...prev, answer_explanation: html }));
               }}
             />
           </QuestionPage.AnswerBody>

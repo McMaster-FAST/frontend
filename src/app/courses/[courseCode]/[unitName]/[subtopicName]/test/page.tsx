@@ -158,7 +158,7 @@ function QuestionTestPage({ params: paramsPromise }: QuestionTestPageProps) {
         <h1>{subtopic}</h1>
       </QuestionPage.Title>
       <QuestionPage.Content>
-        <QuestionPage.QuestionBody error={error}>
+        <QuestionPage.QuestionBody error={error} isLoading={isQuestionLoading}>
           <AlertDialog open={!!showNoQuestionsDialog}>
             <AlertDialogContent className="w-min">
               <AlertDialogTitle>No available questions</AlertDialogTitle>
@@ -186,8 +186,7 @@ function QuestionTestPage({ params: paramsPromise }: QuestionTestPageProps) {
               </div>
             </AlertDialogContent>
           </AlertDialog>
-          {isQuestionLoading && <Skeleton className="w-full h-40" />}
-          {!isQuestionLoading && question.content && (
+          {question.content && (
             <div
               id="question-card"
               className="border p-4 rounded-lg shadow-md"
@@ -196,12 +195,8 @@ function QuestionTestPage({ params: paramsPromise }: QuestionTestPageProps) {
               }}
             ></div>
           )}
-          <QuestionPage.Options>
-            {isQuestionLoading &&
-              Array.from({ length: 4 }).map((_, index) => (
-                <Skeleton key={index} className="w-full h-10" />
-              ))}
-            {!isQuestionLoading && question?.options && (
+          <QuestionPage.Options isLoading={isQuestionLoading}>
+            {question?.options && (
               <RadioGroup
                 value={selectedOption}
                 onValueChange={setSelectedOption}
@@ -232,7 +227,7 @@ function QuestionTestPage({ params: paramsPromise }: QuestionTestPageProps) {
             )}
           </QuestionPage.Options>
         </QuestionPage.QuestionBody>
-        <QuestionPage.Answer>
+        <QuestionPage.Answer isLoading={isQuestionLoading || (submitted && !submitSuccess)}>
           <div className="flex flex-col gap-4">
             {submitSuccess && correctOptionId && (
               <div>
