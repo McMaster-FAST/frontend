@@ -7,13 +7,33 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { ChevronsRight } from "lucide-react";
 import React, { useState } from "react";
-import { getNextQuestion, setSavedForLater, submitAnswer } from "@/lib/api";
+import {
+  getNextQuestion,
+  skipQuestion,
+  submitAnswer,
+  resetSkippedQuestions,
+  getActiveTestSession,
+} from "@/lib/adaptive-test-api";
 import { useEffect } from "react";
 import { useAuthFetch } from "@/hooks/useFetchWithAuth";
 import { Skeleton } from "@/components/ui/skeleton";
 import { QuestionFlagDialog } from "@/components/ui/custom/question-flag-dialog";
 import DOMPurify from "dompurify";
 import debounce from "lodash/debounce";
+import ErrorMessage from "@/components/ui/custom/error-message";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogTitle,
+} from "@radix-ui/react-alert-dialog";
+import {
+  AlertDialogContent,
+  AlertDialogDescription,
+} from "@/components/ui/alert-dialog";
+
+import Link from "next/link";
+import { setSavedForLater } from "@/lib/api";
 
 interface QuestionPageProps {
   params: Promise<{
@@ -23,12 +43,20 @@ interface QuestionPageProps {
   }>;
 }
 
+interface ContinueActions {
+  use_skipped_questions: boolean;
+}
+
 function QuestionPage({ params: paramsPromise }: QuestionPageProps) {
+  // Get course info from URI
   const params = React.use(paramsPromise);
   const course = decodeURI(params.courseCode);
   const unit = decodeURI(params.unitName);
   const subtopic = decodeURI(params.subtopicName);
 
+  const authFetch = useAuthFetch();
+
+  // Setup state
   const [question, setQuestion]: [
     TestQuestion,
     React.Dispatch<React.SetStateAction<TestQuestion>>,
@@ -38,41 +66,87 @@ function QuestionPage({ params: paramsPromise }: QuestionPageProps) {
   const [correctOptionId, setCorrectOptionId] = useState<string>("");
   const [solution, setSolution] = useState<string>("");
   const [submitted, setSubmitted] = useState<boolean>(false);
+  const [error, setError] = useState<string>("");
+  const [isQuestionLoading, setIsQuestionLoading] = useState<boolean>(true);
+  const [continueActions, setContinueActions] = useState<ContinueActions>({
+    use_skipped_questions: false,
+  });
 
-  const authFetch = useAuthFetch();
+  const showNoQuestionsDialog =
+    !question?.public_id && !isQuestionLoading && !error;
 
-  const handleNextQuestion = async () => {
-    getNextQuestion(course, unit, subtopic, authFetch).then((nextQuestion) => {
-      setQuestion(nextQuestion);
-    });
+  const resetState = () => {
+    setIsQuestionLoading(true);
     setSelectedOption("");
     setSubmitSuccess(false);
     setSubmitted(false);
     setCorrectOptionId("");
     setSolution("");
+    setError("");
+  };
+
+  const handleNextQuestion = async () => {
+    resetState();
+
+    getNextQuestion(course, unit, subtopic, authFetch)
+      .then((nextQuestion) => {
+        setQuestion(nextQuestion);
+        updateContinueActions();
+      })
+      .catch((err) => setError(err.message))
+      .finally(() => setIsQuestionLoading(false));
   };
 
   const handleSubmit = async () => {
     setSubmitted(true);
-    const response = await submitAnswer(
-      selectedOption,
-      question.public_id,
-      authFetch,
-    );
-
-    const data = await response.json();
-    setSubmitSuccess(true);
-    setCorrectOptionId(data.correct_option_id);
-    setSolution(data.explanation);
+    submitAnswer(selectedOption, question.public_id, authFetch)
+      .then((data) => {
+        setSubmitSuccess(true);
+        setCorrectOptionId(data.correct_option_id);
+        setSolution(data.explanation);
+      })
+      .catch((err) => setError(err.message));
   };
 
-  const handleSaveForLater = debounce((checked: boolean) => setSavedForLater(question.public_id, checked, authFetch), 500);
+  const handleSkip = async () => {
+    resetState();
+    skipQuestion(question.public_id, authFetch)
+      .then((nextQuestion) => {
+        setQuestion(nextQuestion);
+        updateContinueActions();
+      })
+      .catch((err) => setError(err.message))
+      .finally(() => setIsQuestionLoading(false));
+  };
+
+  const handleSaveForLater = debounce(
+    (checked: boolean) =>
+      setSavedForLater(question.public_id, checked, authFetch),
+    500,
+  );
   const handleQuestionFlag = async () => {
     // Implement question flagging functionality here
   };
 
+  const useSkippedQuestions = () => {
+    resetSkippedQuestions(authFetch).then(() => {
+      handleNextQuestion();
+    });
+  };
+
+  const updateContinueActions = () => {
+    getActiveTestSession(authFetch).then((session) => {
+      setContinueActions({
+        use_skipped_questions: session.skipped_questions.length > 0,
+      });
+    });
+  };
+
   useEffect(() => {
-    handleNextQuestion();
+    (async () => {
+      await handleNextQuestion();
+      updateContinueActions();
+    })();
   }, [course, unit, subtopic]);
 
   return (
@@ -91,8 +165,36 @@ function QuestionPage({ params: paramsPromise }: QuestionPageProps) {
         </div>
         <div id="content" className="flex flex-row gap-4 flex-1">
           <div id="question-content" className="flex-2 flex flex-col gap-6">
-            {!question.content && <Skeleton className="w-full h-40" />}
-            {question.content && (
+            {error && <ErrorMessage message={error} />}
+            <AlertDialog open={!!showNoQuestionsDialog}>
+              <AlertDialogContent className="w-min">
+                <AlertDialogTitle>No available questions</AlertDialogTitle>
+                <AlertDialogDescription>
+                  All questions have been skipped.
+                </AlertDialogDescription>
+                <AlertDialogDescription className="mb-4">
+                  How would you like to proceed?
+                </AlertDialogDescription>
+                <div className="flex flex-col w-fit gap-2 justify-center">
+                  {continueActions.use_skipped_questions && (
+                    <AlertDialogAction asChild>
+                      <Button onClick={useSkippedQuestions}>
+                        Use skipped questions
+                      </Button>
+                    </AlertDialogAction>
+                  )}
+                  <AlertDialogCancel asChild>
+                    <Button variant="secondary">
+                      <Link href={`/courses/${course}/coursepage`}>
+                        Return to Course Page
+                      </Link>
+                    </Button>
+                  </AlertDialogCancel>
+                </div>
+              </AlertDialogContent>
+            </AlertDialog>
+            {isQuestionLoading && <Skeleton className="w-full h-40" />}
+            {!isQuestionLoading && question.content && (
               <div
                 id="question-card"
                 className="border p-4 rounded-lg shadow-md"
@@ -102,16 +204,16 @@ function QuestionPage({ params: paramsPromise }: QuestionPageProps) {
               ></div>
             )}
             <div id="options-list" className="flex flex-col gap-2">
-              {!question?.options &&
+              {isQuestionLoading &&
                 Array.from({ length: 4 }).map((_, index) => (
                   <Skeleton key={index} className="w-full h-10" />
                 ))}
-              <RadioGroup
-                value={selectedOption}
-                onValueChange={setSelectedOption}
-              >
-                {question?.options &&
-                  question.options.map((option) => (
+              {!isQuestionLoading && question?.options && (
+                <RadioGroup
+                  value={selectedOption}
+                  onValueChange={setSelectedOption}
+                >
+                  {question?.options.map((option) => (
                     <div
                       key={option.public_id}
                       className="flex items-center gap-2 w-full"
@@ -133,7 +235,8 @@ function QuestionPage({ params: paramsPromise }: QuestionPageProps) {
                       ></Label>
                     </div>
                   ))}
-              </RadioGroup>
+                </RadioGroup>
+              )}
             </div>
           </div>
           <div
@@ -170,7 +273,7 @@ function QuestionPage({ params: paramsPromise }: QuestionPageProps) {
                 Submit an answer to see the solution.
               </h2>
             )}
-            {(!question?.content || (!submitSuccess && submitted)) && (
+            {(isQuestionLoading || (!submitSuccess && submitted)) && (
               <Skeleton className="w-full h-full" />
             )}
           </div>
@@ -193,7 +296,11 @@ function QuestionPage({ params: paramsPromise }: QuestionPageProps) {
               />
               <Label htmlFor="save-for-later">Save for Later</Label>
             </div>
-            <Button variant="secondary" disabled={submitted}>
+            <Button
+              variant="secondary"
+              disabled={submitted}
+              onClick={handleSkip}
+            >
               Skip
             </Button>
             <Button

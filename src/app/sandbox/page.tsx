@@ -38,6 +38,7 @@ import CourseCard from "@/components/ui/custom/course-card";
 import UnitsAccordion from "@/components/ui/custom/unit-accordion/unit-accordion";
 import { Questions } from "@/app/courses/[courseCode]/dashboard/tabs/questions-tab";
 import debounce from "lodash/debounce";
+import CommentsSheet from "@/components/ui/custom/comments/comments-sheet";
 
 interface QuestionRow {
   question: string;
@@ -69,11 +70,19 @@ export default function Home() {
   return (
     <main>
       <div>
-        <Button variant="secondary" className="w-[300px]" onClick={debounce((event) => console.log("Debounced!"), 1000)}>
+        <Button
+          variant="secondary"
+          className="w-[300px]"
+          onClick={debounce((event) => console.log("Debounced!"), 1000)}
+        >
           Content
         </Button>
 
-        <MacFastHeader/>
+        <MacFastHeader />
+        <CommentsSheet
+          open={true}
+          onOpenChange={(open) => console.log("Comments sheet open:", open)}
+        />
         <Button variant="primary">Primary</Button>
         <Button variant="secondary">Secondary</Button>
         <Button variant="tertiary">Tertiary</Button>
