@@ -8,6 +8,7 @@ import { QuestionItem } from "@/components/ui/custom/questions-item/questions-it
 import { Button } from "@/components/ui/button";
 import { AlertCircle } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import CommentsSheet from "@/components/ui/custom/comments/comments-sheet";
 import { useCourseQuestions } from "@/hooks/useCourseQuestions";
 import { QuestionItemSkeleton } from "@/components/ui/custom/questions-item/questions-item-skeleton";
 import { SearchBar } from "@/components/ui/custom/saerch-bar";
@@ -24,6 +25,7 @@ export function Questions({ course }: QuestionsProps) {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [error, setError] = useState<string | null>(null);
+  const [commentsSheetOpen, setCommentsSheetOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
 
@@ -174,9 +176,9 @@ export function Questions({ course }: QuestionsProps) {
                     question={question}
                     onPreview={() => navigateToPreview(question.public_id)}
                     onEdit={() => navigateToEdit(question.public_id)}
-                    onViewComments={() =>
-                      console.log("View Comments:", question.serial_number)
-                    }
+                    onViewComments={() => {
+                      setCommentsSheetOpen(true);
+                    }}
                     onDelete={() =>
                       console.log("Delete:", question.serial_number)
                     }
@@ -188,6 +190,10 @@ export function Questions({ course }: QuestionsProps) {
           </div>
         </ScrollArea>
       </div>
+      <CommentsSheet
+        open={commentsSheetOpen}
+        onOpenChange={setCommentsSheetOpen}
+      />
     </div>
   );
 }
