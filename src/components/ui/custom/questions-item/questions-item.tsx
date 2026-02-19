@@ -77,7 +77,7 @@ function QuestionItem({
             )}
             <div className="flex items-center text-xs font-medium text-dark-gray truncate max-w-3xl mr-1">
               <NotebookPen className="mr-1 h-4 w-4 text-primary" />
-              {question.subtopic_name}
+              {question.subtopic}
             </div>
           </div>
         </CardContent>

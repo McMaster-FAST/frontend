@@ -94,13 +94,13 @@ export function Questions({ course }: QuestionsProps) {
 
   const navigateToPreview = (questionId: string) => {
     router.push(
-      `/courses/${course?.code}/dashboard/questions/${questionId}/preview`,
+      `/courses/${course?.code}/question/${questionId}/preview`,
     );
   };
 
   const navigateToEdit = (questionId: string) => {
     router.push(
-      `/courses/${course?.code}/dashboard/questions/${questionId}/edit`,
+      `/courses/${course?.code}/question/${questionId}/edit`,
     );
   };
   return (
