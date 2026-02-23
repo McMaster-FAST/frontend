@@ -1,18 +1,17 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { useAuthFetch } from "@/hooks/useFetchWithAuth";
+import debounce from "lodash/debounce";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 export async function getJson(response: Response) {
-  return response
-    .json()
-    .catch(() => {
-      throw new Error(response.status + " " + response.statusText);
-    })
+  if (!response.ok) throw new Error(`ERROR: ${response.status}`);
+
+  return response.json()
     .then((json) => {
       if (!response.ok) {
-        throw new Error(json.message || "Error fetching data");
+        throw new Error(json.detail || "Error fetching data");
       }
       return json;
     });
@@ -74,45 +73,52 @@ export async function getAllQuestions() {
   return getJson(response);
 }
 
-export async function getSavedQuestions(courseCode: string, authFetch: ReturnType<typeof useAuthFetch>) {
+export async function getSavedQuestions(
+  courseCode: string,
+  authFetch: ReturnType<typeof useAuthFetch>,
+) {
   const response = await authFetch(`/api/core/saved-for-later/${courseCode}/`, {
     method: "GET",
   });
 
-  if (!response.ok) {
-    throw new Error(""+response.status);
-  }
-  
-  return response.json();
-
+  return getJson(response);
 }
 
-export async function setSavedForLater(questionId: string, save: boolean, authFetch: ReturnType<typeof useAuthFetch>) {
-  const response = await authFetch(`/api/core/saved-for-later/`, {
-    method: "POST",
+export const setSavedForLaterDebounced = debounce(
+  (
+    courseCode: string,
+    questionId: string,
+    saveForLater: boolean,
+    authFetch: ReturnType<typeof useAuthFetch>,
+  ) => setSavedForLater(courseCode, questionId, saveForLater, authFetch),
+  500,
+);
+
+export async function setSavedForLater(
+  courseCode: string,
+  questionId: string,
+  saveForLater: boolean,
+  authFetch: ReturnType<typeof useAuthFetch>,
+) {
+  await authFetch(`/api/core/saved-for-later/${courseCode}/`, {
+    method: saveForLater ? "POST" : "DELETE",
     body: JSON.stringify({
-      question_id: questionId,
-      save_for_later: save,
+      question_public_id: questionId,
     }),
   });
-
-  if (!response.ok) {
-    throw new Error(""+response.status);
-  }
-  
-  return response.json();
-
 }
 
-export async function getQuestionById(courseCode: string, questionId: string, authFetch: ReturnType<typeof useAuthFetch>) {
-  const response = await authFetch(`/api/courses/${courseCode}/questions/${questionId}/`, {
-    method: "GET"
-  });
+export async function getQuestionById(
+  courseCode: string,
+  questionId: string,
+  authFetch: ReturnType<typeof useAuthFetch>,
+) {
+  const response = await authFetch(
+    `/api/courses/${courseCode}/questions/${questionId}/`,
+    {
+      method: "GET",
+    },
+  );
 
-  if (!response.ok) {
-    throw new Error(""+response.status);
-  }
-  
-  return response.json();
-
+  return getJson(response);
 }

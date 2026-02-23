@@ -8,6 +8,8 @@ import { NotebookPen, SquareArrowOutUpRight, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { SafeHtmlInline } from "@/components/ui/custom/safe-html";
+import { setSavedForLater } from "@/lib/api";
+import { useAuthFetch } from "@/hooks/useFetchWithAuth";
 
 interface SavedQuestionItemProps {
   question: SavedForLaterQuestion;
@@ -18,8 +20,12 @@ export default function SavedQuestionItem({
   question,
   ...props
 }: SavedQuestionItemProps) {
+  const authFetch = useAuthFetch();
   return (
-    <Card className="flex flex-row w-full items-center justify-between" {...props}>
+    <Card
+      className="flex flex-row w-full items-center justify-between"
+      {...props}
+    >
       <div className="flex-grow min-w-0">
         <CardHeader className="whitespace-nowrap truncate overflow-ellipsis block">
           <div className="flex flex-row">
@@ -38,7 +44,18 @@ export default function SavedQuestionItem({
         <Button variant="primary">
           <Link href={`./question/${question.public_id}`}>Review</Link>
         </Button>
-        <Button variant="secondary" size="sm">
+        <Button
+          variant="secondary"
+          size="sm"
+          onClick={() =>
+            setSavedForLater(
+              question.course_code,
+              question.public_id,
+              false,
+              authFetch,
+            )
+          }
+        >
           <Trash2 className="size-4" />
         </Button>
       </CardAction>

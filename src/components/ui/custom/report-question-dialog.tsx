@@ -12,8 +12,9 @@ import {
 import { AlertTriangle, Flag } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Input } from "../input";
+import { isValidEmail } from "@/lib/utils";
 
 
 enum QuestionFlagReason {
@@ -28,17 +29,31 @@ enum QuestionFlagReason {
 interface QuestionFlagDialogProps {
   onSubmit: (reasons: QuestionFlagReason[]) => void;
 }
+
+interface ReportAnswers {
+  reasons: QuestionFlagReason[];
+  additionalDetails: string;
+  email: string;
+}
+
+interface FormValidityState {
+  reasons: boolean;
+  email: boolean;
+  additionalDetails: boolean;
+}
+
 export function QuestionFlagDialog({ onSubmit }: QuestionFlagDialogProps) {
   const [open, setOpen] = useState(false);
-  const [selectedReasons, setSelectedReasons] = useState<QuestionFlagReason[]>(
-    [],
-  );
-  const [additionalDetails, setAdditionalDetails] = useState("");
-  const [email, setEmail] = useState("");
+  const [reportAnswers, setReportAnswers] = useState<ReportAnswers>({
+    reasons: [],
+    additionalDetails: "",
+    email: "",
+  });
 
-  const handleSubmitReport = () => {
+  const handleSubmitReport = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSubmit(reportAnswers.reasons);
     setOpen(false);
-    onSubmit(selectedReasons);
   };
 
   return (
@@ -59,17 +74,21 @@ export function QuestionFlagDialog({ onSubmit }: QuestionFlagDialogProps) {
             <div key={key} className="inline-flex gap-2">
               <Checkbox
                 id={key}
-                checked={selectedReasons.includes(key as QuestionFlagReason)}
+                checked={reportAnswers.reasons.includes(key as QuestionFlagReason)}
                 onCheckedChange={(checked) => {
                   if (checked) {
-                    setSelectedReasons([
-                      ...selectedReasons,
-                      key as QuestionFlagReason,
-                    ]);
+                    setReportAnswers({
+                      ...reportAnswers,
+                      reasons: [...reportAnswers.reasons, key as QuestionFlagReason],
+                    });
+
                   } else {
-                    setSelectedReasons(
-                      selectedReasons.filter((reason) => reason !== key),
-                    );
+                    setReportAnswers({
+                      ...reportAnswers,
+                      reasons: reportAnswers.reasons.filter(
+                        (reason) => reason !== key,
+                      ),
+                    });
                   }
                 }}
               />
@@ -84,8 +103,11 @@ export function QuestionFlagDialog({ onSubmit }: QuestionFlagDialogProps) {
             id="additional-details"
             placeholder="Additional details"
             className="mt-2"
-            value={additionalDetails}
-            onChange={(e) => setAdditionalDetails(e.target.value)}
+            value={reportAnswers.additionalDetails}
+            onChange={(e) => setReportAnswers({
+              ...reportAnswers,
+              additionalDetails: e.target.value
+            })}
           />
           <Label htmlFor="email" className="mt-4">
             Can we reach out to you if we have more questions? Please provide
@@ -96,8 +118,11 @@ export function QuestionFlagDialog({ onSubmit }: QuestionFlagDialogProps) {
             type="email"
             placeholder="Email address"
             className="mt-2"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            value={reportAnswers.email}
+            onChange={(e) => setReportAnswers({
+              ...reportAnswers,
+              email: e.target.value
+            })}
           />
           <DialogFooter>
             <DialogClose asChild>
@@ -106,7 +131,7 @@ export function QuestionFlagDialog({ onSubmit }: QuestionFlagDialogProps) {
             <Button
               type="submit"
               onClick={handleSubmitReport}
-              disabled={selectedReasons.length === 0}
+              disabled={reportAnswers.reasons.length === 0}
             >
               Report
             </Button>

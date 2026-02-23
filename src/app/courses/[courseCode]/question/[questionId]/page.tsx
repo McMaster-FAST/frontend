@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { QuestionFlagDialog } from "@/components/ui/custom/question-flag-dialog";
+import { QuestionFlagDialog } from "@/components/ui/custom/report-question-dialog";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -10,7 +10,7 @@ import Link from "next/link";
 import DOMPurify from "dompurify";
 import { MacFastHeader } from "@/components/ui/custom/macfast-header";
 import { useEffect, useState } from "react";
-import { getQuestionById } from "@/lib/api";
+import { getQuestionById, setSavedForLaterDebounced } from "@/lib/api";
 import { useAuthFetch } from "@/hooks/useFetchWithAuth";
 import React from "react";
 import { SafeHtml } from "@/components/ui/custom/safe-html";
@@ -140,7 +140,18 @@ function SingleQuestionPage({ params: paramsPromise }: QuestionPageProps) {
           <QuestionFlagDialog onSubmit={() => {}} />
           <div className="inline-flex items-center gap-4">
             <div className="inline-flex gap-2">
-              <Checkbox id="save-for-later" onCheckedChange={() => {}} />
+              <Checkbox
+                id="save-for-later"
+                checked={question?.saved_for_later || false}
+                onCheckedChange={(checked: boolean) =>
+                  setSavedForLaterDebounced(
+                    courseCode,
+                    question.public_id,
+                    checked,
+                    authFetch,
+                  )
+                }
+              />
               <Label htmlFor="save-for-later">Save for Later</Label>
             </div>
             <Button variant="secondary" size="lg" disabled={submitted}>
