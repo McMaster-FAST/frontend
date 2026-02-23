@@ -1,10 +1,5 @@
-import {
-  Card,
-  CardAction,
-  CardContent,
-  CardHeader,
-} from "@/components/ui/card";
-import { NotebookPen, SquareArrowOutUpRight, Trash2 } from "lucide-react";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { NotebookPen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { SafeHtmlInline } from "@/components/ui/custom/safe-html";
@@ -13,11 +8,13 @@ import { useAuthFetch } from "@/hooks/useFetchWithAuth";
 
 interface SavedQuestionItemProps {
   question: SavedForLaterQuestion;
+  onRemove: () => void;
   props?: React.ComponentPropsWithoutRef<"div">;
 }
 
 export default function SavedQuestionItem({
   question,
+  onRemove,
   ...props
 }: SavedQuestionItemProps) {
   const authFetch = useAuthFetch();
@@ -27,7 +24,7 @@ export default function SavedQuestionItem({
       {...props}
     >
       <div className="flex-grow min-w-0">
-        <CardHeader className="whitespace-nowrap truncate overflow-ellipsis block">
+        <CardHeader className="whitespace-nowrap truncate">
           <div className="flex flex-row">
             <SafeHtmlInline html={question.content} />
           </div>
@@ -40,25 +37,22 @@ export default function SavedQuestionItem({
           </div>
         </CardContent>
       </div>
-      <CardAction className="flex flex-row gap-2 items-center">
-        <Button variant="primary">
-          <Link href={`./question/${question.public_id}`}>Review</Link>
-        </Button>
-        <Button
-          variant="secondary"
-          size="sm"
-          onClick={() =>
-            setSavedForLater(
-              question.course_code,
-              question.public_id,
-              false,
-              authFetch,
-            )
-          }
-        >
-          <Trash2 className="size-4" />
-        </Button>
-      </CardAction>
+      <Button variant="primary">
+        <Link href={`./question/${question.public_id}`}>Review</Link>
+      </Button>
+      <Button
+        variant="secondary"
+        onClick={() =>
+          setSavedForLater(
+            question.course_code,
+            question.public_id,
+            false,
+            authFetch,
+          ).then(() => onRemove())
+        }
+      >
+        Remove
+      </Button>
     </Card>
   );
 }
