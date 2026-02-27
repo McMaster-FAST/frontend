@@ -13,7 +13,14 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { signIn, signOut, useSession } from "next-auth/react";
-import { ChevronDown, Loader2, LogOut, User } from "lucide-react";
+import {
+  Book,
+  BookText,
+  ChevronDown,
+  Loader2,
+  LogOut,
+  User,
+} from "lucide-react";
 import { useUserCourses } from "@/hooks/useUserCourses";
 
 export function MacFastHeader() {
@@ -123,7 +130,6 @@ export function MacFastHeader() {
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
 
-                {/* Profile Link */}
                 <DropdownMenuItem asChild>
                   <Link href="/profile" className="cursor-pointer">
                     <User className="mr-2 h-4 w-4" />
