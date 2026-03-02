@@ -11,14 +11,15 @@ export default auth((req) => {
     return NextResponse.redirect(new URL("/auth/signin", req.url));
   }
 
-  const isCourseDashboard = /^\/courses\/[^/]+\/dashboard$/.test(pathname);
+  // An example of how to protect a page based on roles (We don't have roles yet!)
+  // const isCourseDashboard = /^\/courses\/[^/]+\/dashboard$/.test(pathname);
 
-  if (isCourseDashboard) {
-    if (!userRoles.includes("admin")) {
-      // Use rewrite to show the denied page while keeping the URL the same
-      return NextResponse.rewrite(new URL("/auth/denied", req.url));
-    }
-  }
+  // if (isCourseDashboard) {
+  //   if (!userRoles.includes("admin")) {
+  //     // Use rewrite to show the denied page while keeping the URL the same
+  //     return NextResponse.rewrite(new URL("/auth/denied", req.url));
+  //   }
+  // }
 
   return NextResponse.next();
 });
