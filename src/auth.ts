@@ -72,7 +72,7 @@ export const { handlers, auth } = NextAuth({
     },
 
     async session({ session, token }) {
-      session.idToken = token.id_token;
+      session.id_token = token.id_token;
       session.error = token.error;
       return session;
     },
