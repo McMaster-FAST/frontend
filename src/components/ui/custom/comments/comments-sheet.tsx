@@ -16,165 +16,38 @@ import { Field, FieldDescription, FieldTitle } from "@/components/ui/field";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useEffect, useState } from "react";
 import { XIcon } from "lucide-react";
-
-const comments: QuestionComment[] = [
-  {
-    public_id: "1",
-    fromUserName: "Alice",
-    question: "What is the capital of France?",
-    commentText: "I think it's Paris.",
-    replyTo: null,
-    timestamp: new Date(Date.now() - 1000 * 24 * 60 * 60 * 1000),
-  },
-  {
-    public_id: "2",
-    fromUserName: "Bob",
-    question: "What is the capital of France?",
-    commentText: "Yes, it's Paris.",
-    replyTo: "1",
-    timestamp: new Date(Date.now() - 366 * 500 * 24 * 60 * 60 * 1000 + 60000),
-  },
-  {
-    public_id: "3",
-    fromUserName: "Charlie",
-    question: "What is the capital of France?",
-    commentText: "I thought it was London.",
-    replyTo: "1",
-    timestamp: new Date(Date.now() - 364 * 24 * 60 * 60 * 1000 + 120000),
-  },
-  {
-    public_id: "4",
-    fromUserName: "Dave",
-    question: "What is the capital of France?",
-    commentText: "No, it's definitely Paris.",
-    replyTo: null,
-    timestamp: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000),
-  },
-  {
-    public_id: "5",
-    fromUserName: "Dave",
-    question: "What is the capital of France?",
-    commentText: "No, it's definitely Paris.",
-    replyTo: null,
-    timestamp: new Date(Date.now() - 9 * 24 * 60 * 60 * 1000),
-  },
-  {
-    public_id: "6",
-    fromUserName: "Dave",
-    question: "What is the capital of France?",
-    commentText: "No, it's definitely Paris.",
-    replyTo: null,
-    timestamp: new Date(Date.now() - 9 * 24 * 60 * 60 * 1000),
-  },
-  {
-    public_id: "7",
-    fromUserName: "Dave",
-    question:
-      "What is the capital of France? Super long question to test wrapping behavior in the comments sheet UI component.",
-    commentText:
-      "No, it's definitely Paris. Super long comment to test wrapping behavior in the comments sheet UI component. No, it's definitely Paris. Super long comment to test wrapping behavior in the comments sheet UI component. No, it's definitely Paris. Super long comment to test wrapping behavior in the comments sheet UI component.",
-    replyTo: null,
-    timestamp: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000),
-  },
-  {
-    public_id: "8",
-    fromUserName: "Dave",
-    question: "What is the capital of France?",
-    commentText:
-      "No, it's definitely Paris. Super long comment to test wrapping behavior in the comments sheet UI component.",
-    replyTo: null,
-    timestamp: new Date(Date.now() - 240000),
-  },
-];
-
-/**
- * Generates a tree structure of comments and their replies. To avoid super nesting
- * we are not allowing replies on replies.
- * @param comments
- * @returns
- */
-function generateCommentTree(comments: QuestionComment[]) {
-  const commentMap: {
-    [key: string]: QuestionComment & { replies: QuestionComment[] };
-  } = {};
-  // Comments that are not replies
-  const roots: (QuestionComment & { replies: QuestionComment[] })[] = [];
-
-  comments.forEach((comment) => {
-    commentMap[comment.public_id] = { ...comment, replies: [] };
-  });
-
-  /* If a comment is a reply, add it to its parent's replies array,
-   * otherwise add it to the roots array
-   */
-  comments.forEach((comment) => {
-    if (comment.replyTo) {
-      const parent = commentMap[comment.replyTo];
-      if (parent) {
-        parent.replies.push(commentMap[comment.public_id]);
-      }
-    } else {
-      roots.push(commentMap[comment.public_id]);
-    }
-  });
-
-  return roots;
-}
+import { useQuestionComments } from "@/hooks/useQuestionComments";
 
 interface CommentsSheetProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  questionId: string | null; // Added prop
 }
 
 export default function CommentsSheet({
   open,
   onOpenChange,
+  questionId,
 }: CommentsSheetProps) {
-  // const [comments, setComments] = useState<Comment[]>([]);
+  const { comments, isLoading, addComment, replyToComment } =
+    useQuestionComments(questionId);
   const [replyComment, setReplyComment] = useState<QuestionComment | null>(
     null,
   );
   const [newCommentText, setNewCommentText] = useState("");
 
-  // TODO: Fetch comments
-  const commentTree = generateCommentTree(
-    comments.sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime()),
-  );
-  const onReply = (commentId: string) => {
-    setReplyComment(commentTree.find((c) => c.public_id === commentId) || null);
-  };
+  const handleSend = async () => {
+    if (!newCommentText.trim()) return;
 
-  function handleKeyDown(event: KeyboardEvent) {
-    //Escape closes sheet
-    if (event.key === "Escape") {
-      onOpenChange(false);
-    }
-
-    // Shift + enter for new line
-    if (event.key === "Enter" && event.shiftKey) {
-      return;
-    }
-
-    // Enter to send comment
-    if (event.key === "Enter") {
-      event.preventDefault();
-    }
-  }
-
-  useEffect(() => {
-    if (open) {
-      window.addEventListener("keydown", handleKeyDown);
+    if (replyComment) {
+      await replyToComment(replyComment.public_id, newCommentText);
     } else {
-      window.removeEventListener("keydown", handleKeyDown);
+      await addComment(newCommentText);
     }
 
-    scrollTo(0, -100);
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-      setNewCommentText("");
-      setReplyComment(null);
-    };
-  }, [open, onOpenChange]);
+    setNewCommentText("");
+    setReplyComment(null);
+  };
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -182,15 +55,18 @@ export default function CommentsSheet({
         <SheetHeader>
           <SheetTitle className="text-2xl font-semibold">Comments</SheetTitle>
         </SheetHeader>
-        {comments && comments.length > 0 && (
+
+        {isLoading ? (
+          <div className="p-4">Loading comments...</div>
+        ) : (
           <ScrollArea className="flex-1 overflow-hidden border-t-2">
             <div className="flex flex-col gap-4 p-4 pr-4">
-              {commentTree.map((comment) => (
+              {comments.map((comment) => (
                 <CommentCard
                   key={comment.public_id}
                   comment={comment}
-                  replies={comment.replies}
-                  onReply={onReply}
+                  replies={comment.replies} // Backend already nested these!
+                  onReply={() => setReplyComment(comment)}
                 />
               ))}
             </div>
@@ -220,7 +96,7 @@ export default function CommentsSheet({
               <InputGroupTextarea
                 placeholder={
                   replyComment
-                    ? `Reply to ${replyComment.fromUserName}...`
+                    ? `Reply to ${replyComment.user_name}...`
                     : "Add a comment..."
                 }
                 rows={2}
@@ -233,7 +109,7 @@ export default function CommentsSheet({
                   variant="primary"
                   className="ml-auto"
                   disabled={newCommentText.trim() === ""}
-                  onClick={() => {}}
+                  onClick={handleSend}
                 >
                   {replyComment ? "Reply" : "Comment"}
                 </InputGroupButton>
