@@ -11,8 +11,6 @@ import {
   getNextQuestion,
   skipQuestion,
   submitAnswer,
-  resetSkippedQuestions,
-  getActiveTestSession,
 } from "@/lib/adaptive-test-api";
 import { useEffect } from "react";
 import { useAuthFetch } from "@/hooks/useFetchWithAuth";
@@ -89,7 +87,6 @@ function QuestionPage({ params: paramsPromise }: QuestionPageProps) {
     getNextQuestion(course, unit, subtopic, authFetch)
       .then((nextQuestion) => {
         setQuestion(nextQuestion);
-        updateContinueActions();
       })
       .catch((err) => setError(err.message))
       .finally(() => setIsQuestionLoading(false));
@@ -111,7 +108,6 @@ function QuestionPage({ params: paramsPromise }: QuestionPageProps) {
     skipQuestion(question.public_id, authFetch)
       .then((nextQuestion) => {
         setQuestion(nextQuestion);
-        updateContinueActions();
       })
       .catch((err) => setError(err.message))
       .finally(() => setIsQuestionLoading(false));
@@ -124,25 +120,8 @@ function QuestionPage({ params: paramsPromise }: QuestionPageProps) {
     // Implement question flagging functionality here
   };
 
-  const useSkippedQuestions = () => {
-    resetSkippedQuestions(authFetch).then(() => {
-      handleNextQuestion();
-    });
-  };
-
-  const updateContinueActions = () => {
-    getActiveTestSession(authFetch).then((session) => {
-      setContinueActions({
-        use_skipped_questions: session.skipped_questions.length > 0,
-      });
-    });
-  };
-
   useEffect(() => {
-    (async () => {
-      await handleNextQuestion();
-      updateContinueActions();
-    })();
+    handleNextQuestion();
   }, [course, unit, subtopic]);
 
   return (
@@ -172,13 +151,6 @@ function QuestionPage({ params: paramsPromise }: QuestionPageProps) {
                   How would you like to proceed?
                 </AlertDialogDescription>
                 <div className="flex flex-col w-fit gap-2 justify-center">
-                  {continueActions.use_skipped_questions && (
-                    <AlertDialogAction asChild>
-                      <Button onClick={useSkippedQuestions}>
-                        Use skipped questions
-                      </Button>
-                    </AlertDialogAction>
-                  )}
                   <AlertDialogCancel asChild>
                     <Button variant="secondary">
                       <Link href={`/courses/${course}/coursepage`}>
