@@ -195,10 +195,7 @@ export default function QuestionEditPage() {
             <div className="flex items-center gap-2 w-full justify-center">
               <Button variant="tertiary" onClick={addQuestionOption}>
                 Add option
-                <PlusCircleIcon
-
-                // onClick={addQuestionOption}
-                />
+                <PlusCircleIcon/>
               </Button>
             </div>
           </QuestionPage.Options>
