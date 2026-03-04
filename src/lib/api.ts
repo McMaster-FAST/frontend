@@ -1,4 +1,5 @@
 import { auth } from "@/auth";
+import { useAuthFetch } from "@/hooks/useFetchWithAuth";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
@@ -21,7 +22,7 @@ export async function fetchWithAuth(
   options: RequestInit = {},
 ) {
   const session = await auth();
-  const token = session?.accessToken;
+  const token = session?.id_token;
 
   console.log(token);
 
@@ -78,9 +79,11 @@ export async function getAllQuestions() {
  */
 export async function getQuestionByPublicId(
   publicId: string,
-  authFetch: ReturnType<typeof useAuthFetch>
+  authFetch: ReturnType<typeof useAuthFetch>,
 ): Promise<Question> {
-  const response = await authFetch(`/api/questions/${encodeURIComponent(publicId)}/`);
+  const response = await authFetch(
+    `/api/questions/${encodeURIComponent(publicId)}/`,
+  );
 
   if (!response.ok) {
     throw new Error(`Failed to fetch question: ${response.status}`);
