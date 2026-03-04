@@ -21,7 +21,7 @@ export async function fetchWithAuth(
   options: RequestInit = {},
 ) {
   const session = await auth();
-  const token = session?.accessToken;
+  const token = session?.id_token;
 
   console.log(token);
 
