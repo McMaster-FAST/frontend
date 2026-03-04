@@ -1,8 +1,12 @@
 import ErrorMessage from "@/components/ui/custom/error-message";
 import React from "react";
-import { Skeleton } from "../skeleton";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
+import { useRouter, useParams } from "next/navigation";
 
 function QuestionPage({ children }: { children: React.ReactNode }) {
+  const router = useRouter();
   let header, content, footer, title;
   for (const child of React.Children.toArray(children)) {
     if (!React.isValidElement(child)) continue;
@@ -21,6 +25,12 @@ function QuestionPage({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex flex-col h-screen">
       {header}
+      <div>
+          <Button variant="tertiary" onClick={() => {router.back()}}>
+            <ArrowLeft />
+            Back
+          </Button>
+        </div>
       <div className="flex flex-col gap-4 p-8 flex-1">
         {title}
         {content}

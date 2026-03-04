@@ -9,9 +9,10 @@ import { Button } from "@/components/ui/button";
 import { ChevronsRight } from "lucide-react";
 import { useAuthFetch } from "@/hooks/useFetchWithAuth";
 import { getQuestionByPublicId } from "@/lib/api";
-import { Skeleton } from "@/components/ui/skeleton";
 import DOMPurify from "dompurify";
 import { QuestionPage } from "@/components/ui/custom/question-page";
+import { QuestionFlagDialog } from "@/components/ui/custom/question-flag-dialog";
+import { Checkbox } from "@/components/ui/checkbox";
 
 export default function QuestionPreviewPage() {
   const params = useParams();
@@ -64,16 +65,17 @@ export default function QuestionPreviewPage() {
       </QuestionPage.Title>
 
       <QuestionPage.Content>
-        <QuestionPage.QuestionBody error={fetchError || ""} isLoading={isLoading}>
-          {question?.content && (
-            <div
-              id="question-card"
-              className="border p-4 rounded-lg shadow-md bg-background"
-              dangerouslySetInnerHTML={{
-                __html: DOMPurify.sanitize(question.content),
-              }}
-            ></div>
-          )}
+        <QuestionPage.QuestionBody
+          error={fetchError || ""}
+          isLoading={isLoading}
+        >
+          <Label
+            className="border p-4 rounded-lg shadow-md"
+            dangerouslySetInnerHTML={{
+              __html: DOMPurify.sanitize(question?.content || ""),
+            }}
+          ></Label>
+
 
           <QuestionPage.Options isLoading={isLoading}>
             <RadioGroup
@@ -91,7 +93,7 @@ export default function QuestionPreviewPage() {
                       className="cursor-pointer"
                     />
                     <Label
-                      className="border-2 p-6 rounded-md items-center flex gap-2 w-full bg-background cursor-pointer"
+                      className="border-2 p-6 rounded-md items-center flex gap-2 w-full"
                       dangerouslySetInnerHTML={{
                         __html: DOMPurify.sanitize(option.content),
                       }}
@@ -115,22 +117,50 @@ export default function QuestionPreviewPage() {
           </QuestionPage.AnswerTitle>
 
           <QuestionPage.AnswerBody>
-            <p
-              dangerouslySetInnerHTML={{
-                __html: DOMPurify.sanitize(question?.answer_explanation || ""),
-              }}
-            />
+            {question?.answer_explanation && (
+              <p
+                dangerouslySetInnerHTML={{
+                  __html: DOMPurify.sanitize(
+                    question?.answer_explanation || "",
+                  ),
+                }}
+              />
+            )}
+            {!question?.answer_explanation && (
+              <p className="italic text-muted-foreground">
+                No explanation provided for this question.
+              </p>
+            )}
           </QuestionPage.AnswerBody>
         </QuestionPage.Answer>
       </QuestionPage.Content>
 
       <QuestionPage.Actions>
-        <Button
-          onClick={() => router.push(`/courses/${courseCode}/dashboard`)}
-          variant="primary"
+        <div
+          id="question-section"
+          className="w-full flex flex-row flex-2 justify-between items-center"
         >
-          Back
-        </Button>
+          <div>
+            <QuestionFlagDialog disabled={true} />
+          </div>
+          <div className="inline-flex items-center gap-4">
+            <div className="inline-flex gap-2">
+              <Checkbox id="save-for-later" disabled={true} />
+              <Label htmlFor="save-for-later">Save for Later</Label>
+            </div>
+            <Button variant="secondary" disabled={true}>
+              Skip
+            </Button>
+            <Button variant="primary" disabled={true}>
+              Submit
+            </Button>
+          </div>
+        </div>
+        <div id="answer-section" className="flex-1 flex justify-end">
+          <Button variant="primary" disabled={true}>
+            Next Question
+          </Button>
+        </div>
       </QuestionPage.Actions>
     </QuestionPage>
   );

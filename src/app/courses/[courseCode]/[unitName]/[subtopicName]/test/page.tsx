@@ -186,15 +186,13 @@ function QuestionTestPage({ params: paramsPromise }: QuestionTestPageProps) {
               </div>
             </AlertDialogContent>
           </AlertDialog>
-          {question.content && (
-            <div
-              id="question-card"
-              className="border p-4 rounded-lg shadow-md"
-              dangerouslySetInnerHTML={{
-                __html: DOMPurify.sanitize(question.content),
-              }}
-            ></div>
-          )}
+          <Label
+            id="question-card"
+            className="border p-4 rounded-lg shadow-md"
+            dangerouslySetInnerHTML={{
+              __html: DOMPurify.sanitize(question?.content || ""),
+            }}
+          ></Label>
           <QuestionPage.Options isLoading={isQuestionLoading}>
             {question?.options && (
               <RadioGroup
@@ -227,7 +225,21 @@ function QuestionTestPage({ params: paramsPromise }: QuestionTestPageProps) {
             )}
           </QuestionPage.Options>
         </QuestionPage.QuestionBody>
-        <QuestionPage.Answer isLoading={isQuestionLoading || (submitted && !submitSuccess)}>
+        <QuestionPage.Answer
+          isLoading={isQuestionLoading || (submitted && !submitSuccess)}
+        >
+          <QuestionPage.AnswerTitle>
+            <p
+              className="font-poppins text-2xl"
+              dangerouslySetInnerHTML={{
+                __html: DOMPurify.sanitize(
+                  question?.options?.find(
+                    (option) => option.public_id === correctOptionId,
+                  )?.content || "",
+                ),
+              }}
+            />
+          </QuestionPage.AnswerTitle>
           <div className="flex flex-col gap-4">
             {submitSuccess && correctOptionId && (
               <div>
