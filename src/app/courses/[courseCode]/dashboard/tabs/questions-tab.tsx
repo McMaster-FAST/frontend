@@ -11,7 +11,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import CommentsSheet from "@/components/ui/custom/comments/comments-sheet";
 import { useCourseQuestions } from "@/hooks/useCourseQuestions";
 import { QuestionItemSkeleton } from "@/components/ui/custom/questions-item/questions-item-skeleton";
-import { SearchBar } from "@/components/ui/custom/saerch-bar";
+import { SearchBar } from "@/components/ui/custom/search-bar";
 import { QuestionsFilter } from "@/components/ui/custom/questions-filter";
 import { useRouter } from "next/navigation";
 

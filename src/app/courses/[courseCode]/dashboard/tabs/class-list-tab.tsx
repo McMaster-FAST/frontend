@@ -15,7 +15,7 @@ import { AlertCircle, User } from "lucide-react";
 import { useState } from "react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { SearchBar } from "@/components/ui/custom/saerch-bar";
+import { SearchBar } from "@/components/ui/custom/search-bar";
 
 interface ClassListProps {
   courseCode: string;
