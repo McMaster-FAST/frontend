@@ -1,76 +1,57 @@
-import { NextAuthOptions } from "next-auth";
-import Auth0Provider from "next-auth/providers/auth0";
+import NextAuth from "next-auth";
+import MicrosoftEntraID from "next-auth/providers/microsoft-entra-id";
 
-const clientId = process.env.AUTH_CLIENT_ID;
-const clientSecret = process.env.AUTH_CLIENT_SECRET;
-const issuer = process.env.AUTH_ISSUER;
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
-// Ensure all necessary environment variables are set
-if (!clientId || !clientSecret || !issuer) {
-  // Only throw if we are actually on the server trying to run this
-  if (typeof window === "undefined") {
-    throw new Error("Missing Auth0 environment variables");
-  }
-}
-
-export const authOptions: NextAuthOptions = {
+export const { handlers, auth, signIn, signOut } = NextAuth({
   providers: [
-    Auth0Provider({
-      clientId: clientId as string,
-      clientSecret: clientSecret as string,
-      issuer: issuer as string,
-      authorization: {
-        params: {
-          scope: "openid email profile offline_access",
-        },
-      },
+    MicrosoftEntraID({
+      clientId: process.env.AUTH_MICROSOFT_ENTRA_ID_ID,
+      clientSecret: process.env.AUTH_MICROSOFT_ENTRA_ID_SECRET,
+      issuer: `https://login.microsoftonline.com/${process.env.AUTH_MICROSOFT_ENTRA_ID_TENANT_ID}/v2.0`,
     }),
   ],
   pages: {
     signIn: "/auth/signin",
   },
   callbacks: {
-    async jwt({ token, account, profile }) {
-      if (account) token.accessToken = account.access_token;
+    async jwt({ token, account }) {
+      if (account) {
+        token.accessToken = account.access_token;
 
-      if (profile) {
-        const customProfile = profile as any;
-        const namespace = "https://chemfast.ca/roles";
-        token.roles = customProfile[namespace] || customProfile.roles || [];
-      }
-
-      // On sign-in (account available) attempt to fetch the user's courses
-      if (account?.access_token) {
+        // Fetch user permissions from Django and include them in the token (not implemented yet, waiting on developer API from McMaster)
         try {
-          const response = await fetch(`${API_BASE_URL}/api/courses/`, {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${account.access_token}`,
+          const response = await fetch(
+            `${API_BASE_URL}/api/user-permissions/`,
+            {
+              headers: {
+                Authorization: `Bearer ${account.access_token}`,
+              },
             },
-          });
+          );
 
           if (response.ok) {
             const data = await response.json();
-            token.courses = data as Course[];
-          } else {
-            token.courses = [];
+            token.roles = data.roles || [];
+            token.courses = data.courses || [];
           }
-        } catch (e) {
+        } catch (error) {
+          console.error("Failed to fetch permissions from Django:", error);
+          token.roles = [];
           token.courses = [];
         }
       }
 
       return token;
     },
+
     async session({ session, token }) {
-      session.accessToken = token.accessToken;
+      // 3. Make the roles and courses available to your Next.js frontend
       if (session.user) {
-        session.user.roles = token.roles;
-        session.user.courses = token.courses as Course[] | undefined;
+        (session.user as any).roles = token.roles;
+        (session.user as any).courses = token.courses;
       }
       return session;
     },
   },
-  debug: process.env.NODE_ENV === "development",
-};
+});
