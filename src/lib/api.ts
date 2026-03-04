@@ -1,7 +1,6 @@
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
 import { useAuthFetch } from "@/hooks/useFetchWithAuth";
 import debounce from "lodash/debounce";
+import { auth } from "@/auth";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
@@ -21,7 +20,7 @@ export async function fetchWithAuth(
   endpoint: string,
   options: RequestInit = {},
 ) {
-  const session = await getServerSession(authOptions);
+  const session = await auth();
   const token = session?.accessToken;
 
   console.log(token);
