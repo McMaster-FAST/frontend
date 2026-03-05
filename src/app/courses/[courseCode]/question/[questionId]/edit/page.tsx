@@ -16,13 +16,53 @@ import { useAuthFetch } from "@/hooks/useFetchWithAuth";
 import { QuestionPage } from "@/components/ui/custom/question-page";
 import { isEqual } from "lodash";
 import ErrorMessage from "@/components/ui/custom/error-message";
-import { getQuestionByPublicId } from "@/lib/api";
+import { getQuestionByPublicId, uploadQuestionImage } from "@/lib/api";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useCourseData } from "@/hooks/useCourseData";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import CommentsSheet from "@/components/ui/custom/comments/comments-sheet";
 import OptionsTab from "./tabs/options-tab";
+
+function dataUrlToFile(dataUrl: string, baseName: string): File | null {
+  const match = dataUrl.match(/^data:(image\/[a-zA-Z0-9.+-]+);base64,(.+)$/);
+  if (!match) return null;
+
+  const mimeType = match[1];
+  const extension = mimeType.split("/")[1] || "png";
+  const binary = atob(match[2]);
+  const bytes = Uint8Array.from(binary, (char) => char.charCodeAt(0));
+
+  return new File([bytes], `${baseName}.${extension}`, { type: mimeType });
+}
+
+async function uploadEmbeddedImagesInHtml(
+  html: string,
+  authFetch: ReturnType<typeof useAuthFetch>,
+  filePrefix: string,
+): Promise<string> {
+  if (!html.includes("data:image/")) return html;
+
+  const documentFragment = new DOMParser().parseFromString(html, "text/html");
+  const embeddedImages = Array.from(
+    documentFragment.querySelectorAll('img[src^="data:image/"]'),
+  );
+
+  for (const [index, image] of embeddedImages.entries()) {
+    const src = image.getAttribute("src");
+    if (!src) continue;
+
+    const file = dataUrlToFile(src, `${filePrefix}-${index + 1}`);
+    if (!file) continue;
+
+    const uploadedUrl = await uploadQuestionImage(file, authFetch);
+    if (uploadedUrl) {
+      image.setAttribute("src", uploadedUrl);
+    }
+  }
+
+  return documentFragment.body.innerHTML;
+}
 
 export default function QuestionEditPage() {
   const params = useParams();
@@ -46,8 +86,30 @@ export default function QuestionEditPage() {
     router.back();
   };
 
-  const handleSave = () => {
-    console.log(question);
+  const handleSave = async () => {
+    if (!question) {
+      setError("Question data is missing");
+      return;
+    }
+
+    const questionWithUploadedImages = structuredClone(question);
+    questionWithUploadedImages.content = await uploadEmbeddedImagesInHtml(
+      questionWithUploadedImages.content,
+      authFetch,
+      `${questionWithUploadedImages.public_id}-question`,
+    );
+    questionWithUploadedImages.options = await Promise.all(
+      questionWithUploadedImages.options.map(async (option, index) => ({
+        ...option,
+        content: await uploadEmbeddedImagesInHtml(
+          option.content,
+          authFetch,
+          `${questionWithUploadedImages.public_id}-option-${index + 1}`,
+        ),
+      })),
+    );
+
+    setQuestion(questionWithUploadedImages);
     // do validation
   };
 
@@ -150,6 +212,7 @@ export default function QuestionEditPage() {
         </div>
       </div>
       <main className="mx-auto w-full max-w-7xl px-6 pt-8 flex-1 flex flex-col min-h-0 overflow-hidden">
+        {error && <ErrorMessage message={error} />}
         <Tabs
           className="w-full flex flex-col h-full overflow-hidden"
           defaultValue="question"

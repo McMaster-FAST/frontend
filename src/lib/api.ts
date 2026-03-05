@@ -92,3 +92,13 @@ export async function getQuestionByPublicId(
   const data = await response.json();
   return data as Question;
 }
+
+export async function uploadQuestionImage(
+  file: File,
+  authFetch: ReturnType<typeof useAuthFetch>,
+): Promise<string> {
+  void file;
+  void authFetch;
+  // TODO: Implement once backend image upload endpoint is available.
+  return "";
+}

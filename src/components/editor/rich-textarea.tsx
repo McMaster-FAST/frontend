@@ -1,19 +1,24 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { JSX, useCallback, useEffect, useRef, useState, type ChangeEvent } from "react";
 import DOMPurify from "dompurify";
 import {
+  $applyNodeReplacement,
+  $insertNodes,
   $createParagraphNode,
   $createTextNode,
   $getRoot,
   $getSelection,
   $isRangeSelection,
+  DecoratorNode,
+  type NodeKey,
   COMMAND_PRIORITY_LOW,
   FORMAT_TEXT_COMMAND,
   type LexicalNode,
   SELECTION_CHANGE_COMMAND,
   type EditorState,
   type LexicalEditor,
+  type SerializedLexicalNode,
   type TextFormatType,
 } from "lexical";
 import {
@@ -52,6 +57,7 @@ import {
   Subscript,
   Superscript,
   Underline,
+  ImagePlus,
 } from "lucide-react";
 
 export interface RichTextareaProps {
@@ -91,6 +97,69 @@ const lexicalTheme = {
     superscript: "align-super text-xs",
   },
 };
+
+interface SerializedImageNode extends SerializedLexicalNode {
+  src: string;
+  altText: string;
+  type: "image";
+  version: 1;
+}
+
+class ImageNode extends DecoratorNode<JSX.Element> {
+  __src: string;
+  __altText: string;
+
+  static getType(): string {
+    return "image";
+  }
+
+  static clone(node: ImageNode): ImageNode {
+    return new ImageNode(node.__src, node.__altText, node.__key);
+  }
+
+  static importJSON(serializedNode: SerializedImageNode): ImageNode {
+    return new ImageNode(serializedNode.src, serializedNode.altText);
+  }
+
+  constructor(src: string, altText: string, key?: NodeKey) {
+    super(key);
+    this.__src = src;
+    this.__altText = altText;
+  }
+
+  createDOM(): HTMLElement {
+    return document.createElement("span");
+  }
+
+  updateDOM(): false {
+    return false;
+  }
+
+  exportJSON(): SerializedImageNode {
+    return {
+      ...super.exportJSON(),
+      type: "image",
+      version: 1,
+      src: this.__src,
+      altText: this.__altText,
+    };
+  }
+
+  decorate(): JSX.Element {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
+        src={this.__src}
+        alt={this.__altText}
+        className="my-2 h-auto max-w-full rounded-md"
+      />
+    );
+  }
+}
+
+function $createImageNode(src: string, altText: string) {
+  return $applyNodeReplacement(new ImageNode(src, altText));
+}
 
 function toPlainText(value: string) {
   if (!value) return "";
@@ -147,6 +216,7 @@ interface ToolbarPluginProps {
 }
 function ToolbarPlugin({ className, isFocused }: ToolbarPluginProps) {
   const [editor] = useLexicalComposerContext();
+  const imageInputRef = useRef<HTMLInputElement>(null);
   const [isBold, setIsBold] = useState(false);
   const [isItalic, setIsItalic] = useState(false);
   const [isUnderline, setIsUnderline] = useState(false);
@@ -253,6 +323,34 @@ function ToolbarPlugin({ className, isFocused }: ToolbarPluginProps) {
     });
   };
 
+  const insertImage = (dataUrl: string, altText: string) => {
+    editor.update(() => {
+      const imageNode = $createImageNode(dataUrl, altText);
+      const selection = $getSelection();
+      if ($isRangeSelection(selection)) {
+        $insertNodes([imageNode, $createParagraphNode()]);
+        return;
+      }
+      const root = $getRoot();
+      root.append(imageNode);
+      root.append($createParagraphNode());
+    });
+  };
+
+  const handleImageFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const input = event.target;
+    const file = input.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result !== "string") return;
+      insertImage(reader.result, file.name);
+      input.value = "";
+    };
+    reader.readAsDataURL(file);
+  };
+
   return (
     <div
       className={cn(
@@ -327,6 +425,19 @@ function ToolbarPlugin({ className, isFocused }: ToolbarPluginProps) {
         pressed={activeListType === "bullet"}
         onPressedChange={() => toggleList("bullet")}
       />
+      <ToolbarButton
+        icon={ImagePlus}
+        label="Insert image"
+        pressed={false}
+        onPressedChange={() => imageInputRef.current?.click()}
+      />
+      <input
+        ref={imageInputRef}
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={handleImageFileChange}
+      />
     </div>
   );
 }
@@ -346,7 +457,7 @@ export function RichTextarea({
   const initialConfig = {
     namespace: "macfast-rich-textarea",
     theme: lexicalTheme,
-    nodes: [HeadingNode, ListNode, ListItemNode],
+    nodes: [HeadingNode, ListNode, ListItemNode, ImageNode],
     onError(error: Error) {
       throw error;
     },
