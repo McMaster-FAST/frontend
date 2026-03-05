@@ -93,22 +93,6 @@ export default function OptionsTab({ question, setQuestion }: OptionsTabProps) {
       return { ...prev, options: updatedOptions };
     });
   };
-  const handleOptionContentChange = (
-    e: React.ChangeEvent<HTMLTextAreaElement>,
-    optionIndex: number,
-  ) => {
-    if (!question || !question.options) return;
-
-    setQuestion((prev) => {
-      if (!prev) return prev;
-      const updatedOptions = prev.options;
-      updatedOptions[optionIndex] = {
-        ...updatedOptions[optionIndex],
-        content: e.target.value,
-      };
-      return { ...prev, options: updatedOptions };
-    });
-  };
 
   return (
     <TabsContent value="options" className="flex-1 overflow-hidden">
@@ -116,9 +100,6 @@ export default function OptionsTab({ question, setQuestion }: OptionsTabProps) {
         <Label className="text-sm font-light">
           The options are not guaranteed to be in this order when shown to
           students.
-          <br />
-          What students will see may vary from this view. Use the preview tab to
-          check instead.
         </Label>
         <Accordion
           value={`option-${currentOptionIndex}`}
@@ -137,7 +118,7 @@ export default function OptionsTab({ question, setQuestion }: OptionsTabProps) {
                       <div className="inline-flex items-center gap-2">
                         <AccordionTrigger className="hover:cursor-pointer w-ful py-2 items-center">
                           <div className="inline-flex gap-2">
-                            <h1 className="text-lg w-full font-semibold line-clamp-2">
+                            <h1 className="text-lg w-full  line-clamp-2">
                               <SafeHtmlInline
                                 html={option.content || `Option ${index + 1}`}
                               />

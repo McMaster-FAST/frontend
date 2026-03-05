@@ -25,6 +25,7 @@ import { Badge } from "@/components/ui/badge";
 import CommentsSheet from "@/components/ui/custom/comments/comments-sheet";
 import OptionsTab from "./tabs/options-tab";
 import QuestionTab from "./tabs/question-tab";
+import QuestionPreviewPage from "../preview/page";
 
 function dataUrlToFile(dataUrl: string, baseName: string): File | null {
   const match = dataUrl.match(/^data:(image\/[a-zA-Z0-9.+-]+);base64,(.+)$/);
@@ -78,6 +79,7 @@ export default function QuestionEditPage() {
   const [isQuestionLoading, setIsQuestionLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [areCommentsOpen, setAreCommentsOpen] = useState(false);
+  const [isPreview, setIsPreview] = useState(false);
 
   const hasChanges = () => {
     return !isEqual(question, questionCopy);
@@ -119,7 +121,6 @@ export default function QuestionEditPage() {
   };
 
   useEffect(() => {
-    setIsQuestionLoading(true);
     getQuestionByPublicId(questionId, authFetch)
       .then((data) => {
         setQuestion(data);
@@ -136,6 +137,15 @@ export default function QuestionEditPage() {
         setIsQuestionLoading(false);
       });
   }, [questionId]);
+
+  if (isPreview) {
+    return (
+      <QuestionPreviewPage
+        useQuestion={question}
+        onReturn={() => setIsPreview(false)}
+      />
+    );
+  }
 
   if (!isQuestionLoading && question && !question.options) {
     return (
@@ -158,60 +168,65 @@ export default function QuestionEditPage() {
   return (
     <div className="flex flex-col h-screen bg-slate-50/50 font-poppins">
       <MacFastHeader />
-      <div className="border-b border-light-gray bg-white px-6 py-8 shadow-sm">
-        <div className="mx-auto max-w-7xl">
-          <div className="flex flex-col gap-4">
-            <div className="h-full">
-              <Button
-                variant="tertiary"
-                className="px-0"
-                onClick={() => router.replace("../../dashboard")}
-              >
-                <ArrowLeft className="mr-1 inline-block h-4 w-4 text-dark-gray" />
-                Back to Dashboard
-              </Button>
-              <div className="mb-2 flex w-full items-center gap-2">
-                <Badge variant="secondary" className="font-bold text-dark-gray">
-                  {isLoading || !course ? (
-                    <Skeleton className="h-4 w-20" />
-                  ) : courseError ? (
-                    <span>Unavailable</span>
-                  ) : (
-                    course.code
-                  )}
-                </Badge>
+      <div className="border-b border-light-gray bg-white shadow-sm">
+        <Button
+          variant="tertiary"
+          onClick={() => router.replace("../../dashboard")}
+        >
+          <ArrowLeft />
+          Back to Dashboard
+        </Button>
 
-                <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                  {isLoading || !course ? (
-                    <Skeleton className="h-4 w-20" />
-                  ) : courseError ? null : (
-                    course.semester
-                  )}
-                </span>
-                <Badge
-                  variant="secondary"
-                  className="ml-auto font-bold text-dark-gray"
-                >
-                  <Pencil className="mr-1 inline-block h-4 w-4 text-dark-gray" />
-                  Question Editor
-                </Badge>
-              </div>
-              <h1 className="text-3xl font-bold text-foreground">
-                {isLoading || !course ? (
-                  <Skeleton className="h-16 w-120" />
-                ) : courseError ? (
-                  <span className="text-red-900">
-                    <AlertTriangle className="mr-2 inline-block" />
-                    Error loading course
+        <div className="px-6 py-8">
+          <div className="mx-auto max-w-7xl">
+            <div className="flex flex-col gap-4">
+              <div className="h-full">
+                <div className="mb-2 flex w-full items-center gap-2">
+                  <Badge
+                    variant="secondary"
+                    className="font-bold text-dark-gray"
+                  >
+                    {isLoading || !course ? (
+                      <Skeleton className="h-4 w-20" />
+                    ) : courseError ? (
+                      <span>Unavailable</span>
+                    ) : (
+                      course.code
+                    )}
+                  </Badge>
+
+                  <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                    {isLoading || !course ? (
+                      <Skeleton className="h-4 w-20" />
+                    ) : courseError ? null : (
+                      course.semester
+                    )}
                   </span>
-                ) : (
-                  course.name
-                )}
-              </h1>
-              <h2 className="text-lg font-semibold text-muted-foreground">
-                Question:{" "}
-                <span className="font-normal">{question?.public_id}</span>
-              </h2>
+                  <Badge
+                    variant="secondary"
+                    className="ml-auto font-bold text-dark-gray"
+                  >
+                    <Pencil className="mr-1 inline-block h-4 w-4 text-dark-gray" />
+                    Question Editor
+                  </Badge>
+                </div>
+                <h1 className="text-3xl font-bold text-foreground">
+                  {isLoading || !course ? (
+                    <Skeleton className="h-16 w-120" />
+                  ) : courseError ? (
+                    <span className="text-red-900">
+                      <AlertTriangle className="mr-2 inline-block" />
+                      Error loading course
+                    </span>
+                  ) : (
+                    course.name
+                  )}
+                </h1>
+                <h2 className="text-lg font-semibold text-muted-foreground">
+                  Question:{" "}
+                  <span className="font-normal">{question?.public_id}</span>
+                </h2>
+              </div>
             </div>
           </div>
         </div>
@@ -250,13 +265,17 @@ export default function QuestionEditPage() {
               View Comments
               <MessageSquare />
             </Button>
-            <Button variant="secondary" onClick={() => router.replace(`./preview`)}>
+            <Button variant="secondary" onClick={() => setIsPreview(true)}>
               Preview
               <Eye />
             </Button>
           </div>
           <div className="flex gap-4">
-            <Button variant="secondary" onClick={handleCancel}>
+            <Button
+              variant="secondary"
+              disabled={!hasChanges()}
+              onClick={handleCancel}
+            >
               Cancel
             </Button>
             <Button disabled={!hasChanges()} onClick={handleSave}>

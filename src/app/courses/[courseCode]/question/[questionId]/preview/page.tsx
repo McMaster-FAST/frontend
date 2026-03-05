@@ -9,15 +9,19 @@ import { Button } from "@/components/ui/button";
 import { ChevronsRight } from "lucide-react";
 import { useAuthFetch } from "@/hooks/useFetchWithAuth";
 import { getQuestionByPublicId } from "@/lib/api";
-import DOMPurify from "dompurify";
 import { QuestionPage } from "@/components/ui/custom/question-page";
 import { QuestionFlagDialog } from "@/components/ui/custom/question-flag-dialog";
 import { Checkbox } from "@/components/ui/checkbox";
 import { SafeHtml } from "@/components/ui/custom/safe-html";
 
-export default function QuestionPreviewPage() {
+interface QuestionPreviewPageProps {
+  // If provided, will use this question data instead of fetching it. Useful for previewing unsaved changes.
+  useQuestion: Question | null; 
+  // Optional callback when user wants to return from preview
+  onReturn?: () => void; 
+}
+export default function QuestionPreviewPage({ useQuestion, onReturn }: QuestionPreviewPageProps) {
   const params = useParams();
-  const router = useRouter();
   const courseCode = decodeURIComponent(params.courseCode as string);
   const questionId = decodeURIComponent(params.questionId as string);
   const authFetch = useAuthFetch();
@@ -27,9 +31,13 @@ export default function QuestionPreviewPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [fetchError, setFetchError] = useState<string | null>(null);
 
-  // Idk what this is
   useEffect(() => {
     let cancelled = false;
+    if (useQuestion) {
+      setQuestion(useQuestion);
+      setIsLoading(false);
+      return;
+    }
     getQuestionByPublicId(questionId, authFetch)
       .then((data) => {
         if (cancelled) return;
@@ -48,10 +56,10 @@ export default function QuestionPreviewPage() {
     return () => {
       cancelled = true;
     };
-  }, [questionId, authFetch]);
+  }, [questionId]);
 
   return (
-    <QuestionPage>
+    <QuestionPage onReturn={onReturn}>
       <QuestionPage.Header>
         <MacFastHeader />
       </QuestionPage.Header>

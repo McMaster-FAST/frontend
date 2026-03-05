@@ -5,7 +5,12 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { useRouter, useParams } from "next/navigation";
 
-function QuestionPage({ children }: { children: React.ReactNode }) {
+interface QuestionPageProps {
+  children: React.ReactNode;
+  onReturn?: () => void;
+}
+
+function QuestionPage({ children, onReturn }: QuestionPageProps) {
   const router = useRouter();
   let header, content, footer, title;
   for (const child of React.Children.toArray(children)) {
@@ -26,7 +31,7 @@ function QuestionPage({ children }: { children: React.ReactNode }) {
     <div className="flex flex-col h-screen">
       {header}
       <div>
-          <Button variant="tertiary" onClick={() => {router.back()}}>
+          <Button variant="tertiary" onClick={onReturn ? onReturn : () => router.back()}>
           <ArrowLeft />
           Back
         </Button>
