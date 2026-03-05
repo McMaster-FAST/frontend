@@ -44,11 +44,11 @@ function UnitsAccordion({ tab, course, value, setValue }: UnitsAccordionProps) {
           <AccordionItem value={`unit-${index}`} key={index}>
             <AccordionTrigger className="flex justify-between items-center py-2 hover:no-underline w-full">
               <div className="text-left flex-1 pr-8 flex flex-col justify-center w-full md:w-4/5">
-                <div className="font-semibold truncate text-lg">
+                <div className="font-medium truncate text-md">
                   {`Unit ${unit.number}: ${unit.name}`}
                 </div>
                 {tab === "practiceProblems" && (
-                  <div className="flex flex-row items-center w-full gap-6">
+                  <div className="flex flex-row items-center w-full gap-6 mt-1">
                     <div className="flex-1">
                       <AnimatedXPBar totalXp={rawTotalXp} />
                     </div>
@@ -86,7 +86,7 @@ function UnitsAccordion({ tab, course, value, setValue }: UnitsAccordionProps) {
               {unit.subtopics?.map((subtopic, subIndex) => (
                 <div key={subIndex} className="w-full">
                   <div className="ml-2 whitespace-nowrap flex flex-row items-center font-poppins font-medium justify-between">
-                    <div className="w-full flex-2 pr-4">
+                    <div className="w-full flex-2">
                       <p>{subtopic.name}</p>
                       {tab === "practiceProblems" && (
                         <div className="mt-1 w-full max-w-sm">
