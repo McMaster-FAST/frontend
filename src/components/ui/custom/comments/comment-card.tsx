@@ -36,7 +36,6 @@ export default function CommentCard({
           <CardContent>
             <CardTitle className="flex justify-between items-center text-foreground">
               <div className="inline-flex items-center gap-2 text-sm">
-                <User className="size-4 text-primary" />
                 {comment.user_name || "Unknown"}
               </div>
 

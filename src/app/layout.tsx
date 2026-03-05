@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import { Inter, Poppins } from "next/font/google";
 import "@/styles/globals.css";
 
+import { SessionProvider } from "next-auth/react";
 import { auth } from "@/auth";
-import { Providers } from "./providers";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -30,13 +30,13 @@ export default async function RootLayout({
 
   return (
     <html lang="en" className="h-full">
-      <Providers session={session}>
+      <SessionProvider session={session}>
         <body
           className={`${inter.variable} ${poppins.variable} antialiased h-full`}
         >
           {children}
         </body>
-      </Providers>
+      </SessionProvider>
     </html>
   );
 }
