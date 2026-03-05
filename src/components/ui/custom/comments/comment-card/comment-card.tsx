@@ -6,7 +6,7 @@ import {
   CardFooter,
   CardTitle,
 } from "@/components/ui/card";
-import { getTimeString } from "./time-utils";
+import { getTimeString } from "@/lib/time-utils";
 import { ChevronUp, CornerDownRight, User } from "lucide-react";
 import { useState } from "react";
 

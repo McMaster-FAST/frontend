@@ -5,7 +5,8 @@ import {
   SheetTitle,
   SheetFooter,
 } from "@/components/ui/sheet";
-import CommentCard from "./comment-card";
+import CommentCard from "@/components/ui/custom/comments/comment-card/comment-card";
+import CommentCardSkeleton from "@/components/ui/custom/comments/comment-card/comment-card-skeleton";
 import {
   InputGroup,
   InputGroupAddon,
@@ -14,7 +15,7 @@ import {
 } from "@/components/ui/input-group";
 import { Field, FieldDescription, FieldTitle } from "@/components/ui/field";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { XIcon } from "lucide-react";
 import { useQuestionComments } from "@/hooks/useQuestionComments";
 
@@ -57,7 +58,13 @@ export default function CommentsSheet({
         </SheetHeader>
 
         {isLoading ? (
-          <div className="p-4">Loading comments...</div>
+          <ScrollArea className="flex-1 overflow-hidden border-t-2">
+            <div className="flex flex-col gap-4 p-4">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <CommentCardSkeleton key={i} />
+              ))}
+            </div>
+          </ScrollArea>
         ) : (
           <ScrollArea className="flex-1 overflow-hidden border-t-2">
             <div className="flex flex-col gap-4 p-4 pr-4">
@@ -72,13 +79,12 @@ export default function CommentsSheet({
             </div>
           </ScrollArea>
         )}
-        {!comments ||
-          (comments.length === 0 && (
-            <p className="p-4 h-full text-muted-foreground text-lg">
-              There are no comments on this question. <br />
-              Be the first!
-            </p>
-          ))}
+        {!isLoading && (!comments || comments.length === 0) && (
+          <p className="p-4 h-full text-muted-foreground text-lg">
+            There are no comments on this question. <br />
+            Be the first!
+          </p>
+        )}
         <SheetFooter className="flex flex-row flex-0 gap-2 border-t-4 border-gold mt-0">
           <Field>
             <FieldTitle>
