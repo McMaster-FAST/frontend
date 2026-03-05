@@ -106,10 +106,7 @@ export function Questions({ course }: QuestionsProps) {
 
       {isUploading && (
         <div className="mb-6">
-          <Progress
-            value={uploadProgress}
-            caption={`Uploading... ${uploadProgress}%`}
-          />
+          <Progress value={uploadProgress} />
         </div>
       )}
 

@@ -5,6 +5,8 @@ declare module "next-auth" {
   interface Session {
     id_token?: string;
     error?: "RefreshTokenError";
+    id_token?: string;
+    error?: "RefreshTokenError";
   }
 }
 
