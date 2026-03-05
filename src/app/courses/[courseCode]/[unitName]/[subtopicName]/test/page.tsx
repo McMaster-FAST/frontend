@@ -32,6 +32,7 @@ import {
 import Link from "next/link";
 import { QuestionPage } from "@/components/ui/custom/question-page";
 import { MacFastHeader } from "@/components/ui/custom/macfast-header";
+import { SafeHtml, SafeHtmlInline } from "@/components/ui/custom/safe-html";
 
 interface QuestionTestPageProps {
   params: Promise<{
@@ -186,13 +187,9 @@ function QuestionTestPage({ params: paramsPromise }: QuestionTestPageProps) {
               </div>
             </AlertDialogContent>
           </AlertDialog>
-          <Label
-            id="question-card"
-            className="border p-4 rounded-lg shadow-md"
-            dangerouslySetInnerHTML={{
-              __html: DOMPurify.sanitize(question?.content || ""),
-            }}
-          ></Label>
+          <div className="border p-4 rounded-lg shadow-md">
+            <SafeHtml html={question?.content || ""} />
+          </div>
           <QuestionPage.Options isLoading={isQuestionLoading}>
             {question?.options && (
               <RadioGroup
@@ -208,17 +205,16 @@ function QuestionTestPage({ params: paramsPromise }: QuestionTestPageProps) {
                       value={option.public_id}
                       className="cursor-pointer"
                     />
-                    <Label
+                    <div
                       className={
                         "border-2 p-6 rounded-md items-center flex gap-2 w-full" +
                         (correctOptionId === option.public_id
                           ? " border-primary"
                           : "")
                       }
-                      dangerouslySetInnerHTML={{
-                        __html: DOMPurify.sanitize(option.content),
-                      }}
-                    ></Label>
+                    >
+                      <SafeHtml html={option.content} />
+                    </div>
                   </div>
                 ))}
               </RadioGroup>
@@ -229,16 +225,15 @@ function QuestionTestPage({ params: paramsPromise }: QuestionTestPageProps) {
           isLoading={isQuestionLoading || (submitted && !submitSuccess)}
         >
           <QuestionPage.AnswerTitle>
-            <p
-              className="font-poppins text-2xl"
-              dangerouslySetInnerHTML={{
-                __html: DOMPurify.sanitize(
+            <p className="font-poppins text-2xl">
+              <SafeHtml
+                html={
                   question?.options?.find(
                     (option) => option.public_id === correctOptionId,
-                  )?.content || "",
-                ),
-              }}
-            />
+                  )?.content || ""
+                }
+              />
+            </p>
           </QuestionPage.AnswerTitle>
           <div className="flex flex-col gap-4">
             {submitSuccess && correctOptionId && (
@@ -258,11 +253,7 @@ function QuestionTestPage({ params: paramsPromise }: QuestionTestPageProps) {
             {submitSuccess && solution && (
               <div>
                 <h2 className="font-poppins font-semibold text-lg">Why?</h2>
-                <p
-                  dangerouslySetInnerHTML={{
-                    __html: DOMPurify.sanitize(solution),
-                  }}
-                ></p>
+                <SafeHtml html={solution} />
               </div>
             )}
           </div>

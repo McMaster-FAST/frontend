@@ -93,6 +93,9 @@ export default function QuestionEditPage() {
     }
 
     const questionWithUploadedImages = structuredClone(question);
+    // We upload the images to the backend to get their URLs and embed that in the question HTML
+    // This could be done on the backend, potentially but that can be saved for when we hook the rest 
+    // of this up to the backend
     questionWithUploadedImages.content = await uploadEmbeddedImagesInHtml(
       questionWithUploadedImages.content,
       authFetch,

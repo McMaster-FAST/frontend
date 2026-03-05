@@ -13,6 +13,7 @@ import DOMPurify from "dompurify";
 import { QuestionPage } from "@/components/ui/custom/question-page";
 import { QuestionFlagDialog } from "@/components/ui/custom/question-flag-dialog";
 import { Checkbox } from "@/components/ui/checkbox";
+import { SafeHtml } from "@/components/ui/custom/safe-html";
 
 export default function QuestionPreviewPage() {
   const params = useParams();
@@ -69,14 +70,9 @@ export default function QuestionPreviewPage() {
           error={fetchError || ""}
           isLoading={isLoading}
         >
-          <Label
-            className="border p-4 rounded-lg shadow-md"
-            dangerouslySetInnerHTML={{
-              __html: DOMPurify.sanitize(question?.content || ""),
-            }}
-          ></Label>
-
-
+          <div className="border p-4 rounded-lg shadow-md">
+            <SafeHtml html={question?.content || ""} />
+          </div>
           <QuestionPage.Options isLoading={isLoading}>
             <RadioGroup
               value={selectedOption}
@@ -92,12 +88,9 @@ export default function QuestionPreviewPage() {
                       value={option.public_id}
                       className="cursor-pointer"
                     />
-                    <Label
-                      className="border-2 p-6 rounded-md items-center flex gap-2 w-full"
-                      dangerouslySetInnerHTML={{
-                        __html: DOMPurify.sanitize(option.content),
-                      }}
-                    ></Label>
+                    <div className="border-2 p-6 rounded-md items-center flex gap-2 w-full">
+                      <SafeHtml html={option.content || ""} />
+                    </div>
                   </div>
                 ))}
             </RadioGroup>
@@ -105,26 +98,21 @@ export default function QuestionPreviewPage() {
         </QuestionPage.QuestionBody>
         <QuestionPage.Answer isLoading={isLoading}>
           <QuestionPage.AnswerTitle>
-            <p
-              className="font-poppins text-2xl"
-              dangerouslySetInnerHTML={{
-                __html: DOMPurify.sanitize(
+            <p className="font-poppins text-2xl">
+              <SafeHtml
+                html={
                   question?.options.find((option) => option.is_answer)
-                    ?.content || "",
-                ),
-              }}
-            />
+                    ?.content || ""
+                }
+              />
+            </p>
           </QuestionPage.AnswerTitle>
 
           <QuestionPage.AnswerBody>
             {question?.answer_explanation && (
-              <p
-                dangerouslySetInnerHTML={{
-                  __html: DOMPurify.sanitize(
-                    question?.answer_explanation || "",
-                  ),
-                }}
-              />
+              <p>
+                <SafeHtml html={question?.answer_explanation || ""} />
+              </p>
             )}
             {!question?.answer_explanation && (
               <p className="italic text-muted-foreground">

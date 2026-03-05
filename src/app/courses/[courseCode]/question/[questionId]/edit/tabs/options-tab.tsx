@@ -7,6 +7,7 @@ import {
 } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { SafeHtml, SafeHtmlInline } from "@/components/ui/custom/safe-html";
 import { Label } from "@/components/ui/label";
 import { TabsContent } from "@/components/ui/tabs";
 import { CheckCheck, CircleMinus, CirclePlus } from "lucide-react";
@@ -133,13 +134,11 @@ export default function OptionsTab({ question, setQuestion }: OptionsTabProps) {
                       <div className="inline-flex items-center gap-2">
                         <AccordionTrigger className="hover:cursor-pointer w-ful py-2 items-center">
                           <div className="inline-flex gap-2">
-                            {/* TODO: Transition to inline safe html when branches are merged */}
-                            <h1
-                              className="text-lg font-semibold"
-                              dangerouslySetInnerHTML={{
-                                __html: option.content || `Option ${index + 1}`,
-                              }}
-                            />
+                            <h1 className="text-lg font-semibold">
+                              <SafeHtmlInline
+                                html={option.content || `Option ${index + 1}`}
+                              />
+                            </h1>
                           </div>
                         </AccordionTrigger>
                       </div>
