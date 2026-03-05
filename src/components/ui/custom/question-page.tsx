@@ -27,10 +27,10 @@ function QuestionPage({ children }: { children: React.ReactNode }) {
       {header}
       <div>
           <Button variant="tertiary" onClick={() => {router.back()}}>
-            <ArrowLeft />
-            Back
-          </Button>
-        </div>
+          <ArrowLeft />
+          Back
+        </Button>
+      </div>
       <div className="flex flex-col gap-4 p-8 flex-1">
         {title}
         {content}

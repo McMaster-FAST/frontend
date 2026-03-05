@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import {
   AlertTriangle,
   ArrowLeft,
+  Eye,
   List,
   MessageSquare,
   NotebookPen,
@@ -23,6 +24,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import CommentsSheet from "@/components/ui/custom/comments/comments-sheet";
 import OptionsTab from "./tabs/options-tab";
+import QuestionTab from "./tabs/question-tab";
 
 function dataUrlToFile(dataUrl: string, baseName: string): File | null {
   const match = dataUrl.match(/^data:(image\/[a-zA-Z0-9.+-]+);base64,(.+)$/);
@@ -94,7 +96,7 @@ export default function QuestionEditPage() {
 
     const questionWithUploadedImages = structuredClone(question);
     // We upload the images to the backend to get their URLs and embed that in the question HTML
-    // This could be done on the backend, potentially but that can be saved for when we hook the rest 
+    // This could be done on the backend, potentially but that can be saved for when we hook the rest
     // of this up to the backend
     questionWithUploadedImages.content = await uploadEmbeddedImagesInHtml(
       questionWithUploadedImages.content,
@@ -230,7 +232,7 @@ export default function QuestionEditPage() {
               Options
             </TabsTrigger>
           </TabsList>
-
+          <QuestionTab question={question} setQuestion={setQuestion} />
           <OptionsTab question={question} setQuestion={setQuestion} />
         </Tabs>
         <CommentsSheet
@@ -240,13 +242,17 @@ export default function QuestionEditPage() {
       </main>
       <footer className="border-t-2 border-light-gray">
         <div className="flex justify-between px-6 py-4">
-          <div>
+          <div className="inline-flex gap-2">
             <Button
               variant="secondary"
               onClick={() => setAreCommentsOpen(true)}
             >
               View Comments
               <MessageSquare />
+            </Button>
+            <Button variant="secondary" onClick={() => router.replace(`./preview`)}>
+              Preview
+              <Eye />
             </Button>
           </div>
           <div className="flex gap-4">

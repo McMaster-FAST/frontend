@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { SafeHtml, SafeHtmlInline } from "@/components/ui/custom/safe-html";
+import { SafeHtmlInline } from "@/components/ui/custom/safe-html";
 import { Label } from "@/components/ui/label";
 import { TabsContent } from "@/components/ui/tabs";
 import { CheckCheck, CircleMinus, CirclePlus } from "lucide-react";
@@ -115,7 +115,10 @@ export default function OptionsTab({ question, setQuestion }: OptionsTabProps) {
       <div className="flex flex-col gap-4 h-full overflow-auto">
         <Label className="text-sm font-light">
           The options are not guaranteed to be in this order when shown to
-          students. Label them if you need to have cross-references.
+          students.
+          <br />
+          What students will see may vary from this view. Use the preview tab to
+          check instead.
         </Label>
         <Accordion
           value={`option-${currentOptionIndex}`}
@@ -134,7 +137,7 @@ export default function OptionsTab({ question, setQuestion }: OptionsTabProps) {
                       <div className="inline-flex items-center gap-2">
                         <AccordionTrigger className="hover:cursor-pointer w-ful py-2 items-center">
                           <div className="inline-flex gap-2">
-                            <h1 className="text-lg font-semibold">
+                            <h1 className="text-lg w-full font-semibold line-clamp-2">
                               <SafeHtmlInline
                                 html={option.content || `Option ${index + 1}`}
                               />
@@ -152,7 +155,7 @@ export default function OptionsTab({ question, setQuestion }: OptionsTabProps) {
                             Set as Answer
                           </Button>
                         ) : (
-                          <Badge variant="default" className="mr-6">
+                          <Badge variant="default" className="mx-7">
                             Correct Answer
                           </Badge>
                         )}
@@ -196,10 +199,16 @@ export default function OptionsTab({ question, setQuestion }: OptionsTabProps) {
               );
             })}
         </Accordion>
-        <Button variant="tertiary" onClick={addQuestionOption}>
-          <CirclePlus />
-          Add option
-        </Button>
+        <div className="flex justify-center">
+          <Button
+            className="w-fit"
+            variant="tertiary"
+            onClick={addQuestionOption}
+          >
+            <CirclePlus />
+            Add option
+          </Button>
+        </div>
       </div>
     </TabsContent>
   );
