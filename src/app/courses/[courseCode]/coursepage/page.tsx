@@ -140,7 +140,6 @@ function CoursePage() {
               ) : (
                 <UnitsAccordion
                   key={course.code}
-                  units={course.units}
                   course={course}
                   tab="practiceProblems"
                   value={openUnits}
@@ -180,7 +179,6 @@ function CoursePage() {
               ) : (
                 <UnitsAccordion
                   key={course.code + "-lo"}
-                  units={course.units}
                   course={course}
                   tab="learningObjectives"
                   value={openUnits}
