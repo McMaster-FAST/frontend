@@ -43,8 +43,8 @@ function QuestionItem({
   return (
     <Card className="flex flex-row w-full items-center">
       <div className="flex-1 min-w-0">
-        <CardHeader className="whitespace-nowrap overflow-ellipsis block">
-          <SafeHtmlInline html={question.content} />
+        <CardHeader className="whitespace-nowrap truncate block text-md font-medium">
+          {question.content}
         </CardHeader>
 
         <CardContent className="flex flex-col gap-1">

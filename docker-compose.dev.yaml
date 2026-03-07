@@ -13,12 +13,6 @@ x-nextjs-service: &nextjs-service
     - NODE_ENV=development
     - NEXT_TELEMETRY_DISABLED=1
     - WATCHPACK_POLLING=true
-    - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
-    - NEXTAUTH_URL=${NEXTAUTH_URL}
-    - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
-    - AUTH_CLIENT_ID=${AUTH_CLIENT_ID}
-    - AUTH_CLIENT_SECRET=${AUTH_CLIENT_SECRET}
-    - AUTH_ISSUER=${AUTH_ISSUER}
   restart: unless-stopped
 
 name: mac-fast-frontend-dev
@@ -27,3 +21,10 @@ services:
     <<: *nextjs-service
     ports:
       - "3000:3000"
+
+networks:
+  default:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.21.0.0/16
