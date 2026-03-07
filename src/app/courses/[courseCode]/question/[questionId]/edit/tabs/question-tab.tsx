@@ -124,7 +124,7 @@ export default function QuestionTab({
                 Subtopic
               </Label>
               <Select
-                value={question?.subtopic || ""}
+                value={question?.subtopic_name || ""}
                 onValueChange={(val) =>
                   setQuestion((prev) =>
                     prev ? { ...prev, subtopic: val } : prev,

@@ -67,9 +67,9 @@ export default function QuestionPreviewPage({ useQuestion, onReturn }: QuestionP
         <h1>{question?.course || courseCode}</h1>
         <ChevronsRight />
         <h1>
-          {question?.unit && question?.subtopic
-            ? `${question.unit} - ${question.subtopic}`
-            : question?.unit || question?.subtopic || ""}
+          {question?.unit && question?.subtopic_name
+            ? `${question.unit} - ${question.subtopic_name}`
+            : question?.unit || question?.subtopic_name || ""}
         </h1>
       </QuestionPage.Title>
 
