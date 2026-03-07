@@ -21,19 +21,19 @@ export async function fetchWithAuth(
   options: RequestInit = {},
 ) {
   const session = await auth();
-  const token = session?.accessToken;
+  const token = session?.id_token;
 
   console.log(token);
 
-  // Merge default headers with custom headers
-  const headers = {
-    "Content-Type": "application/json",
-    ...(options.headers || {}),
-  } as Record<string, string>;
+  const headers = new Headers(options.headers);
+
+  if (!(options.body instanceof FormData) && !headers.has("Content-Type")) {
+    headers.set("Content-Type", "application/json");
+  }
 
   // Inject Authorization if we have a token
   if (token) {
-    headers["Authorization"] = `Bearer ${token}`;
+    headers.set("Authorization", `Bearer ${token}`);
   }
 
   // Ensure endpoint starts with a slash if user forgot it
@@ -53,16 +53,27 @@ export async function ping() {
   return getJson(response);
 }
 
-export async function uploadQuestions(file: File) {
+interface CourseIdentifier extends Course {
+  code: string;
+  year: number;
+  semester: string;
+}
+export async function uploadQuestions(
+  file: File,
+  course: CourseIdentifier,
+  authFetch: typeof fetchWithAuth,
+) {
   const formData = new FormData();
   formData.append("file", file);
-  formData.append("group_name", "");
+  formData.append("create_required", "true");
+  formData.append("course_code", course.code);
+  formData.append("course_year", course.year.toString());
+  formData.append("course_semester", course.semester.toString());
 
-  const response = await fetch(`${API_BASE_URL}/api/core/upload/`, {
+  const response = await authFetch(`/api/core/upload/`, {
     method: "PUT",
     body: formData,
   });
-
   return getJson(response);
 }
 

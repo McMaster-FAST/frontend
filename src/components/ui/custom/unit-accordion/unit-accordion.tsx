@@ -19,6 +19,12 @@ interface UnitsAccordionProps {
 }
 
 function UnitsAccordion({ tab, course, value, setValue }: UnitsAccordionProps) {
+  const getEncodedTestURI = (courseCode: string, unitName: string, subtopicName: string) => {
+    const encodedCourseCode = encodeURIComponent(courseCode);
+    const encodedUnitName = encodeURIComponent(unitName);
+    const encodedSubtopicName = encodeURIComponent(subtopicName);
+    return `/courses/${encodedCourseCode}/${encodedUnitName}/${encodedSubtopicName}/test`;
+  };
   return (
     <Accordion
       type="single"
@@ -112,7 +118,7 @@ function UnitsAccordion({ tab, course, value, setValue }: UnitsAccordionProps) {
                         <div className="flex-0 flex justify-end">
                           <Button variant="secondary" className="text-sm">
                             <Link
-                              href={`/courses/${course.code}/${unit.name}/${subtopic.name}/test`}
+                              href={getEncodedTestURI(course.code, unit.name, subtopic.name)}
                             >
                               Practice
                             </Link>

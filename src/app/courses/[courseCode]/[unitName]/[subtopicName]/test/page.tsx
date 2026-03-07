@@ -20,7 +20,6 @@ import DOMPurify from "dompurify";
 import ErrorMessage from "@/components/ui/custom/error-message";
 import {
   AlertDialog,
-  AlertDialogAction,
   AlertDialogCancel,
   AlertDialogTitle,
 } from "@radix-ui/react-alert-dialog";
@@ -30,6 +29,7 @@ import {
 } from "@/components/ui/alert-dialog";
 
 import Link from "next/link";
+import { getHost, resolveImages } from "@/lib/utils";
 
 interface QuestionPageProps {
   params: Promise<{
@@ -39,16 +39,12 @@ interface QuestionPageProps {
   }>;
 }
 
-interface ContinueActions {
-  use_skipped_questions: boolean;
-}
-
 function QuestionPage({ params: paramsPromise }: QuestionPageProps) {
   // Get course info from URI
   const params = React.use(paramsPromise);
-  const course = decodeURI(params.courseCode);
-  const unit = decodeURI(params.unitName);
-  const subtopic = decodeURI(params.subtopicName);
+  const course = decodeURIComponent(params.courseCode);
+  const unit = decodeURIComponent(params.unitName);
+  const subtopic = decodeURIComponent(params.subtopicName);
 
   const authFetch = useAuthFetch();
 
@@ -64,9 +60,6 @@ function QuestionPage({ params: paramsPromise }: QuestionPageProps) {
   const [submitted, setSubmitted] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
   const [isQuestionLoading, setIsQuestionLoading] = useState<boolean>(true);
-  const [continueActions, setContinueActions] = useState<ContinueActions>({
-    use_skipped_questions: false,
-  });
 
   const showNoQuestionsDialog =
     !question?.public_id && !isQuestionLoading && !error;
@@ -83,7 +76,7 @@ function QuestionPage({ params: paramsPromise }: QuestionPageProps) {
 
   const handleNextQuestion = async () => {
     resetState();
-
+    
     getNextQuestion(course, unit, subtopic, authFetch)
       .then((nextQuestion) => {
         setQuestion(nextQuestion);
@@ -122,7 +115,7 @@ function QuestionPage({ params: paramsPromise }: QuestionPageProps) {
 
   useEffect(() => {
     handleNextQuestion();
-  }, [course, unit, subtopic]);
+  }, []);
 
   return (
     <div className="flex flex-col h-screen">
@@ -167,7 +160,7 @@ function QuestionPage({ params: paramsPromise }: QuestionPageProps) {
                 id="question-card"
                 className="border p-4 rounded-lg shadow-md"
                 dangerouslySetInnerHTML={{
-                  __html: DOMPurify.sanitize(question.content),
+                  __html: DOMPurify.sanitize(resolveImages(question.content, question.public_id)),
                 }}
               ></div>
             )}
@@ -190,17 +183,17 @@ function QuestionPage({ params: paramsPromise }: QuestionPageProps) {
                         value={option.public_id}
                         className="cursor-pointer"
                       />
-                      <Label
-                        className={
-                          "border-2 p-6 rounded-md items-center flex gap-2 w-full" +
+                        <div
+                          className={
+                          "border-2 p-6 rounded-md w-full" +
                           (correctOptionId === option.public_id
                             ? " border-primary"
                             : "")
-                        }
+                          }
                         dangerouslySetInnerHTML={{
-                          __html: DOMPurify.sanitize(option.content),
+                          __html: DOMPurify.sanitize(resolveImages(option.content, question.public_id)),
                         }}
-                      ></Label>
+                      />
                     </div>
                   ))}
                 </RadioGroup>

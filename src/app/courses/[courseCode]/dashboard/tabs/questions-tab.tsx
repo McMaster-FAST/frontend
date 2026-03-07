@@ -13,6 +13,7 @@ import { useCourseQuestions } from "@/hooks/useCourseQuestions";
 import { QuestionItemSkeleton } from "@/components/ui/custom/questions-item/questions-item-skeleton";
 import { SearchBar } from "@/components/ui/custom/saerch-bar";
 import { QuestionsFilter } from "@/components/ui/custom/questions-filter";
+import { useAuthFetch } from "@/hooks/useFetchWithAuth";
 
 interface QuestionsProps {
   course?: Course | null;
@@ -22,11 +23,10 @@ export function Questions({ course }: QuestionsProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [filters, setFilters] = useState<QuestionFilters>({});
   const [isUploading, setIsUploading] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [commentsSheetOpen, setCommentsSheetOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-
+  const authFetch = useAuthFetch();
   const allSubtopics =
     course?.units.flatMap((unit) => unit.subtopics ?? []) || [];
 
@@ -48,25 +48,12 @@ export function Questions({ course }: QuestionsProps) {
     try {
       setIsUploading(true);
       setError(null);
-      setUploadProgress(0);
-
-      // Simulate progress for mock upload
-      const progressInterval = setInterval(() => {
-        setUploadProgress((prev) => {
-          if (prev >= 90) {
-            clearInterval(progressInterval);
-            return 90;
-          }
-          return prev + 10;
-        });
-      }, 100);
-
-      await uploadQuestions(file);
+      if (!course) {
+        throw new Error("Course information is missing. Please try again.");
+      }
+      await uploadQuestions(file, course, authFetch);
 
       await refetch();
-
-      setUploadProgress(100);
-      clearInterval(progressInterval);
     } catch (error) {
       console.error("Upload failed:", error);
       setError(
@@ -74,7 +61,6 @@ export function Questions({ course }: QuestionsProps) {
       );
     } finally {
       setIsUploading(false);
-      setUploadProgress(0);
       // Reset file input
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
@@ -99,15 +85,6 @@ export function Questions({ course }: QuestionsProps) {
           <AlertTitle>Error</AlertTitle>
           <AlertDescription>{error}</AlertDescription>
         </Alert>
-      )}
-
-      {isUploading && (
-        <div className="mb-6">
-          <Progress
-            value={uploadProgress}
-            caption={`Uploading... ${uploadProgress}%`}
-          />
-        </div>
       )}
 
       <div className="flex flex-row flex-0 gap-4 mb-6 items-center">
