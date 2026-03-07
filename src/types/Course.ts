@@ -1,8 +1,9 @@
 interface Course {
-    code: string;
-    name: string;
-    description: string;
-    year: number;
-    semester: string;
-    units: Unit[];
+  code: string;
+  name: string;
+  description: string;
+  is_archived: boolean;
+  year: number;
+  semester: string;
+  units: Unit[];
 }
