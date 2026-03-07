@@ -17,8 +17,7 @@ import {
 import { useEffect } from "react";
 import { useAuthFetch } from "@/hooks/useFetchWithAuth";
 import { Skeleton } from "@/components/ui/skeleton";
-import { QuestionFlagDialog } from "@/components/ui/custom/question-flag-dialog";
-import DOMPurify from "dompurify";
+import { QuestionFlagDialog } from "@/components/ui/custom/report-question-dialog";
 import ErrorMessage from "@/components/ui/custom/error-message";
 import {
   AlertDialog,
@@ -32,6 +31,8 @@ import {
 } from "@/components/ui/alert-dialog";
 
 import Link from "next/link";
+import { setSavedForLaterDebounced } from "@/lib/api";
+import { SafeHtml } from "@/components/ui/custom/safe-html";
 
 interface QuestionPageProps {
   params: Promise<{
@@ -69,6 +70,7 @@ function QuestionPage({ params: paramsPromise }: QuestionPageProps) {
   const [continueActions, setContinueActions] = useState<ContinueActions>({
     use_skipped_questions: false,
   });
+  const [savedForLater, setSavedForLaterState] = useState<boolean>(false);
 
   const showNoQuestionsDialog =
     !question?.public_id && !isQuestionLoading && !error;
@@ -91,7 +93,9 @@ function QuestionPage({ params: paramsPromise }: QuestionPageProps) {
         setQuestion(nextQuestion);
         updateContinueActions();
       })
-      .catch((err) => setError(err.message))
+      .catch((err: Error) => {
+        setError(err.message);
+      })
       .finally(() => setIsQuestionLoading(false));
   };
 
@@ -117,8 +121,9 @@ function QuestionPage({ params: paramsPromise }: QuestionPageProps) {
       .finally(() => setIsQuestionLoading(false));
   };
 
-  const handleSaveForLater = async () => {
-    // Implement save for later functionality here
+  const handleSaveForLater = (checked: boolean) => {
+    setSavedForLaterDebounced(course, question.public_id, checked, authFetch);
+    setSavedForLaterState(checked);
   };
   const handleQuestionFlag = async () => {
     // Implement question flagging functionality here
@@ -137,6 +142,10 @@ function QuestionPage({ params: paramsPromise }: QuestionPageProps) {
       });
     });
   };
+
+  useEffect(() => {
+    setSavedForLaterState(question?.saved_for_later || false);
+  }, [question]);
 
   useEffect(() => {
     (async () => {
@@ -166,7 +175,11 @@ function QuestionPage({ params: paramsPromise }: QuestionPageProps) {
               <AlertDialogContent className="w-min">
                 <AlertDialogTitle>No available questions</AlertDialogTitle>
                 <AlertDialogDescription>
-                  All questions have been skipped.
+                  {continueActions.use_skipped_questions ? (
+                    <>All questions have been skipped.</>
+                  ) : (
+                    "There are no questions available for this subtopic."
+                  )}
                 </AlertDialogDescription>
                 <AlertDialogDescription className="mb-4">
                   How would you like to proceed?
@@ -191,13 +204,9 @@ function QuestionPage({ params: paramsPromise }: QuestionPageProps) {
             </AlertDialog>
             {isQuestionLoading && <Skeleton className="w-full h-40" />}
             {!isQuestionLoading && question.content && (
-              <div
-                id="question-card"
-                className="border p-4 rounded-lg shadow-md"
-                dangerouslySetInnerHTML={{
-                  __html: DOMPurify.sanitize(question.content),
-                }}
-              ></div>
+              <div className="border p-4 rounded-lg shadow-md">
+                <SafeHtml html={question.content} />
+              </div>
             )}
             <div id="options-list" className="flex flex-col gap-2">
               {isQuestionLoading &&
@@ -225,10 +234,9 @@ function QuestionPage({ params: paramsPromise }: QuestionPageProps) {
                             ? " border-primary"
                             : "")
                         }
-                        dangerouslySetInnerHTML={{
-                          __html: DOMPurify.sanitize(option.content),
-                        }}
-                      ></Label>
+                      >
+                        <SafeHtml html={option.content} />
+                      </Label>
                     </div>
                   ))}
                 </RadioGroup>
@@ -246,21 +254,21 @@ function QuestionPage({ params: paramsPromise }: QuestionPageProps) {
                     The correct answer is:
                   </h1>
                   <p className="font-poppins text-2xl">
-                    {
-                      question?.options.find(
-                        (option) => option.public_id === correctOptionId,
-                      )?.content
-                    }
+                    <SafeHtml
+                      html={
+                        question?.options.find(
+                          (option) => option.public_id === correctOptionId,
+                        )?.content || ""
+                      }
+                    />
                   </p>
                 </div>
 
                 <div>
                   <h2 className="font-poppins font-semibold text-lg">Why?</h2>
-                  <p
-                    dangerouslySetInnerHTML={{
-                      __html: DOMPurify.sanitize(solution),
-                    }}
-                  ></p>
+                  <p>
+                    <SafeHtml html={solution} />
+                  </p>
                 </div>
               </div>
             )}
@@ -286,21 +294,22 @@ function QuestionPage({ params: paramsPromise }: QuestionPageProps) {
           <div className="inline-flex items-center gap-4">
             <div className="inline-flex gap-2">
               <Checkbox
-                id="save-for-later"
+                disabled={!!error}
+                checked={savedForLater}
                 onCheckedChange={handleSaveForLater}
               />
               <Label htmlFor="save-for-later">Save for Later</Label>
             </div>
             <Button
               variant="secondary"
-              disabled={submitted}
+              disabled={submitted || !!error}
               onClick={handleSkip}
             >
               Skip
             </Button>
             <Button
               variant="primary"
-              disabled={!selectedOption || submitted}
+              disabled={!selectedOption || submitted || !!error}
               onClick={handleSubmit}
             >
               Submit

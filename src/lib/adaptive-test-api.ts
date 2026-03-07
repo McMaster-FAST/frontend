@@ -20,6 +20,7 @@ export function convertToTestQuestion(data: any): TestQuestion {
     public_id: question_data.public_id,
     content: question_data.content,
     options: options,
+    saved_for_later: question_data.saved_for_later,
   } as TestQuestion;
 }
 

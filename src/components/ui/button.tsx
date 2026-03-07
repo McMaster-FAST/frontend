@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Slot } from "@radix-ui/react-slot";
+import { Slot, Slottable } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
 import { LucideIcon, ArrowRight } from "lucide-react";
 
@@ -76,7 +76,7 @@ function Button({
       {LeftIcon && (
         <LeftIcon strokeWidth={strokeWidth} className={leftClasses} />
       )}
-      {children}
+      <Slottable>{children}</Slottable>
       {RightIcon && (
         <RightIcon strokeWidth={strokeWidth} className={rightClasses} />
       )}

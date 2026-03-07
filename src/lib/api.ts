@@ -1,16 +1,16 @@
+import { useAuthFetch } from "@/hooks/useFetchWithAuth";
+import debounce from "lodash/debounce";
 import { auth } from "@/auth";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 export async function getJson(response: Response) {
-  return response
-    .json()
-    .catch(() => {
-      throw new Error(response.status + " " + response.statusText);
-    })
+  if (!response.ok) throw new Error(`ERROR: ${response.status}`);
+
+  return response.json()
     .then((json) => {
       if (!response.ok) {
-        throw new Error(json.message || "Error fetching data");
+        throw new Error(json.detail || "Error fetching data");
       }
       return json;
     });
@@ -21,7 +21,7 @@ export async function fetchWithAuth(
   options: RequestInit = {},
 ) {
   const session = await auth();
-  const token = session?.accessToken;
+  const token = session?.id_token;
 
   console.log(token);
 
@@ -68,6 +68,56 @@ export async function uploadQuestions(file: File) {
 
 export async function getAllQuestions() {
   const response = await fetch(`${API_BASE_URL}/api/core/questions/`);
+
+  return getJson(response);
+}
+
+export async function getSavedQuestions(
+  courseCode: string,
+  authFetch: ReturnType<typeof useAuthFetch>,
+) {
+  const response = await authFetch(`/api/core/saved-for-later/${courseCode}/`, {
+    method: "GET",
+  });
+
+  return getJson(response);
+}
+
+export const setSavedForLaterDebounced = debounce(
+  (
+    courseCode: string,
+    questionId: string,
+    saveForLater: boolean,
+    authFetch: ReturnType<typeof useAuthFetch>,
+  ) => setSavedForLater(courseCode, questionId, saveForLater, authFetch),
+  500,
+);
+
+export async function setSavedForLater(
+  courseCode: string,
+  questionId: string,
+  saveForLater: boolean,
+  authFetch: ReturnType<typeof useAuthFetch>,
+) {
+  await authFetch(`/api/core/saved-for-later/${courseCode}/`, {
+    method: saveForLater ? "POST" : "DELETE",
+    body: JSON.stringify({
+      question_public_id: questionId,
+    }),
+  });
+}
+
+export async function getQuestionById(
+  courseCode: string,
+  questionId: string,
+  authFetch: ReturnType<typeof useAuthFetch>,
+) {
+  const response = await authFetch(
+    `/api/courses/${courseCode}/questions/${questionId}/`,
+    {
+      method: "GET",
+    },
+  );
 
   return getJson(response);
 }
