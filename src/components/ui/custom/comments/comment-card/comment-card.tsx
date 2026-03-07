@@ -6,7 +6,7 @@ import {
   CardFooter,
   CardTitle,
 } from "@/components/ui/card";
-import { getTimeString } from "./time-utils";
+import { getTimeString } from "@/lib/time-utils";
 import { ChevronUp, CornerDownRight, User } from "lucide-react";
 import { useState } from "react";
 
@@ -24,20 +24,19 @@ export default function CommentCard({
   const [isSeeMore, setIsSeeMore] = useState(false);
   const CUTOFF_LENGTH = 50;
   const truncatedCommentText =
-    comment.commentText.length > CUTOFF_LENGTH && !isSeeMore
-      ? comment.commentText.slice(0, CUTOFF_LENGTH) + "..."
-      : comment.commentText;
+    comment.comment_text.length > CUTOFF_LENGTH && !isSeeMore
+      ? comment.comment_text.slice(0, CUTOFF_LENGTH) + "..."
+      : comment.comment_text;
 
   return (
     <div className="flex flex-row w-full gap-2">
       {!replies && <CornerDownRight className="text-primary ml-auto" />}
       <div className="flex flex-col gap-2 w-full">
-        <Card className="w-full">
+        <Card className="w-full px-4">
           <CardContent>
             <CardTitle className="flex justify-between items-center text-foreground">
-              <div className="inline-flex items-center gap-2">
-                <User className="size-4 text-primary" />
-                {comment.fromUserName || "Unknown"}
+              <div className="inline-flex items-center gap-2 text-sm">
+                {comment.user_name || "Unknown"}
               </div>
 
               <p className="text-sm text-muted-foreground">
@@ -50,7 +49,7 @@ export default function CommentCard({
               {truncatedCommentText}
             </CardDescription>
             <CardFooter className="text-sm gap-2 flex flex-row">
-              {comment.commentText.length > CUTOFF_LENGTH && (
+              {comment.comment_text.length > CUTOFF_LENGTH && (
                 <p
                   onClick={() => setIsSeeMore(!isSeeMore)}
                   className="cursor-pointer text-foreground hover:underline select-none text-primary"

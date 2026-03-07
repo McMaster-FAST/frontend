@@ -9,7 +9,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { ChevronDown, FilterIcon } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { cn } from "@/lib/utils";
 import {
   Select,
@@ -18,6 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import debounce from "lodash/debounce";
 
 interface QuestionsFilterProps {
   subtopics: Subtopic[];
@@ -31,21 +32,32 @@ export function QuestionsFilter({
   onFilterChange,
 }: QuestionsFilterProps) {
   const [open, setOpen] = useState(false);
-
-  const sliderValue = [
+  const [sliderValue, setSliderValue] = useState([
     filters.min_difficulty ?? 0,
     filters.max_difficulty ?? 1,
-  ];
+  ]);
+
+  const debouncedFilterChange = useMemo(
+    () =>
+      debounce((value: number[]) => {
+        const minVal = value[0] > 0 ? value[0] : undefined;
+        const maxVal = value[1] < 1 ? value[1] : undefined;
+        onFilterChange({
+          ...filters,
+          min_difficulty: minVal,
+          max_difficulty: maxVal,
+        });
+      }, 300),
+    [filters, onFilterChange],
+  );
+
+  useEffect(() => {
+    return () => debouncedFilterChange.cancel();
+  }, [debouncedFilterChange]);
 
   const handleSliderChange = (value: number[]) => {
-    const minVal = value[0] > 0 ? value[0] : undefined;
-    const maxVal = value[1] < 1 ? value[1] : undefined;
-
-    onFilterChange({
-      ...filters,
-      min_difficulty: minVal,
-      max_difficulty: maxVal,
-    });
+    setSliderValue(value);
+    debouncedFilterChange(value);
   };
 
   const handleToggleChange = (
@@ -62,6 +74,7 @@ export function QuestionsFilter({
 
   const clearFilters = () => {
     onFilterChange({});
+    setSliderValue([0, 1]);
     setOpen(false);
   };
 

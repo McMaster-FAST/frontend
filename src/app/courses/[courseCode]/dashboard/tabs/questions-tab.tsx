@@ -25,6 +25,9 @@ export function Questions({ course }: QuestionsProps) {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [error, setError] = useState<string | null>(null);
+  const [selectedQuestionId, setSelectedQuestionId] = useState<string | null>(
+    null,
+  );
   const [commentsSheetOpen, setCommentsSheetOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
@@ -116,10 +119,7 @@ export function Questions({ course }: QuestionsProps) {
 
       {isUploading && (
         <div className="mb-6">
-          <Progress
-            value={uploadProgress}
-            caption={`Uploading... ${uploadProgress}%`}
-          />
+          <Progress value={uploadProgress} />
         </div>
       )}
 
@@ -177,6 +177,7 @@ export function Questions({ course }: QuestionsProps) {
                     onPreview={() => navigateToPreview(question.public_id)}
                     onEdit={() => navigateToEdit(question.public_id)}
                     onViewComments={() => {
+                      setSelectedQuestionId(question.public_id);
                       setCommentsSheetOpen(true);
                     }}
                     onDelete={() =>
@@ -193,6 +194,7 @@ export function Questions({ course }: QuestionsProps) {
       <CommentsSheet
         open={commentsSheetOpen}
         onOpenChange={setCommentsSheetOpen}
+        questionId={selectedQuestionId}
       />
     </div>
   );

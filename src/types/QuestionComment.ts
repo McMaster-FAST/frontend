@@ -1,8 +1,7 @@
 interface QuestionComment {
-    public_id: string;
-    fromUserName: string;
-    question: string;
-    commentText: string;
-    replyTo: string | null;
-    timestamp: Date;
+  public_id: string;
+  comment_text: string;
+  user_name: string;
+  timestamp: Date;
+  replies: QuestionComment[];
 }
