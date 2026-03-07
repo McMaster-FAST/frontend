@@ -4,8 +4,6 @@ import Image from "next/image";
 import { MacFastHeader } from "@/components/ui/custom/macfast-header";
 import CourseCard from "@/components/ui/custom/course-card";
 import { useUserCourses } from "@/hooks/useUserCourses";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { AlertCircle } from "lucide-react";
 import ErrorMessage from "@/components/ui/custom/error-message";
 
 export default function Home() {

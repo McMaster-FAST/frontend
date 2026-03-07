@@ -72,20 +72,14 @@ function InstructorDashboardPage() {
       <main className="mx-auto w-full max-w-7xl px-6 py-8 flex-1 flex flex-col min-h-0">
         <Tabs className="w-full flex flex-col h-full" defaultValue="questions">
           <div className="mb-8 overflow-x-auto pb-2 mx-auto">
-            <TabsList className="h-12 w-auto justify-start gap-2 bg-transparent p-0">
-              <TabsTrigger
-                value="questions"
-                className="group flex gap-2 rounded-full border border-transparent px-6 py-2 data-[state=active]:border-light-gray data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-primary"
-              >
-                <FileQuestion className="h-4 w-4 text-dark-gray group-data-[state=active]:text-primary-hover" />
+            <TabsList className="h-12 w-auto justify-start gap-2 p-0">
+              <TabsTrigger value="questions">
+                <FileQuestion />
                 Questions
               </TabsTrigger>
 
-              <TabsTrigger
-                value="classList"
-                className="group flex gap-2 rounded-full border border-transparent px-6 py-2 data-[state=active]:border-light-gray data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-primary"
-              >
-                <Users className="h-4 w-4 text-dark-gray group-data-[state=active]:text-primary-hover" />
+              <TabsTrigger value="classList">
+                <Users />
                 Class List
               </TabsTrigger>
             </TabsList>
