@@ -147,14 +147,14 @@ export default function QuestionEditPage() {
     );
   }
 
-  if (!isQuestionLoading && question && !question.options) {
+  if (!isQuestionLoading && (!question || !question.options)) {
     return (
       <QuestionPage>
         <QuestionPage.Header>
           <MacFastHeader />
         </QuestionPage.Header>
         <QuestionPage.Title>
-          <h1>{question.course}</h1>#<h1>{questionId}</h1>
+          <h1>Question data is malformed</h1>
         </QuestionPage.Title>
         <QuestionPage.Content>
           <div>
@@ -253,6 +253,7 @@ export default function QuestionEditPage() {
         <CommentsSheet
           open={areCommentsOpen}
           onOpenChange={setAreCommentsOpen}
+          questionId={question?.public_id || ""}
         />
       </main>
       <footer className="border-t-2 border-light-gray">

@@ -87,13 +87,13 @@ export default function QuestionPreviewPage({ useQuestion, onReturn }: QuestionP
               onValueChange={setSelectedOption}
             >
               {question?.options &&
-                question.options.map((option: QuestionOption) => (
+                question.options.map((option: QuestionOption, index: number) => (
                   <div
-                    key={option.public_id}
+                    key={index}
                     className="flex items-center gap-2 w-full"
                   >
                     <RadioGroupItem
-                      value={option.public_id}
+                      value={option.public_id || `option-${index}`}
                       className="cursor-pointer"
                     />
                     <div className="border-2 p-6 rounded-md items-center flex gap-2 w-full">
