@@ -169,14 +169,6 @@ export default function QuestionEditPage() {
     <div className="flex flex-col h-screen bg-slate-50/50 font-poppins">
       <MacFastHeader />
       <div className="border-b border-light-gray bg-white shadow-sm">
-        <Button
-          variant="tertiary"
-          onClick={() => router.replace("../../dashboard")}
-        >
-          <ArrowLeft />
-          Back to Dashboard
-        </Button>
-
         <div className="px-6 py-8">
           <div className="mx-auto max-w-7xl">
             <div className="flex flex-col gap-4">
@@ -232,6 +224,14 @@ export default function QuestionEditPage() {
         </div>
       </div>
       <main className="mx-auto w-full max-w-7xl px-6 pt-8 flex-1 flex flex-col min-h-0 overflow-hidden">
+        <Button
+          className="mr-auto px-0"
+          variant="tertiary"
+          onClick={() => router.replace("../../dashboard")}
+        >
+          <ArrowLeft />
+          Back to Dashboard
+        </Button>
         {error && <ErrorMessage message={error} />}
         <Tabs
           className="w-full flex flex-col h-full overflow-hidden"

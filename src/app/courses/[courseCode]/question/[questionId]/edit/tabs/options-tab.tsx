@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { SafeHtmlInline } from "@/components/ui/custom/safe-html";
 import { Label } from "@/components/ui/label";
 import { TabsContent } from "@/components/ui/tabs";
-import { CheckCheck, CircleMinus, CirclePlus } from "lucide-react";
+import { Check, CirclePlus, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 
 interface OptionsTabProps {
@@ -116,9 +116,9 @@ export default function OptionsTab({ question, setQuestion }: OptionsTabProps) {
                   <AccordionItem value={`option-${index}`}>
                     <div className="inline-flex items-center justify-between w-full">
                       <div className="inline-flex items-center gap-2">
-                        <AccordionTrigger className="hover:cursor-pointer w-ful py-2 items-center">
+                        <AccordionTrigger className="hover:cursor-pointer w-full py-4 items-center">
                           <div className="inline-flex gap-2">
-                            <h1 className="text-lg w-full  line-clamp-2">
+                            <h1 className="text-md font-medium w-full line-clamp-2">
                               <SafeHtmlInline
                                 html={option.content || `Option ${index + 1}`}
                               />
@@ -126,26 +126,30 @@ export default function OptionsTab({ question, setQuestion }: OptionsTabProps) {
                           </div>
                         </AccordionTrigger>
                       </div>
-                      <div className="flex items-center">
+                      <div className="flex items-center gap-2">
                         {!isIndexAnswer(index) ? (
                           <Button
                             variant="tertiary"
+                            className="w-40" // standard 10rem width
                             onClick={() => setOptionAsAnswer(index)}
                           >
-                            <CheckCheck />
+                            <Check className="mr-2 h-4 w-4" />
                             Set as Answer
                           </Button>
                         ) : (
-                          <Badge variant="default" className="mx-7">
+                          <Badge
+                            variant="default"
+                            className="flex w-36 items-center justify-center text-sm"
+                          >
                             Correct Answer
                           </Badge>
                         )}
+
                         <Button
                           variant="tertiary"
-                          className="justify-end"
                           onClick={() => deleteQuestionOption(index)}
                         >
-                          <CircleMinus />
+                          <Trash2 className="mr-2 h-4 w-4" />
                           Remove
                         </Button>
                       </div>
@@ -187,7 +191,7 @@ export default function OptionsTab({ question, setQuestion }: OptionsTabProps) {
             onClick={addQuestionOption}
           >
             <CirclePlus />
-            Add option
+            Add an option
           </Button>
         </div>
       </div>

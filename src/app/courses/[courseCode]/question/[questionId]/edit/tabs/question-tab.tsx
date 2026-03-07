@@ -23,29 +23,25 @@ export default function QuestionTab({
     const isVerified = value === "true";
     setQuestion((prev) => (prev ? { ...prev, is_verified: isVerified } : prev));
   };
+
   return (
     <TabsContent value="question" className="flex-1 overflow-hidden">
-      <div className="flex flex-col gap-4 h-full overflow-auto">
-        <div className="flex flex-col gap-6">
-          <div className="flex-1 flex-col gap-2">
-            <h2 className="text-lg font-semibold">Question Content</h2>
-            <Label className="text-sm font-light">
-              What the student will be asked
-            </Label>
-            <RichTextarea
-              value={question?.content ?? ""}
-              placeholder="Question content..."
-              onChange={(content) =>
-                setQuestion((prev) => (prev ? { ...prev, content } : prev))
-              }
-            />
-          </div>
-          <div className="flex-1 flex-col gap-2">
-            <h2 className="text-lg font-semibold">Question Details</h2>
-            <div>
-              <div className="inline-flex items-center gap-4">
-                <Label htmlFor="is-verified">Status:</Label>
-              </div>
+      <div className="flex flex-col gap-8 h-full overflow-auto pb-6">
+        {/* Question Details Section */}
+        <div className="flex flex-col gap-4">
+          <h2 className="text-lg font-semibold text-foreground border-b border-light-gray pb-2">
+            Question Details
+          </h2>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+            {/* Status */}
+            <div className="flex flex-col gap-2">
+              <Label
+                htmlFor="is-verified"
+                className="text-md font-semibold text-foreground"
+              >
+                Status
+              </Label>
               <Select
                 value={question?.is_verified?.toString() || "false"}
                 onValueChange={updateVerifiedStatus}
@@ -65,25 +61,108 @@ export default function QuestionTab({
                   <SelectItem value="false">Unverified</SelectItem>
                 </SelectContent>
               </Select>
-              <Label className="text-sm font-light">
+              <p className="text-xs text-muted-foreground">
                 Whether the question is ready to be shown to students.
-              </Label>
+              </p>
             </div>
-            <div className="items-center gap-2">
-              <div className="inline-flex items-center gap-2">
-                <Label htmlFor="difficulty">Difficulty: </Label>
-              </div>
+
+            {/* Difficulty */}
+            <div className="flex flex-col gap-2">
+              <Label
+                htmlFor="difficulty"
+                className="text-md font-semibold text-foreground"
+              >
+                Difficulty
+              </Label>
               <Input
-                className="w-24"
+                id="difficulty"
+                className="w-1/4 bg-slate-50/50"
                 value={question?.difficulty ?? "0.0000"}
                 disabled
                 readOnly
               />
-              <Label className="text-sm font-light">
+              <p className="text-xs text-muted-foreground">
                 The difficulty of the question as given on question upload.
+              </p>
+            </div>
+
+            {/* Unit */}
+            <div className="flex flex-col gap-2">
+              <Label
+                htmlFor="unit"
+                className="text-md font-semibold text-foreground"
+              >
+                Unit
               </Label>
+              <Select
+                value={question?.unit || ""}
+                onValueChange={(val) =>
+                  setQuestion((prev) => (prev ? { ...prev, unit: val } : prev))
+                }
+              >
+                <SelectTrigger id="unit">
+                  <SelectValue placeholder="Select a unit" />
+                </SelectTrigger>
+                <SelectContent>
+                  {/* Replace with actual unit data map if dynamic */}
+                  <SelectItem value="unit-1">Unit 1</SelectItem>
+                  <SelectItem value="unit-2">Unit 2</SelectItem>
+                  <SelectItem value="unit-3">Unit 3</SelectItem>
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground">
+                The primary unit this question is categorized under.
+              </p>
+            </div>
+
+            {/* Subtopic */}
+            <div className="flex flex-col gap-2">
+              <Label
+                htmlFor="subtopic"
+                className="text-md font-semibold text-foreground"
+              >
+                Subtopic
+              </Label>
+              <Select
+                value={question?.subtopic || ""}
+                onValueChange={(val) =>
+                  setQuestion((prev) =>
+                    prev ? { ...prev, subtopic: val } : prev,
+                  )
+                }
+              >
+                <SelectTrigger id="subtopic">
+                  <SelectValue placeholder="Select a subtopic" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="subtopic-1">Subtopic 1</SelectItem>
+                  <SelectItem value="subtopic-2">Subtopic 2</SelectItem>
+                  <SelectItem value="subtopic-3">Subtopic 3</SelectItem>
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground">
+                The specific subtopic for this question.
+              </p>
             </div>
           </div>
+        </div>
+        {/* Question Content Section */}
+        <div className="flex flex-col gap-3">
+          <div>
+            <h2 className="text-lg font-semibold text-foreground">
+              Question Content
+            </h2>
+            <p className="text-sm text-muted-foreground">
+              What the student will be asked
+            </p>
+          </div>
+          <RichTextarea
+            value={question?.content ?? ""}
+            placeholder="Question content..."
+            onChange={(content) =>
+              setQuestion((prev) => (prev ? { ...prev, content } : prev))
+            }
+          />
         </div>
       </div>
     </TabsContent>

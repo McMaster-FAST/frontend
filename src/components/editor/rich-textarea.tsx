@@ -1,6 +1,13 @@
 "use client";
 
-import { JSX, useCallback, useEffect, useRef, useState, type ChangeEvent } from "react";
+import {
+  JSX,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type ChangeEvent,
+} from "react";
 import DOMPurify from "dompurify";
 import {
   $applyNodeReplacement,
@@ -489,7 +496,7 @@ export function RichTextarea({
             error
               ? "ring ring-[3px] ring-primary/30"
               : "focus-within:ring-ring/50",
-            "border-input dark:bg-input/30 relative w-full overflow-hidden rounded-md border bg-transparent text-base shadow-xs transition-[color,box-shadow] focus-within:border-ring focus-within:ring-[3px] md:text-sm",
+            "border-input dark:bg-input/30 relative w-full flex flex-col overflow-hidden rounded-md border bg-transparent text-base shadow-xs transition-[color,box-shadow] focus-within:border-ring focus-within:ring-[3px] md:text-sm",
             disabled && "cursor-not-allowed opacity-50",
             className,
           )}
@@ -506,7 +513,7 @@ export function RichTextarea({
                       {/* TODO fix how this is laid out it is stupid */}
                     </span>
                   }
-                  className="min-h-16 px-3 py-2 outline-none"
+                  className="min-h-24 px-3 py-2 outline-none"
                 />
               }
               ErrorBoundary={LexicalErrorBoundary}
