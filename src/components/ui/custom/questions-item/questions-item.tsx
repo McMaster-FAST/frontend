@@ -21,7 +21,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { SafeHtmlInline } from "@/components/ui/custom/safe-html";
 
 interface QuestionItemProps extends React.HTMLAttributes<HTMLDivElement> {
   question: Question;
