@@ -195,16 +195,23 @@ function QuestionTestPage({ params: paramsPromise }: QuestionTestPageProps) {
     // Implement question flagging functionality here
   };
 
-  useEffect(() => {
-    if (!course) return;
-    const unit = course.units.find((unit) => unit.name === unit_name);
-    if (!unit || !unit.subtopics) return;
-    const subtopic = unit.subtopics.find(
-      (subtopic) => subtopic.name === subtopic_name,
-    );
-    if (!subtopic) return;
-    setSubtopicId(subtopic.public_id);
-  }, [course]);
+  const useSkippedQuestions = () => {
+    resetSkippedQuestions(authFetch).then(() => {
+      handleNextQuestion();
+    });
+  };
+
+  const updateContinueActions = () => {
+    getActiveTestSession(authFetch)
+      .then((session) => {
+        setContinueActions({
+          use_skipped_questions: session.skipped_questions.length > 0,
+        });
+      })
+      .catch(() => {
+        setContinueActions({ use_skipped_questions: false });
+      });
+  };
 
   useEffect(() => {
     if (!subtopicId) return;

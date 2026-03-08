@@ -1,13 +1,29 @@
 "use client";
 
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { MacFastHeader } from "@/components/ui/custom/macfast-header";
 import CourseCard from "@/components/ui/custom/course-card";
 import { useUserCourses } from "@/hooks/useUserCourses";
+import { useAuthFetch } from "@/hooks/useFetchWithAuth";
+import { getResumeTarget } from "@/lib/resume-api";
 import ErrorMessage from "@/components/ui/custom/error-message";
 
 export default function Home() {
+  const router = useRouter();
+  const authFetch = useAuthFetch();
   const { courses: userCourses, isLoading, error } = useUserCourses();
+
+  const handleResume = async (courseCode: string) => {
+    try {
+      const target = await getResumeTarget(courseCode, authFetch);
+      const url = `/courses/${encodeURIComponent(target.course_code)}/${encodeURIComponent(target.unit_name)}/${encodeURIComponent(target.subtopic_name)}/test`;
+      router.push(url);
+    } catch {
+      // Fallback to course page if resume fails (e.g. when backend not ready)
+      router.push(`/courses/${encodeURIComponent(courseCode)}/coursepage`);
+    }
+  };
 
   console.log("Error:", error);
 
@@ -42,7 +58,12 @@ export default function Home() {
 
           <div className="grid grid-cols-1 gap-6 pb-10 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-5">
             {userCourses.map((course, index) => (
-              <CourseCard key={index} course={course} progress={50} />
+              <CourseCard
+                key={index}
+                course={course}
+                progress={50}
+                onResume={handleResume}
+              />
             ))}
           </div>
         </div>

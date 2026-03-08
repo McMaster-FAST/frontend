@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Card,
   CardContent,
@@ -22,9 +24,11 @@ export type Course = {
 type CourseCardProps = {
   course: Course;
   progress: number;
+  /** Called when user clicks Resume; if provided, Resume uses this instead of a static link. */
+  onResume?: (courseCode: string) => void;
 };
 
-function CourseCard({ course, progress }: CourseCardProps) {
+function CourseCard({ course, progress, onResume }: CourseCardProps) {
   return (
     <Card className="group relative flex w-full flex-col overflow-hidden border-light-gray bg-white transition-all hover:-translate-y-1 hover:shadow-lg">
       <div className="h-40 bg-gradient-to-br from-slate-50 to-slate-200 p-4 transition-colors group-hover:from-text-gold group-hover:to-text-maroon">
@@ -71,9 +75,20 @@ function CourseCard({ course, progress }: CourseCardProps) {
         <Button variant="secondary" className="flex-1 text-xs font-bold">
           <Link href={`/courses/${course.code}/coursepage`}>Details</Link>
         </Button>
-        <Button className="flex-1 gap-2 text-xs shadow-sm font-bold">
-          Resume <ArrowRight className="h-3 w-3" />
-        </Button>
+        {onResume ? (
+          <Button
+            className="flex-1 gap-2 text-xs shadow-sm font-bold"
+            onClick={() => onResume(course.code)}
+          >
+            Resume <ArrowRight className="h-3 w-3" />
+          </Button>
+        ) : (
+          <Button className="flex-1 gap-2 text-xs shadow-sm font-bold" asChild>
+            <Link href={`/courses/${course.code}/coursepage`}>
+              Resume <ArrowRight className="h-3 w-3" />
+            </Link>
+          </Button>
+        )}
       </CardFooter>
     </Card>
   );

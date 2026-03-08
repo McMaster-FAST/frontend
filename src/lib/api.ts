@@ -1,4 +1,5 @@
-import { auth } from "@/auth";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 import { useAuthFetch } from "@/hooks/useFetchWithAuth";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
@@ -23,8 +24,8 @@ export async function fetchWithAuth(
   endpoint: string,
   options: RequestInit = {},
 ) {
-  const session = await auth();
-  const token = session?.id_token;
+  const session = await getServerSession(authOptions);
+  const token = session?.accessToken;
 
   console.log(token);
 
