@@ -3,4 +3,5 @@ interface Subtopic {
   description?: string[];
   study_aids?: StudyAid[];
   user_ability: UserAbility | null;
+  public_id: string;
 }

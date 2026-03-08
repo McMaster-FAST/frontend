@@ -1,12 +1,55 @@
 import { getJson } from "@/lib/api";
 import { useAuthFetch } from "@/hooks/useFetchWithAuth";
+import {
+  ContinueAction,
+  SuggestedAction,
+} from "@/types/actions/ContinueAction";
 
 const API_BASE_URL = "/api/core/adaptive-test";
 
-function convertToTestQuestion(data: any): TestQuestion {
+function convertToContinueAction(action: string): ContinueAction | undefined {
+  console.log(`Converting action: ${action}`);
+  if (Object.keys(ContinueAction).includes(action)) {
+    
+    return ContinueAction[action as keyof typeof ContinueAction];
+  }
+  return undefined;
+}
+
+function convertToContinueActions(actions: string[]): ContinueAction[] {
+  if (!actions) return [];
+  return actions
+    .map((action) => convertToContinueAction(action))
+    .filter((action): action is ContinueAction => action !== undefined);
+}
+
+function convertToSuggestedAction(action: string): SuggestedAction | undefined {
+  if (Object.keys(SuggestedAction).includes(action)) {
+    return SuggestedAction[action as keyof typeof SuggestedAction];
+  }
+  return undefined;
+}
+
+function convertToSuggestedActions(actions: string[]): SuggestedAction[] {
+  if (!actions) return [];
+  return actions
+    .map((action) => convertToSuggestedAction(action))
+    .filter((action): action is SuggestedAction => action !== undefined);
+}
+
+function convertToTestQuestion(data: any): {
+  question: TestQuestion;
+  continue_actions: ContinueAction[];
+  suggested_actions: SuggestedAction[];
+} {
+  console.log(data);
   const question_data = data.question;
   if (!question_data) {
-    return {} as TestQuestion;
+    return {
+      question: {} as TestQuestion,
+      continue_actions: convertToContinueActions(data.continue_actions),
+      suggested_actions: convertToSuggestedActions(data.suggested_actions),
+    };
   }
   const options = question_data.options.map(
     (option: any) =>
@@ -17,10 +60,13 @@ function convertToTestQuestion(data: any): TestQuestion {
   );
 
   return {
-    public_id: question_data.public_id,
-    content: question_data.content,
-    options: options,
-  } as TestQuestion;
+    question: {
+      ...question_data,
+      options: options,
+    } as TestQuestion,
+    continue_actions: convertToContinueActions(data.continue_actions),
+    suggested_actions: convertToSuggestedActions(data.suggested_actions),
+  };
 }
 
 export async function getNextQuestion(

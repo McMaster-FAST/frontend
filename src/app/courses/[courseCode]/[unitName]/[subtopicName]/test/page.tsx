@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { ChevronsRight } from "lucide-react";
 import React, { useState } from "react";
+import { JSX } from "react/jsx-runtime";
 import {
   getNextQuestion,
   skipQuestion,
@@ -18,18 +19,19 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { QuestionFlagDialog } from "@/components/ui/custom/question-flag-dialog";
 import DOMPurify from "dompurify";
 import ErrorMessage from "@/components/ui/custom/error-message";
-import {
-  AlertDialog,
-  AlertDialogCancel,
-  AlertDialogTitle,
-} from "@radix-ui/react-alert-dialog";
-import {
-  AlertDialogContent,
-  AlertDialogDescription,
-} from "@/components/ui/alert-dialog";
-
+import { resolveImages } from "@/lib/utils";
+import TestContinueDialog from "@/components/ui/custom/test-continue-dialog";
 import Link from "next/link";
-import { getHost, resolveImages } from "@/lib/utils";
+import {
+  ContinueAction,
+  SuggestedAction,
+} from "@/types/actions/ContinueAction";
+import ActionInfo from "@/types/actions/ContinueActionInfo";
+import {
+  updateSelWindowLowerBound,
+  updateSelWindowUpperBound,
+} from "@/lib/api";
+import { useCourseData } from "@/hooks/useCourseData";
 
 interface QuestionPageProps {
   params: Promise<{
@@ -39,16 +41,47 @@ interface QuestionPageProps {
   }>;
 }
 
+function generateNoteFromSuggestedActions(
+  suggested_actions: SuggestedAction[],
+): JSX.Element[] {
+  return suggested_actions.map((action) => {
+    switch (action) {
+      case SuggestedAction.STOP_STUDYING:
+        return (
+          <span>
+            <span className="block">
+              The algorithm has determined your ability with some level of
+              confidence, which you can view from the{" "}
+              <Link className="clickable-text" href="../../coursepage">
+                course page
+              </Link>
+              .
+            </span>
+            <span className="block">
+              This should give you an idea of your understanding of this
+              subtopic. If you are satisfied with your performance we suggest
+              you move on to other subtopics.
+            </span>
+          </span>
+        );
+    }
+  });
+}
+
 function QuestionPage({ params: paramsPromise }: QuestionPageProps) {
   // Get course info from URI
   const params = React.use(paramsPromise);
-  const course = decodeURIComponent(params.courseCode);
-  const unit = decodeURIComponent(params.unitName);
-  const subtopic = decodeURIComponent(params.subtopicName);
-
+  const unit_name = decodeURIComponent(params.unitName);
+  const subtopic_name = decodeURIComponent(params.subtopicName);
+  const {
+    course,
+    isLoading,
+    error: courseError,
+    refetch,
+    courseCode,
+  } = useCourseData();
   const authFetch = useAuthFetch();
 
-  // Setup state
   const [question, setQuestion]: [
     TestQuestion,
     React.Dispatch<React.SetStateAction<TestQuestion>>,
@@ -60,6 +93,9 @@ function QuestionPage({ params: paramsPromise }: QuestionPageProps) {
   const [submitted, setSubmitted] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
   const [isQuestionLoading, setIsQuestionLoading] = useState<boolean>(true);
+  const [actions, setActions] = useState<ActionInfo[]>([]);
+  const [notes, setNotes] = useState<JSX.Element[]>([]);
+  const [subtopicId, setSubtopicId] = useState("");
 
   const showNoQuestionsDialog =
     !question?.public_id && !isQuestionLoading && !error;
@@ -74,15 +110,53 @@ function QuestionPage({ params: paramsPromise }: QuestionPageProps) {
     setError("");
   };
 
-  const handleNextQuestion = async () => {
-    resetState();
-    
-    getNextQuestion(course, unit, subtopic, authFetch)
-      .then((nextQuestion) => {
-        setQuestion(nextQuestion);
+  const generateActionsForContinueActions = (
+    continue_actions: ContinueAction[],
+    subtopic_id: string,
+  ): ActionInfo[] => {
+    return continue_actions.map((action) => {
+      switch (action) {
+        case ContinueAction.INCREMENT_WINDOW_UPPERBOUND:
+          return {
+            caption: <span>See harder questions</span>,
+            action: () => {
+              updateSelWindowUpperBound(subtopic_id, 0.25, authFetch);
+            },
+          };
+        case ContinueAction.DECREMENT_WINDOW_LOWERBOUND:
+          return {
+            caption: <span>See easier questions</span>,
+            action: () => {
+              updateSelWindowLowerBound(subtopic_id, -0.25, authFetch);
+            },
+          };
+      }
+    });
+  };
+  const updateWithNewQuestion = (
+    questionPromise: Promise<{
+      question: TestQuestion;
+      continue_actions: ContinueAction[];
+      suggested_actions: SuggestedAction[];
+    }>,
+  ) => {
+    questionPromise
+      .then(({ question, continue_actions, suggested_actions }) => {
+        setQuestion(question);
+        setActions(
+          generateActionsForContinueActions(continue_actions, subtopicId),
+        );
+        setNotes(generateNoteFromSuggestedActions(suggested_actions));
       })
       .catch((err) => setError(err.message))
       .finally(() => setIsQuestionLoading(false));
+  };
+
+  const handleNextQuestion = async () => {
+    resetState();
+    updateWithNewQuestion(
+      getNextQuestion(courseCode || "", unit_name, subtopic_name, authFetch),
+    );
   };
 
   const handleSubmit = async () => {
@@ -95,15 +169,9 @@ function QuestionPage({ params: paramsPromise }: QuestionPageProps) {
       })
       .catch((err) => setError(err.message));
   };
-
   const handleSkip = async () => {
     resetState();
-    skipQuestion(question.public_id, authFetch)
-      .then((nextQuestion) => {
-        setQuestion(nextQuestion);
-      })
-      .catch((err) => setError(err.message))
-      .finally(() => setIsQuestionLoading(false));
+    updateWithNewQuestion(skipQuestion(question.public_id, authFetch));
   };
 
   const handleSaveForLater = async () => {
@@ -113,9 +181,23 @@ function QuestionPage({ params: paramsPromise }: QuestionPageProps) {
     // Implement question flagging functionality here
   };
 
+  useEffect(() => {}, [course]);
+
   useEffect(() => {
+    if (!course) return;
+    const unit = course.units.find((unit) => unit.name === unit_name);
+    if (!unit || !unit.subtopics) return;
+    const subtopic = unit.subtopics.find(
+      (subtopic) => subtopic.name === subtopic_name,
+    );
+    if (!subtopic) return;
+    setSubtopicId(subtopic.public_id);
+  }, [course]);
+
+  useEffect(() => {
+    if (!subtopicId) return;
     handleNextQuestion();
-  }, []);
+  }, [subtopicId]);
 
   return (
     <div className="flex flex-col h-screen">
@@ -125,42 +207,29 @@ function QuestionPage({ params: paramsPromise }: QuestionPageProps) {
           id="header"
           className="flex flex-row font-poppins font-semibold text-xl items-center gap-2 text-dark-gray"
         >
-          <h1>{course}</h1>
+          <h1>{courseCode}</h1>
           <ChevronsRight />
           <h1>
-            {unit} - {subtopic}
+            {unit_name} - {subtopic_name}
           </h1>
         </div>
         <div id="content" className="flex flex-row gap-4 flex-1">
           <div id="question-content" className="flex-2 flex flex-col gap-6">
             {error && <ErrorMessage message={error} />}
-            <AlertDialog open={!!showNoQuestionsDialog}>
-              <AlertDialogContent className="w-min">
-                <AlertDialogTitle>No available questions</AlertDialogTitle>
-                <AlertDialogDescription>
-                  All questions have been skipped.
-                </AlertDialogDescription>
-                <AlertDialogDescription className="mb-4">
-                  How would you like to proceed?
-                </AlertDialogDescription>
-                <div className="flex flex-col w-fit gap-2 justify-center">
-                  <AlertDialogCancel asChild>
-                    <Button variant="secondary">
-                      <Link href={`/courses/${course}/coursepage`}>
-                        Return to Course Page
-                      </Link>
-                    </Button>
-                  </AlertDialogCancel>
-                </div>
-              </AlertDialogContent>
-            </AlertDialog>
+            <TestContinueDialog
+              open={showNoQuestionsDialog}
+              actions={actions}
+              notes={notes}
+            />
             {isQuestionLoading && <Skeleton className="w-full h-40" />}
             {!isQuestionLoading && question.content && (
               <div
                 id="question-card"
                 className="border p-4 rounded-lg shadow-md"
                 dangerouslySetInnerHTML={{
-                  __html: DOMPurify.sanitize(resolveImages(question.content, question.public_id)),
+                  __html: DOMPurify.sanitize(
+                    resolveImages(question.content, question.public_id),
+                  ),
                 }}
               ></div>
             )}
@@ -183,15 +252,17 @@ function QuestionPage({ params: paramsPromise }: QuestionPageProps) {
                         value={option.public_id}
                         className="cursor-pointer"
                       />
-                        <div
-                          className={
+                      <div
+                        className={
                           "border-2 p-6 rounded-md w-full" +
                           (correctOptionId === option.public_id
                             ? " border-primary"
                             : "")
-                          }
+                        }
                         dangerouslySetInnerHTML={{
-                          __html: DOMPurify.sanitize(resolveImages(option.content, question.public_id)),
+                          __html: DOMPurify.sanitize(
+                            resolveImages(option.content, question.public_id),
+                          ),
                         }}
                       />
                     </div>

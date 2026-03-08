@@ -82,3 +82,32 @@ export async function getAllQuestions() {
 
   return getJson(response);
 }
+
+export async function updateSelWindowUpperBound(
+  subtopic_id: string,
+  increment: number,
+  authFetch: typeof fetchWithAuth,
+) {
+  const response = await authFetch(
+    `/api/test-sessions/${subtopic_id}/update-sel-window/upper-bound/`,
+    {
+      method: "POST",
+      body: JSON.stringify({ increment: increment }),
+    },
+  );
+  return getJson(response);
+}
+export async function updateSelWindowLowerBound(
+  subtopic_id: string,
+  increment: number,
+  authFetch: typeof fetchWithAuth,
+) {
+  const response = await authFetch(
+    `/api/test-sessions/${subtopic_id}/update-sel-window/lower-bound/`,
+    {
+      method: "POST",
+      body: JSON.stringify({ increment: increment }),
+    },
+  );
+  return getJson(response);
+}
