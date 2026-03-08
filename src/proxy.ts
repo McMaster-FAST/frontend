@@ -1,28 +1,31 @@
-import { auth } from "@/auth";
+import { withAuth } from "next-auth/middleware";
 import { NextResponse } from "next/server";
 
-export default auth((req) => {
-  const pathname = req.nextUrl.pathname;
+export default withAuth(
+  // (Unauthenticated users get auto-redirected to /auth/signin before reaching here)
+  function middleware(req) {
+    const pathname = req.nextUrl.pathname;
+    const userRoles = req.nextauth.token?.roles || [];
 
-  const isLoggedIn = !!req.auth;
-  const userRoles = (req.auth?.user as any)?.roles || [];
+    // Just an example of how roles could be used to prevent users from viewing certain pages
+    const isCourseDashboard = /^\/courses\/[^/]+\/dashboard$/.test(pathname);
 
-  if (!isLoggedIn && pathname !== "/auth/signin") {
-    return NextResponse.redirect(new URL("/auth/signin", req.url));
+    if (isCourseDashboard) {
+      if (!userRoles.includes("admin")) {
+        return NextResponse.rewrite(new URL("/auth/denied", req.url));
+      }
+    }
+  },
+  {
+    callbacks: {
+      // Ensure the token exists
+      authorized: ({ token }) => !!token,
+    },
+    pages: {
+      signIn: "/auth/signin",
+    },
   }
-
-  // An example of how to protect a page based on roles (We don't have roles yet!)
-  // const isCourseDashboard = /^\/courses\/[^/]+\/dashboard$/.test(pathname);
-
-  // if (isCourseDashboard) {
-  //   if (!userRoles.includes("admin")) {
-  //     // Use rewrite to show the denied page while keeping the URL the same
-  //     return NextResponse.rewrite(new URL("/auth/denied", req.url));
-  //   }
-  // }
-
-  return NextResponse.next();
-});
+);
 
 // Do not block public assets and auth pages
 export const config = {

@@ -7,7 +7,7 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 export function useAuthFetch() {
   const { data: session } = useSession();
-  const token = session?.id_token;
+  const token = session?.accessToken;
 
   const authFetch = useCallback(
     async (endpoint: string, options: RequestInit = {}) => {

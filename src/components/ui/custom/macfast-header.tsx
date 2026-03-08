@@ -139,7 +139,7 @@ export function MacFastHeader() {
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   className="text-red-600 focus:text-red-600 cursor-pointer"
-                  onClick={() => signOut({ redirectTo: "/" })}
+                  onClick={() => signOut({ callbackUrl: "/" })}
                 >
                   <LogOut className="mr-2 h-4 w-4" />
                   <span>Log out</span>
@@ -148,7 +148,7 @@ export function MacFastHeader() {
             </DropdownMenu>
           ) : (
             <Button
-              onClick={() => signIn("microsoft-entra-id")}
+              onClick={() => signIn("auth0")}
               variant="secondary"
               className="ml-2 font-semibold shadow-sm"
             >

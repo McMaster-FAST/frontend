@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import { Inter, Poppins } from "next/font/google";
-import "@/styles/globals.css";
-import "@/styles/globals.css";
+import "../styles/globals.css";
 
-import { SessionProvider } from "next-auth/react";
-import { auth } from "@/auth";
+import { authOptions } from "@/lib/auth";
+import { getServerSession } from "next-auth";
+import { Providers } from "./providers";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -27,17 +27,17 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const session = await auth();
+  const session = await getServerSession(authOptions);
 
   return (
     <html lang="en" className="h-full">
-      <SessionProvider session={session}>
+      <Providers session={session}>
         <body
           className={`${inter.variable} ${poppins.variable} antialiased h-full`}
         >
           {children}
         </body>
-      </SessionProvider>
+      </Providers>
     </html>
   );
 }
