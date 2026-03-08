@@ -11,8 +11,9 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import CommentsSheet from "@/components/ui/custom/comments/comments-sheet";
 import { useCourseQuestions } from "@/hooks/useCourseQuestions";
 import { QuestionItemSkeleton } from "@/components/ui/custom/questions-item/questions-item-skeleton";
-import { SearchBar } from "@/components/ui/custom/saerch-bar";
+import { SearchBar } from "@/components/ui/custom/search-bar";
 import { QuestionsFilter } from "@/components/ui/custom/questions-filter";
+import { useRouter } from "next/navigation";
 
 interface QuestionsProps {
   course?: Course | null;
@@ -29,6 +30,7 @@ export function Questions({ course }: QuestionsProps) {
   );
   const [commentsSheetOpen, setCommentsSheetOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const router = useRouter();
 
   const allSubtopics =
     course?.units.flatMap((unit) => unit.subtopics ?? []) || [];
@@ -95,6 +97,17 @@ export function Questions({ course }: QuestionsProps) {
 
   const fetchError = getFetchErrorDetails();
 
+  const navigateToPreview = (questionId: string) => {
+    router.push(
+      `/courses/${course?.code}/question/${questionId}/preview`,
+    );
+  };
+
+  const navigateToEdit = (questionId: string) => {
+    router.push(
+      `/courses/${course?.code}/question/${questionId}/edit`,
+    );
+  };
   return (
     <div className="flex flex-col h-full">
       {error && (
@@ -161,10 +174,8 @@ export function Questions({ course }: QuestionsProps) {
                   <QuestionItem
                     key={question.serial_number}
                     question={question}
-                    onPreview={() =>
-                      console.log("Preview:", question.serial_number)
-                    }
-                    onEdit={() => console.log("Edit:", question.serial_number)}
+                    onPreview={() => navigateToPreview(question.public_id)}
+                    onEdit={() => navigateToEdit(question.public_id)}
                     onViewComments={() => {
                       setSelectedQuestionId(question.public_id);
                       setCommentsSheetOpen(true);
