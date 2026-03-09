@@ -1,8 +1,6 @@
 import * as React from "react";
 import { Slot, Slottable } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
-import { LucideIcon, ArrowRight } from "lucide-react";
-
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
@@ -15,11 +13,11 @@ const buttonVariants = cva(
         secondary:
           "bg-secondary text-secondary-foreground shadow-[inset_0_0_0_2px_var(--color-secondary-foreground)] hover:bg-secondary-hover hover:text-background disabled:bg-disabled-primary disabled:shadow-[inset_0_0_0_2px_var(--color-disabled-secondary)]",
         tertiary:
-          "hover:bg-tertiary text-tertiary-foreground hover:text-tertiary-hover-foreground focus:ring-0",
+          "text-tertiary-foreground hover:text-tertiary-hover-foreground focus:ring-0 [&_svg]:text-primary [&_svg]:stroke-sm",
       },
       size: {
         default:
-          "h-8 gap-1.5 px-6 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2",
+          "h-8 gap-1 px-6 py-5 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2",
         xs: "h-6 gap-1 rounded-[min(var(--radius-md),10px)] px-2 text-xs in-data-[slot=button-group]:rounded-lg has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*='size-'])]:size-3",
         sm: "h-7 gap-1 rounded-[min(var(--radius-md),12px)] px-2.5 text-[0.8rem] in-data-[slot=button-group]:rounded-lg has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*='size-'])]:size-3.5",
         lg: "h-9 gap-1.5 px-2.5 has-data-[icon=inline-end]:pr-3 has-data-[icon=inline-start]:pl-3",
@@ -30,14 +28,10 @@ const buttonVariants = cva(
           "size-7 rounded-[min(var(--radius-md),12px)] in-data-[slot=button-group]:rounded-lg",
         "icon-lg": "size-9",
       },
-      iconOnly: {
-        true: "px-3 py-3",
-        false: "px-6 py-3",
-      },
     },
     defaultVariants: {
       variant: "primary",
-      iconOnly: false,
+      size: "default",
     },
   },
 );
@@ -45,47 +39,25 @@ const buttonVariants = cva(
 interface ButtonProps
   extends React.ComponentProps<"button">, VariantProps<typeof buttonVariants> {
   asChild?: boolean;
-  leftIcon?: LucideIcon;
-  rightIcon?: LucideIcon;
-  leftClasses?: string;
-  rightClasses?: string;
 }
 
 function Button({
   className,
   variant,
   size = "default",
-  iconOnly,
   asChild = false,
-  leftIcon: LeftIcon,
-  leftClasses,
-  rightClasses,
-  rightIcon: RightIcon,
   children,
   ...props
 }: ButtonProps) {
   const Comp = asChild ? Slot : "button";
-  const strokeWidth = 3;
   return (
     <Comp
       data-slot="button"
       data-size={size}
-      className={cn(buttonVariants({ variant, iconOnly, className }))}
+      className={cn(buttonVariants({ variant, size }), className)}
       {...props}
     >
-      {LeftIcon && (
-        <LeftIcon strokeWidth={strokeWidth} className={leftClasses} />
-      )}
-      <Slottable>{children}</Slottable>
-      {RightIcon && (
-        <RightIcon strokeWidth={strokeWidth} className={rightClasses} />
-      )}
-      {variant === "tertiary" && (
-        <ArrowRight
-          className={!props.disabled ? "text-tertiary-hover-foreground" : ""}
-          strokeWidth={strokeWidth}
-        />
-      )}
+      {children}
     </Comp>
   );
 }

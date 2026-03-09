@@ -2,7 +2,6 @@
 
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { MacFastHeader } from "@/components/ui/custom/macfast-header";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { ChevronsRight } from "lucide-react";
@@ -18,7 +17,7 @@ import { useEffect } from "react";
 import { useAuthFetch } from "@/hooks/useFetchWithAuth";
 import { Skeleton } from "@/components/ui/skeleton";
 import { QuestionFlagDialog } from "@/components/ui/custom/report-question-dialog";
-import ErrorMessage from "@/components/ui/custom/error-message";
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -32,9 +31,11 @@ import {
 
 import Link from "next/link";
 import { setSavedForLaterDebounced } from "@/lib/api";
+import { QuestionPage } from "@/components/ui/custom/question-page";
+import { MacFastHeader } from "@/components/ui/custom/macfast-header";
 import { SafeHtml } from "@/components/ui/custom/safe-html";
 
-interface QuestionPageProps {
+interface QuestionTestPageProps {
   params: Promise<{
     courseCode: string;
     unitName: string;
@@ -46,7 +47,7 @@ interface ContinueActions {
   use_skipped_questions: boolean;
 }
 
-function QuestionPage({ params: paramsPromise }: QuestionPageProps) {
+function QuestionTestPage({ params: paramsPromise }: QuestionTestPageProps) {
   // Get course info from URI
   const params = React.use(paramsPromise);
   const course = decodeURI(params.courseCode);
@@ -155,135 +156,127 @@ function QuestionPage({ params: paramsPromise }: QuestionPageProps) {
   }, [course, unit, subtopic]);
 
   return (
-    <div className="flex flex-col h-screen">
-      <MacFastHeader />
-      <div id="content" className="flex flex-col gap-4 p-8 flex-1">
-        <div
-          id="header"
-          className="flex flex-row font-poppins font-semibold text-xl items-center gap-2 text-dark-gray"
-        >
-          <h1>{course}</h1>
-          <ChevronsRight />
-          <h1>
-            {unit} - {subtopic}
-          </h1>
-        </div>
-        <div id="content" className="flex flex-row gap-4 flex-1">
-          <div id="question-content" className="flex-2 flex flex-col gap-6">
-            {error && <ErrorMessage message={error} />}
-            <AlertDialog open={!!showNoQuestionsDialog}>
-              <AlertDialogContent className="w-min">
-                <AlertDialogTitle>No available questions</AlertDialogTitle>
-                <AlertDialogDescription>
-                  {continueActions.use_skipped_questions ? (
-                    <>All questions have been skipped.</>
-                  ) : (
-                    "There are no questions available for this subtopic."
-                  )}
-                </AlertDialogDescription>
-                <AlertDialogDescription className="mb-4">
-                  How would you like to proceed?
-                </AlertDialogDescription>
-                <div className="flex flex-col w-fit gap-2 justify-center">
-                  {continueActions.use_skipped_questions && (
-                    <AlertDialogAction asChild>
-                      <Button onClick={useSkippedQuestions}>
-                        Use skipped questions
-                      </Button>
-                    </AlertDialogAction>
-                  )}
-                  <AlertDialogCancel asChild>
-                    <Button variant="secondary">
-                      <Link href={`/courses/${course}/coursepage`}>
-                        Return to Course Page
-                      </Link>
+    <QuestionPage>
+      <QuestionPage.Header>
+        <MacFastHeader />
+      </QuestionPage.Header>
+      <QuestionPage.Title>
+        <h1>{course}</h1>
+        <ChevronsRight />
+        <h1>{unit}</h1>
+        <ChevronsRight />
+        <h1>{subtopic}</h1>
+      </QuestionPage.Title>
+      <QuestionPage.Content>
+        <QuestionPage.QuestionBody error={error} isLoading={isQuestionLoading}>
+          <AlertDialog open={!!showNoQuestionsDialog}>
+            <AlertDialogContent className="w-min">
+              <AlertDialogTitle>No available questions</AlertDialogTitle>
+              <AlertDialogDescription>
+                All questions have been skipped.
+              </AlertDialogDescription>
+              <AlertDialogDescription className="mb-4">
+                How would you like to proceed?
+              </AlertDialogDescription>
+              <div className="flex flex-col w-fit gap-2 justify-center">
+                {continueActions.use_skipped_questions && (
+                  <AlertDialogAction asChild>
+                    <Button onClick={useSkippedQuestions}>
+                      Use skipped questions
                     </Button>
-                  </AlertDialogCancel>
-                </div>
-              </AlertDialogContent>
-            </AlertDialog>
-            {isQuestionLoading && <Skeleton className="w-full h-40" />}
-            {!isQuestionLoading && question.content && (
-              <div className="border p-4 rounded-lg shadow-md">
-                <SafeHtml html={question.content} />
+                  </AlertDialogAction>
+                )}
+                <AlertDialogCancel asChild>
+                  <Button variant="secondary">
+                    <Link href={`/courses/${course}/coursepage`}>
+                      Return to Course Page
+                    </Link>
+                  </Button>
+                </AlertDialogCancel>
               </div>
-            )}
-            <div id="options-list" className="flex flex-col gap-2">
-              {isQuestionLoading &&
-                Array.from({ length: 4 }).map((_, index) => (
-                  <Skeleton key={index} className="w-full h-10" />
-                ))}
-              {!isQuestionLoading && question?.options && (
-                <RadioGroup
-                  value={selectedOption}
-                  onValueChange={setSelectedOption}
-                >
-                  {question?.options.map((option) => (
-                    <div
-                      key={option.public_id}
-                      className="flex items-center gap-2 w-full"
-                    >
-                      <RadioGroupItem
-                        value={option.public_id}
-                        className="cursor-pointer"
-                      />
-                      <Label
-                        className={
-                          "border-2 p-6 rounded-md items-center flex gap-2 w-full" +
-                          (correctOptionId === option.public_id
-                            ? " border-primary"
-                            : "")
-                        }
-                      >
-                        <SafeHtml html={option.content} />
-                      </Label>
-                    </div>
-                  ))}
-                </RadioGroup>
-              )}
-            </div>
+            </AlertDialogContent>
+          </AlertDialog>
+          <div className="border p-4 rounded-lg shadow-md">
+            <SafeHtml html={question?.content || ""} />
           </div>
-          <div
-            id="answer-content"
-            className="border-l-2 border-gray-300 pl-4 flex-1 flex flex-col gap-4"
-          >
-            {submitSuccess && solution && (
-              <div className="flex flex-col gap-4">
-                <div>
-                  <h1 className="font-poppins font-bold text-2xl">
-                    The correct answer is:
-                  </h1>
-                  <p className="font-poppins text-2xl">
-                    <SafeHtml
-                      html={
-                        question?.options.find(
-                          (option) => option.public_id === correctOptionId,
-                        )?.content || ""
-                      }
+          <QuestionPage.Options isLoading={isQuestionLoading}>
+            {question?.options && (
+              <RadioGroup
+                value={selectedOption}
+                onValueChange={setSelectedOption}
+              >
+                {question?.options.map((option) => (
+                  <div
+                    key={option.public_id}
+                    className="flex items-center gap-2 w-full"
+                  >
+                    <RadioGroupItem
+                      value={option.public_id}
+                      className="cursor-pointer"
                     />
-                  </p>
-                </div>
-
-                <div>
-                  <h2 className="font-poppins font-semibold text-lg">Why?</h2>
-                  <p>
-                    <SafeHtml html={solution} />
-                  </p>
-                </div>
+                    <div
+                      className={
+                        "border-2 p-6 rounded-md items-center flex gap-2 w-full" +
+                        (correctOptionId === option.public_id
+                          ? " border-primary"
+                          : "")
+                      }
+                    >
+                      <SafeHtml html={option.content} />
+                    </div>
+                  </div>
+                ))}
+              </RadioGroup>
+            )}
+          </QuestionPage.Options>
+        </QuestionPage.QuestionBody>
+        <QuestionPage.Answer
+          isLoading={isQuestionLoading || (submitted && !submitSuccess)}
+        >
+          <QuestionPage.AnswerTitle>
+            <p className="font-poppins text-2xl">
+              <SafeHtml
+                html={
+                  question?.options?.find(
+                    (option) => option.public_id === correctOptionId,
+                  )?.content || ""
+                }
+              />
+            </p>
+          </QuestionPage.AnswerTitle>
+          <div className="flex flex-col gap-4">
+            {submitSuccess && correctOptionId && (
+              <div>
+                <h1 className="font-poppins font-bold text-2xl">
+                  The correct answer is:
+                </h1>
+                <p className="font-poppins text-2xl">
+                  {
+                    question?.options.find(
+                      (option) => option.public_id === correctOptionId,
+                    )?.content
+                  }
+                </p>
               </div>
             )}
-            {question?.content && !submitSuccess && (
-              <h2 className="font-poppins font-semibold text-md mt-6 mb-2">
-                Submit an answer to see the solution.
-              </h2>
-            )}
-            {(isQuestionLoading || (!submitSuccess && submitted)) && (
-              <Skeleton className="w-full h-full" />
+            {submitSuccess && solution && (
+              <div>
+                <h2 className="font-poppins font-semibold text-lg">Why?</h2>
+                <SafeHtml html={solution} />
+              </div>
             )}
           </div>
-        </div>
-      </div>
-      <footer className="flex flex-row gap-4 sticky bottom-0 left-0 w-full p-4 border-t-2 bg-white">
+          {question?.content && !submitSuccess && (
+            <h2 className="font-poppins font-semibold text-md mt-6 mb-2">
+              Submit an answer to see the solution.
+            </h2>
+          )}
+          {(isQuestionLoading || (!submitSuccess && submitted)) && (
+            <Skeleton className="w-full h-full" />
+          )}
+        </QuestionPage.Answer>
+      </QuestionPage.Content>
+      <QuestionPage.Actions>
         <div
           id="question-section"
           className="w-full flex flex-row flex-2 justify-between items-center"
@@ -323,9 +316,9 @@ function QuestionPage({ params: paramsPromise }: QuestionPageProps) {
             </Button>
           )}
         </div>
-      </footer>
-    </div>
+      </QuestionPage.Actions>
+    </QuestionPage>
   );
 }
 
-export default QuestionPage;
+export default QuestionTestPage;

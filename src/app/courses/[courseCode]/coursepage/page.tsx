@@ -72,32 +72,21 @@ function CoursePage() {
           className="w-full flex flex-col h-full"
           defaultValue="practiceProblems"
         >
-          <div className="mb-8 overflow-x-auto pb-2 mx-auto shrink-0 w-full flex justify-start md:justify-center">
-            {" "}
-            <TabsList className="h-12 gap-2 bg-transparent p-0 border-dark-gray">
-              <TabsTrigger
-                value="practiceProblems"
-                className="group flex gap-2 rounded-full border border-transparent px-6 py-2 data-[state=active]:border-light-gray data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-primary"
-              >
-                <BookOpen className="h-4 w-4 text-dark-gray group-data-[state=active]:text-primary-hover" />
-                Practice Problems
-              </TabsTrigger>
+          <TabsList>
+            <TabsTrigger value="practiceProblems">
+              <BookOpen />
+              Practice Problems
+            </TabsTrigger>
 
-              <TabsTrigger
-                value="learningObjectives"
-                className="group flex gap-2 rounded-full border border-transparent px-6 py-2 data-[state=active]:border-light-gray data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-primary"
-              >
-                <ListChecks className="h-4 w-4 text-dark-gray group-data-[state=active]:text-primary-hover" />
-                Learning Objectives
-              </TabsTrigger>
+            <TabsTrigger value="learningObjectives">
+              <ListChecks />
+              Learning Objectives
+            </TabsTrigger>
 
-              <TabsTrigger
-                value="statistics"
-                className="group flex gap-2 rounded-full border border-transparent px-6 py-2 data-[state=active]:border-light-gray data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-primary"
-              >
-                <LineChart className="h-4 w-4 text-dark-gray group-data-[state=active]:text-primary-hover" />
-                Statistics
-              </TabsTrigger>
+            <TabsTrigger value="statistics">
+              <LineChart />
+              Statistics
+            </TabsTrigger>
 
               <TabsTrigger
                 value="savedQuestions"
@@ -107,7 +96,6 @@ function CoursePage() {
                 Saved Questions
               </TabsTrigger>
             </TabsList>
-          </div>
           <UnitsTab
             course={course}
             isLoading={isLoading}

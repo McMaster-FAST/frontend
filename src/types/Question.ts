@@ -10,6 +10,8 @@ interface Question {
   course: string;
   unit: string;
   subtopic_name: string;
+  // TODO: Get this from the backend
+  answer_explanation: string;
 }
 
 interface TestQuestion {

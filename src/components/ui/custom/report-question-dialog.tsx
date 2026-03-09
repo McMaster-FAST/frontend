@@ -9,12 +9,12 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { AlertTriangle, Flag } from "lucide-react";
+import { AlertTriangle } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { useEffect, useState } from "react";
-import { Input } from "../input";
-import { isValidEmail } from "@/lib/utils";
+import { useState } from "react";
+import { Input } from "@/components/ui/input";
+
 
 
 enum QuestionFlagReason {
@@ -27,7 +27,8 @@ enum QuestionFlagReason {
 }
 
 interface QuestionFlagDialogProps {
-  onSubmit: (reasons: QuestionFlagReason[]) => void;
+  onSubmit?: (reasons: QuestionFlagReason[]) => void;
+  disabled?: boolean;
 }
 
 interface ReportAnswers {
@@ -42,7 +43,7 @@ interface FormValidityState {
   additionalDetails: boolean;
 }
 
-export function QuestionFlagDialog({ onSubmit }: QuestionFlagDialogProps) {
+export function QuestionFlagDialog({ onSubmit, disabled }: QuestionFlagDialogProps) {
   const [open, setOpen] = useState(false);
   const [reportAnswers, setReportAnswers] = useState<ReportAnswers>({
     reasons: [],
@@ -52,7 +53,7 @@ export function QuestionFlagDialog({ onSubmit }: QuestionFlagDialogProps) {
 
   const handleSubmitReport = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(reportAnswers.reasons);
+    onSubmit?.(reportAnswers.reasons);
     setOpen(false);
   };
 
@@ -60,7 +61,7 @@ export function QuestionFlagDialog({ onSubmit }: QuestionFlagDialogProps) {
     <Dialog open={open} onOpenChange={setOpen}>
       <form>
         <DialogTrigger asChild>
-          <Button variant="secondary">
+          <Button variant="secondary" disabled={disabled}>
             Report question
             <AlertTriangle className="size-4" />
           </Button>

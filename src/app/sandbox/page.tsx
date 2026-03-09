@@ -86,6 +86,7 @@ export default function Home() {
         <Button variant="primary">Primary</Button>
         <Button variant="secondary">Secondary</Button>
         <Button variant="tertiary">Tertiary</Button>
+        <Button variant="primary" />
 
         <Checkbox id="checkbox-1" />
         <Label htmlFor="checkbox-1">Check me!</Label>
