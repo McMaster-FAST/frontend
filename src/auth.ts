@@ -1,6 +1,8 @@
 import NextAuth from "next-auth";
 import MicrosoftEntraID from "next-auth/providers/microsoft-entra-id";
 
+// followed example from https://authjs.dev/guides/refresh-token-rotation and https://authjs.dev/reference/core/providers/microsoft-entra-id
+
 export const { handlers, auth } = NextAuth({
   providers: [
     MicrosoftEntraID({
@@ -9,7 +11,6 @@ export const { handlers, auth } = NextAuth({
       issuer: `https://login.microsoftonline.com/${process.env.AUTH_MICROSOFT_ENTRA_ID_TENANT_ID}/v2.0`,
       authorization: {
         params: {
-          // Entra requires "offline_access" to provide a `refresh_token`
           scope: "openid profile email offline_access",
         },
       },
@@ -17,25 +18,32 @@ export const { handlers, auth } = NextAuth({
   ],
   callbacks: {
     async jwt({ token, account }) {
-      // sign ing in for the first time, save the tokens from Microsoft
       if (account) {
+        console.log("new sign-in, saving tokens");
         return {
           ...token,
+          access_token: account.access_token,
           id_token: account.id_token,
           expires_at: account.expires_at,
           refresh_token: account.refresh_token,
         };
       }
 
-      // check if token is still valid
-      // authjs uses seconds for expires_at
-      if (token.expires_at && Date.now() < token.expires_at * 1000) {
+      const shouldRefresh =
+        !token.expires_at || Date.now() >= (token.expires_at - 60) * 1000;
+
+      if (!shouldRefresh) {
+        const secondsLeft = token.expires_at
+          ? Math.floor(token.expires_at - Date.now() / 1000)
+          : "unknown";
+        console.log(`token still valid, ${secondsLeft}s until refresh`);
         return token;
       }
 
-      // try to refresh token
+      console.log("token expired, attempting refresh...");
+
       if (!token.refresh_token) {
-        console.error("Missing refresh token");
+        console.error("no refresh token available");
         return { ...token, error: "RefreshTokenError" };
       }
 
@@ -49,24 +57,24 @@ export const { handlers, auth } = NextAuth({
               client_id: process.env.AUTH_MICROSOFT_ENTRA_ID_ID!,
               client_secret: process.env.AUTH_MICROSOFT_ENTRA_ID_SECRET!,
               grant_type: "refresh_token",
-              refresh_token: token.refresh_token,
+              refresh_token: token.refresh_token as string,
             }),
           },
         );
 
         const tokensOrError = await response.json();
-
         if (!response.ok) throw tokensOrError;
 
         return {
           ...token,
-          id_token: tokensOrError.id_token,
-          expires_at: Math.floor(Date.now() / 1000 + tokensOrError.expires_in),
-          // fallback to old refresh token if Microsoft doesn't issue a new one
+          access_token: tokensOrError.access_token,
+          id_token: tokensOrError.id_token ?? token.id_token,
+          expires_at: Math.floor(Date.now() / 1000) + tokensOrError.expires_in,
           refresh_token: tokensOrError.refresh_token ?? token.refresh_token,
+          error: undefined,
         };
       } catch (error) {
-        console.error("Error refreshing token", error);
+        console.error("token refresh failed:", error);
         return { ...token, error: "RefreshTokenError" };
       }
     },

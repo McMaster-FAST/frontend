@@ -1,4 +1,5 @@
 import { auth } from "@/auth";
+import { useAuthFetch } from "@/hooks/useFetchWithAuth";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
@@ -100,6 +101,7 @@ export async function updateSelWindowUpperBound(
     throw new Error(`Failed to update selection window upper bound: ${response.statusText}`);
   }
 }
+
 export async function updateSelWindowLowerBound(
   subtopic_id: string,
   authFetch: typeof fetchWithAuth,
@@ -115,4 +117,34 @@ export async function updateSelWindowLowerBound(
   if (!response.ok) {
     throw new Error(`Failed to update selection window lower bound: ${response.statusText}`);
   }
+}
+
+/**
+ * Fetch a single question by public_id for the edit page.
+ * GET /api/core/questions/<public_id>/
+ */
+export async function getQuestionByPublicId(
+  publicId: string,
+  authFetch: ReturnType<typeof useAuthFetch>,
+): Promise<Question> {
+  const response = await authFetch(
+    `/api/questions/${encodeURIComponent(publicId)}/`,
+  );
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch question: ${response.status}`);
+  }
+
+  const data = await response.json();
+  return data as Question;
+}
+
+export async function uploadQuestionImage(
+  file: File,
+  authFetch: ReturnType<typeof useAuthFetch>,
+): Promise<string> {
+  void file;
+  void authFetch;
+  // TODO: Implement once backend image upload endpoint is available.
+  return "";
 }
