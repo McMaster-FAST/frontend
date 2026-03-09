@@ -119,15 +119,18 @@ function QuestionPage({ params: paramsPromise }: QuestionPageProps) {
         case ContinueAction.INCREMENT_WINDOW_UPPERBOUND:
           return {
             caption: <span>See harder questions</span>,
-            action: () => {
-              updateSelWindowUpperBound(subtopic_id, 0.25, authFetch);
+            action: async () => {
+              await updateSelWindowUpperBound(subtopic_id, authFetch);
+              resetState();
+              await handleNextQuestion();
             },
           };
         case ContinueAction.DECREMENT_WINDOW_LOWERBOUND:
           return {
             caption: <span>See easier questions</span>,
-            action: () => {
-              updateSelWindowLowerBound(subtopic_id, -0.25, authFetch);
+            action: async () => {
+              await updateSelWindowLowerBound(subtopic_id, authFetch);
+              await handleNextQuestion();
             },
           };
       }
@@ -180,8 +183,6 @@ function QuestionPage({ params: paramsPromise }: QuestionPageProps) {
   const handleQuestionFlag = async () => {
     // Implement question flagging functionality here
   };
-
-  useEffect(() => {}, [course]);
 
   useEffect(() => {
     if (!course) return;

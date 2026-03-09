@@ -3,17 +3,19 @@ import { auth } from "@/auth";
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 export async function getJson(response: Response) {
-  return response
-    .json()
-    .catch(() => {
-      throw new Error(response.status + " " + response.statusText);
-    })
-    .then((json) => {
-      if (!response.ok) {
-        throw new Error(json.message || "Error fetching data");
-      }
-      return json;
-    });
+  let json;
+
+  try {
+    json = await response.json();
+  } catch {
+    throw new Error(`${response.status} ${response.statusText}`);
+  }
+
+  if (!response.ok) {
+    throw new Error(json?.message || "Error fetching data");
+  }
+
+  return json;
 }
 
 export async function fetchWithAuth(
@@ -85,29 +87,32 @@ export async function getAllQuestions() {
 
 export async function updateSelWindowUpperBound(
   subtopic_id: string,
-  increment: number,
   authFetch: typeof fetchWithAuth,
 ) {
   const response = await authFetch(
     `/api/test-sessions/${subtopic_id}/update-sel-window/upper-bound/`,
     {
       method: "POST",
-      body: JSON.stringify({ increment: increment }),
+      body: "",
     },
   );
-  return getJson(response);
+  if (!response.ok) {
+    throw new Error(`Failed to update selection window upper bound: ${response.statusText}`);
+  }
 }
 export async function updateSelWindowLowerBound(
   subtopic_id: string,
-  increment: number,
   authFetch: typeof fetchWithAuth,
 ) {
   const response = await authFetch(
     `/api/test-sessions/${subtopic_id}/update-sel-window/lower-bound/`,
     {
       method: "POST",
-      body: JSON.stringify({ increment: increment }),
+      body: "",
     },
   );
-  return getJson(response);
+
+  if (!response.ok) {
+    throw new Error(`Failed to update selection window lower bound: ${response.statusText}`);
+  }
 }
