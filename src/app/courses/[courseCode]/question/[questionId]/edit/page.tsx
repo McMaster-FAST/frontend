@@ -26,6 +26,7 @@ import CommentsSheet from "@/components/macfast/comments/comments-sheet";
 import OptionsTab from "./tabs/options-tab";
 import QuestionTab from "./tabs/question-tab";
 import QuestionPreviewPage from "../preview/page";
+import { updateQuestion } from "@/lib/api";
 import { CourseBanner } from "@/components/macfast/course-banner/course-banner";
 
 function dataUrlToFile(dataUrl: string, baseName: string): File | null {
@@ -117,8 +118,25 @@ export default function QuestionEditPage() {
       })),
     );
 
-    setQuestion(questionWithUploadedImages);
-    // do validation
+    // TODO: patch individual options via PATCH /api/questions/<id>/options/<option_id>/
+    
+    try {
+      const saved = await updateQuestion(
+        questionWithUploadedImages.public_id,
+        {
+          content: questionWithUploadedImages.content,
+          answer_explanation: questionWithUploadedImages.answer_explanation,
+          is_flagged: questionWithUploadedImages.is_flagged,
+          is_active: questionWithUploadedImages.is_active,
+          is_verified: questionWithUploadedImages.is_verified,
+        },
+        authFetch,
+      );
+      setQuestion(saved);
+      setQuestionCopy(structuredClone(saved));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to save question");
+    }
   };
 
   useEffect(() => {

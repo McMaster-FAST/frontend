@@ -134,7 +134,7 @@ export function Questions({ course }: QuestionsProps) {
             type="file"
             ref={fileInputRef}
             onChange={handleFileChange}
-            accept=".docx"
+            accept=".docx, .csv"
             className="hidden"
           />
           <Button
