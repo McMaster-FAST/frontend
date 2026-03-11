@@ -226,7 +226,10 @@ function QuestionTestPage({ params: paramsPromise }: QuestionTestPageProps) {
           actions={actions}
           notes={notes}
         />
-        <QuestionPage.QuestionBody error={error} isLoading={isQuestionLoading || showNoQuestionsDialog}>
+        <QuestionPage.QuestionBody
+          error={error}
+          isLoading={isQuestionLoading || showNoQuestionsDialog}
+        >
           {question.content && (
             <div className="border p-4 rounded-lg shadow-md">
               <SafeHtml
@@ -234,42 +237,48 @@ function QuestionTestPage({ params: paramsPromise }: QuestionTestPageProps) {
               />
             </div>
           )}
-        
-        <QuestionPage.Options isLoading={isQuestionLoading || showNoQuestionsDialog}>
-          {question?.options && (
-            <RadioGroup
-              value={selectedOption}
-              onValueChange={setSelectedOption}
-            >
-              {question?.options.map((option) => (
-                <div
-                  key={option.public_id}
-                  className="flex items-center gap-2 w-full"
-                >
-                  <RadioGroupItem
-                    value={option.public_id}
-                    className="cursor-pointer"
-                  />
+
+          <QuestionPage.Options
+            isLoading={isQuestionLoading || showNoQuestionsDialog}
+          >
+            {question?.options && (
+              <RadioGroup
+                value={selectedOption}
+                onValueChange={setSelectedOption}
+              >
+                {question?.options.map((option) => (
                   <div
-                    className={
-                      "border-2 p-6 rounded-md items-center flex gap-2 w-full" +
-                      (correctOptionId === option.public_id
-                        ? " border-primary"
-                        : "")
-                    }
+                    key={option.public_id}
+                    className="flex items-center gap-2 w-full"
                   >
-                    <SafeHtml
-                      html={resolveImages(option.content, question.public_id)}
+                    <RadioGroupItem
+                      value={option.public_id}
+                      className="cursor-pointer"
                     />
+                    <div
+                      className={
+                        "border-2 p-6 rounded-md items-center flex gap-2 w-full" +
+                        (correctOptionId === option.public_id
+                          ? " border-primary"
+                          : "")
+                      }
+                    >
+                      <SafeHtml
+                        html={resolveImages(option.content, question.public_id)}
+                      />
+                    </div>
                   </div>
-                </div>
-              ))}
-            </RadioGroup>
-          )}
-        </QuestionPage.Options>
+                ))}
+              </RadioGroup>
+            )}
+          </QuestionPage.Options>
         </QuestionPage.QuestionBody>
         <QuestionPage.Answer
-          isLoading={isQuestionLoading || (submitted && !submitSuccess) || showNoQuestionsDialog}
+          isLoading={
+            isQuestionLoading ||
+            (submitted && !submitSuccess) ||
+            showNoQuestionsDialog
+          }
           isAnswered={submitted || showNoQuestionsDialog}
         >
           <QuestionPage.AnswerTitle>
@@ -291,14 +300,14 @@ function QuestionTestPage({ params: paramsPromise }: QuestionTestPageProps) {
               </p>
             )}
           </QuestionPage.AnswerBody>
-          {question?.content && !submitSuccess && (
+          <QuestionPage.AnswerPlaceholder>
+            {question?.content && !submitSuccess && (
             <h2 className="font-poppins font-semibold text-md mt-6 mb-2">
               Submit an answer to see the solution.
             </h2>
           )}
-          {(isQuestionLoading || (!submitSuccess && submitted)) && (
-            <Skeleton className="w-full h-full" />
-          )}
+          </QuestionPage.AnswerPlaceholder>
+          
         </QuestionPage.Answer>
       </QuestionPage.Content>
       <QuestionPage.Actions>
