@@ -29,8 +29,11 @@ export const { handlers, auth } = NextAuth({
         };
       }
 
+      const bufferSeconds = 600;
+
       const shouldRefresh =
-        !token.expires_at || Date.now() >= (token.expires_at - 60) * 1000;
+        !token.expires_at ||
+        Date.now() >= (token.expires_at - bufferSeconds) * 1000;
 
       if (!shouldRefresh) {
         const secondsLeft = token.expires_at
