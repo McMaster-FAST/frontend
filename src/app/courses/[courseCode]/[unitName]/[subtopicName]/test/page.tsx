@@ -214,53 +214,55 @@ function QuestionTestPage({ params: paramsPromise }: QuestionTestPageProps) {
         <h1>{subtopic_name}</h1>
       </QuestionPage.Title>
       <QuestionPage.Content>
-        <QuestionPage.QuestionBody error={error} isLoading={isQuestionLoading}>
-          <TestContinueDialog
-            open={showNoQuestionsDialog}
-            actions={actions}
-            notes={notes}
-          />
-          <div className="border p-4 rounded-lg shadow-md">
-            <SafeHtml
-              html={resolveImages(question.content, question.public_id)}
-            />
-          </div>
-          <QuestionPage.Options isLoading={isQuestionLoading}>
-            {question?.options && (
-              <RadioGroup
-                value={selectedOption}
-                onValueChange={setSelectedOption}
-              >
-                {question?.options.map((option) => (
-                  <div
-                    key={option.public_id}
-                    className="flex items-center gap-2 w-full"
-                  >
-                    <RadioGroupItem
-                      value={option.public_id}
-                      className="cursor-pointer"
-                    />
-                    <div
-                      className={
-                        "border-2 p-6 rounded-md items-center flex gap-2 w-full" +
-                        (correctOptionId === option.public_id
-                          ? " border-primary"
-                          : "")
-                      }
-                    >
-                      <SafeHtml
-                        html={resolveImages(option.content, question.public_id)}
-                      />
-                    </div>
-                  </div>
-                ))}
-              </RadioGroup>
-            )}
-          </QuestionPage.Options>
+        <TestContinueDialog
+          open={showNoQuestionsDialog}
+          actions={actions}
+          notes={notes}
+        />
+        <QuestionPage.QuestionBody error={error} isLoading={isQuestionLoading || showNoQuestionsDialog}>
+          {question.content && (
+            <div className="border p-4 rounded-lg shadow-md">
+              <SafeHtml
+                html={resolveImages(question.content, question.public_id)}
+              />
+            </div>
+          )}
         </QuestionPage.QuestionBody>
+        <QuestionPage.Options isLoading={isQuestionLoading || showNoQuestionsDialog}>
+          {question?.options && (
+            <RadioGroup
+              value={selectedOption}
+              onValueChange={setSelectedOption}
+            >
+              {question?.options.map((option) => (
+                <div
+                  key={option.public_id}
+                  className="flex items-center gap-2 w-full"
+                >
+                  <RadioGroupItem
+                    value={option.public_id}
+                    className="cursor-pointer"
+                  />
+                  <div
+                    className={
+                      "border-2 p-6 rounded-md items-center flex gap-2 w-full" +
+                      (correctOptionId === option.public_id
+                        ? " border-primary"
+                        : "")
+                    }
+                  >
+                    <SafeHtml
+                      html={resolveImages(option.content, question.public_id)}
+                    />
+                  </div>
+                </div>
+              ))}
+            </RadioGroup>
+          )}
+        </QuestionPage.Options>
         <QuestionPage.Answer
-          isLoading={isQuestionLoading || (submitted && !submitSuccess)}
-          isAnswered={submitted}
+          isLoading={isQuestionLoading || (submitted && !submitSuccess) || showNoQuestionsDialog}
+          isAnswered={submitted || showNoQuestionsDialog}
         >
           <QuestionPage.AnswerTitle>
             <p className="font-poppins text-2xl">
@@ -273,10 +275,8 @@ function QuestionTestPage({ params: paramsPromise }: QuestionTestPageProps) {
               />
             </p>
           </QuestionPage.AnswerTitle>
-                    <QuestionPage.AnswerBody>
-            {solution && (
-              <SafeHtml html={solution} />
-            )}
+          <QuestionPage.AnswerBody>
+            {solution && <SafeHtml html={solution} />}
             {!solution && (
               <p className="italic text-muted-foreground">
                 No explanation provided for this question.
