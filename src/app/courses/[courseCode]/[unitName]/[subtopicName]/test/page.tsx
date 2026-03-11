@@ -122,8 +122,7 @@ function QuestionTestPage({ params: paramsPromise }: QuestionTestPageProps) {
             caption: <span>See harder questions</span>,
             action: async () => {
               await updateSelWindowUpperBound(subtopic_id, authFetch);
-              resetState();
-              await handleNextQuestion();
+              handleNextQuestion();
             },
           };
         case ContinueAction.DECREMENT_WINDOW_LOWERBOUND:
@@ -131,7 +130,15 @@ function QuestionTestPage({ params: paramsPromise }: QuestionTestPageProps) {
             caption: <span>See easier questions</span>,
             action: async () => {
               await updateSelWindowLowerBound(subtopic_id, authFetch);
-              await handleNextQuestion();
+              handleNextQuestion();
+            },
+          };
+        case ContinueAction.USE_SKIPPED_QUESTIONS:
+          return {
+            caption: <span>Retry skipped questions</span>,
+            action: async () => {
+              resetState();
+              handleNextQuestion();
             },
           };
       }
