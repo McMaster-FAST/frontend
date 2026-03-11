@@ -3,8 +3,7 @@ import React from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
-import { useRouter, useParams } from "next/navigation";
-
+import { useRouter } from "next/navigation";
 interface QuestionPageProps {
   children: React.ReactNode;
   onReturn?: () => void;
@@ -31,7 +30,10 @@ function QuestionPage({ children, onReturn }: QuestionPageProps) {
     <div className="flex flex-col h-screen">
       {header}
       <div>
-          <Button variant="tertiary" onClick={onReturn ? onReturn : () => router.back()}>
+        <Button
+          variant="tertiary"
+          onClick={onReturn ? onReturn : () => router.back()}
+        >
           <ArrowLeft />
           Back
         </Button>
@@ -103,13 +105,16 @@ function Options({
 function Answer({
   children,
   isLoading,
+  isAnswered,
 }: {
   children: React.ReactNode;
   isLoading: boolean;
+  isAnswered: boolean;
 }) {
   return (
     <div className="border-l-2 border-gray-300 pl-4 flex-1 flex flex-col gap-4">
-      {isLoading ? <Skeleton className="w-full h-40" /> : children}
+      {isLoading && isAnswered && <Skeleton className="w-full h-40" />}
+      {!isLoading && isAnswered && children}
     </div>
   );
 }

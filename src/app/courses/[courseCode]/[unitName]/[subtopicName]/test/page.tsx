@@ -260,6 +260,7 @@ function QuestionTestPage({ params: paramsPromise }: QuestionTestPageProps) {
         </QuestionPage.QuestionBody>
         <QuestionPage.Answer
           isLoading={isQuestionLoading || (submitted && !submitSuccess)}
+          isAnswered={submitted}
         >
           <QuestionPage.AnswerTitle>
             <p className="font-poppins text-2xl">
@@ -272,28 +273,16 @@ function QuestionTestPage({ params: paramsPromise }: QuestionTestPageProps) {
               />
             </p>
           </QuestionPage.AnswerTitle>
-          <div className="flex flex-col gap-4">
-            {submitSuccess && correctOptionId && (
-              <div>
-                <h1 className="font-poppins font-bold text-2xl">
-                  The correct answer is:
-                </h1>
-                <p className="font-poppins text-2xl">
-                  {
-                    question?.options.find(
-                      (option) => option.public_id === correctOptionId,
-                    )?.content
-                  }
-                </p>
-              </div>
+                    <QuestionPage.AnswerBody>
+            {solution && (
+              <SafeHtml html={solution} />
             )}
-            {submitSuccess && solution && (
-              <div>
-                <h2 className="font-poppins font-semibold text-lg">Why?</h2>
-                <SafeHtml html={solution} />
-              </div>
+            {!solution && (
+              <p className="italic text-muted-foreground">
+                No explanation provided for this question.
+              </p>
             )}
-          </div>
+          </QuestionPage.AnswerBody>
           {question?.content && !submitSuccess && (
             <h2 className="font-poppins font-semibold text-md mt-6 mb-2">
               Submit an answer to see the solution.
