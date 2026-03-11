@@ -227,7 +227,7 @@ function QuestionTestPage({ params: paramsPromise }: QuestionTestPageProps) {
               />
             </div>
           )}
-        </QuestionPage.QuestionBody>
+        
         <QuestionPage.Options isLoading={isQuestionLoading || showNoQuestionsDialog}>
           {question?.options && (
             <RadioGroup
@@ -260,6 +260,7 @@ function QuestionTestPage({ params: paramsPromise }: QuestionTestPageProps) {
             </RadioGroup>
           )}
         </QuestionPage.Options>
+        </QuestionPage.QuestionBody>
         <QuestionPage.Answer
           isLoading={isQuestionLoading || (submitted && !submitSuccess) || showNoQuestionsDialog}
           isAnswered={submitted || showNoQuestionsDialog}
