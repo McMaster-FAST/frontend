@@ -1,7 +1,7 @@
 "use client";
 
 import { Questions } from "@/app/courses/[courseCode]/dashboard/tabs/questions-tab";
-import { MacFastHeader } from "@/components/ui/custom/macfast-header";
+import { MacFastHeader } from "@/components/macfast/macfast-header";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import {

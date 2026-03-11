@@ -4,15 +4,15 @@ import { uploadQuestions } from "@/lib/api";
 import { useRef, useState } from "react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Progress } from "@/components/ui/progress";
-import { QuestionItem } from "@/components/ui/custom/questions-item/questions-item";
+import { QuestionItem } from "@/components/macfast/questions-item/questions-item";
 import { Button } from "@/components/ui/button";
 import { AlertCircle } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import CommentsSheet from "@/components/ui/custom/comments/comments-sheet";
+import CommentsSheet from "@/components/macfast/comments/comments-sheet";
 import { useCourseQuestions } from "@/hooks/useCourseQuestions";
-import { QuestionItemSkeleton } from "@/components/ui/custom/questions-item/questions-item-skeleton";
-import { SearchBar } from "@/components/ui/custom/search-bar";
-import { QuestionsFilter } from "@/components/ui/custom/questions-filter";
+import { QuestionItemSkeleton } from "@/components/macfast/questions-item/questions-item-skeleton";
+import { SearchBar } from "@/components/macfast/search-bar";
+import { QuestionsFilter } from "@/components/macfast/questions-filter";
 import { useRouter } from "next/navigation";
 
 interface QuestionsProps {
@@ -98,15 +98,11 @@ export function Questions({ course }: QuestionsProps) {
   const fetchError = getFetchErrorDetails();
 
   const navigateToPreview = (questionId: string) => {
-    router.push(
-      `/courses/${course?.code}/question/${questionId}/preview`,
-    );
+    router.push(`/courses/${course?.code}/question/${questionId}/preview`);
   };
 
   const navigateToEdit = (questionId: string) => {
-    router.push(
-      `/courses/${course?.code}/question/${questionId}/edit`,
-    );
+    router.push(`/courses/${course?.code}/question/${questionId}/edit`);
   };
   return (
     <div className="flex flex-col h-full">

@@ -1,8 +1,8 @@
 "use client";
 
-import { MacFastHeader } from "@/components/ui/custom/macfast-header";
+import { MacFastHeader } from "@/components/macfast/macfast-header";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import UnitsAccordion from "@/components/ui/custom/unit-accordion/unit-accordion";
+import UnitsAccordion from "@/components/macfast/unit-accordion/unit-accordion";
 import { Badge } from "@/components/ui/badge";
 import {
   AlertCircle,
@@ -15,7 +15,7 @@ import {
 import { useCourseData } from "@/hooks/useCourseData";
 import { useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { UnitsAccordionSkeleton } from "@/components/ui/custom/unit-accordion/unit-accordion-skeleton";
+import { UnitsAccordionSkeleton } from "@/components/macfast/unit-accordion/unit-accordion-skeleton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 function CoursePage() {

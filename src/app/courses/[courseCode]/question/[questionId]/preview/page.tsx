@@ -2,25 +2,28 @@
 
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { MacFastHeader } from "@/components/ui/custom/macfast-header";
+import { MacFastHeader } from "@/components/macfast/macfast-header";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { ChevronsRight } from "lucide-react";
 import { useAuthFetch } from "@/hooks/useFetchWithAuth";
 import { getQuestionByPublicId } from "@/lib/api";
-import { QuestionPage } from "@/components/ui/custom/question-page";
-import { QuestionFlagDialog } from "@/components/ui/custom/question-flag-dialog";
+import { QuestionPage } from "@/components/macfast/question-page";
+import { QuestionFlagDialog } from "@/components/macfast/question-flag-dialog";
 import { Checkbox } from "@/components/ui/checkbox";
-import { SafeHtml } from "@/components/ui/custom/safe-html";
+import { SafeHtml } from "@/components/macfast/safe-html";
 
 interface QuestionPreviewPageProps {
   // If provided, will use this question data instead of fetching it. Useful for previewing unsaved changes.
-  useQuestion: Question | null; 
+  useQuestion: Question | null;
   // Optional callback when user wants to return from preview
-  onReturn?: () => void; 
+  onReturn?: () => void;
 }
-export default function QuestionPreviewPage({ useQuestion, onReturn }: QuestionPreviewPageProps) {
+export default function QuestionPreviewPage({
+  useQuestion,
+  onReturn,
+}: QuestionPreviewPageProps) {
   const params = useParams();
   const courseCode = decodeURIComponent(params.courseCode as string);
   const questionId = decodeURIComponent(params.questionId as string);
@@ -87,20 +90,19 @@ export default function QuestionPreviewPage({ useQuestion, onReturn }: QuestionP
               onValueChange={setSelectedOption}
             >
               {question?.options &&
-                question.options.map((option: QuestionOption, index: number) => (
-                  <div
-                    key={index}
-                    className="flex items-center gap-2 w-full"
-                  >
-                    <RadioGroupItem
-                      value={option.public_id || `option-${index}`}
-                      className="cursor-pointer"
-                    />
-                    <div className="border-2 p-6 rounded-md items-center flex gap-2 w-full">
-                      <SafeHtml html={option.content || ""} />
+                question.options.map(
+                  (option: QuestionOption, index: number) => (
+                    <div key={index} className="flex items-center gap-2 w-full">
+                      <RadioGroupItem
+                        value={option.public_id || `option-${index}`}
+                        className="cursor-pointer"
+                      />
+                      <div className="border-2 p-6 rounded-md items-center flex gap-2 w-full">
+                        <SafeHtml html={option.content || ""} />
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ),
+                )}
             </RadioGroup>
           </QuestionPage.Options>
         </QuestionPage.QuestionBody>

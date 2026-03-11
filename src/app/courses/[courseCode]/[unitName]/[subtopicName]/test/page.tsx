@@ -16,7 +16,7 @@ import {
 import { useEffect } from "react";
 import { useAuthFetch } from "@/hooks/useFetchWithAuth";
 import { Skeleton } from "@/components/ui/skeleton";
-import { QuestionFlagDialog } from "@/components/ui/custom/question-flag-dialog";
+import { QuestionFlagDialog } from "@/components/macfast/question-flag-dialog";
 import DOMPurify from "dompurify";
 import {
   AlertDialog,
@@ -30,9 +30,9 @@ import {
 } from "@/components/ui/alert-dialog";
 
 import Link from "next/link";
-import { QuestionPage } from "@/components/ui/custom/question-page";
-import { MacFastHeader } from "@/components/ui/custom/macfast-header";
-import { SafeHtml, SafeHtmlInline } from "@/components/ui/custom/safe-html";
+import { QuestionPage } from "@/components/macfast/question-page";
+import { MacFastHeader } from "@/components/macfast/macfast-header";
+import { SafeHtml, SafeHtmlInline } from "@/components/macfast/safe-html";
 
 interface QuestionTestPageProps {
   params: Promise<{

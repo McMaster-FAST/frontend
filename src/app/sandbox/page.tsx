@@ -25,7 +25,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
-import { MacFastHeader } from "@/components/ui/custom/macfast-header";
+import { MacFastHeader } from "@/components/macfast/macfast-header";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -34,10 +34,10 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import CourseCard from "@/components/ui/custom/course-card";
-import UnitsAccordion from "@/components/ui/custom/unit-accordion/unit-accordion";
+import CourseCard from "@/components/macfast/course-card";
+import UnitsAccordion from "@/components/macfast/unit-accordion/unit-accordion";
 import { Questions } from "@/app/courses/[courseCode]/dashboard/tabs/questions-tab";
-import CommentsSheet from "@/components/ui/custom/comments/comments-sheet";
+import CommentsSheet from "@/components/macfast/comments/comments-sheet";
 
 interface QuestionRow {
   question: string;
@@ -69,7 +69,10 @@ export default function Home() {
   return (
     <main>
       <div>
-        <CommentsSheet open={true} onOpenChange={(open) => console.log("Comments sheet open:", open)} />
+        <CommentsSheet
+          open={true}
+          onOpenChange={(open) => console.log("Comments sheet open:", open)}
+        />
         <Button variant="primary">Primary</Button>
         <Button variant="secondary">Secondary</Button>
         <Button variant="tertiary">Tertiary</Button>

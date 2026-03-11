@@ -1,10 +1,10 @@
 "use client";
 
 import Image from "next/image";
-import { MacFastHeader } from "@/components/ui/custom/macfast-header";
-import CourseCard from "@/components/ui/custom/course-card";
+import { MacFastHeader } from "@/components/macfast/macfast-header";
+import CourseCard from "@/components/macfast/course-card";
 import { useUserCourses } from "@/hooks/useUserCourses";
-import ErrorMessage from "@/components/ui/custom/error-message";
+import ErrorMessage from "@/components/macfast/error-message";
 
 export default function Home() {
   const { courses: userCourses, isLoading, error } = useUserCourses();
@@ -17,7 +17,10 @@ export default function Home() {
         <MacFastHeader />
         <main className="flex-1 px-6 py-10 md:px-12">
           <div className="mx-auto max-w-7xl">
-            <ErrorMessage title="Access Denied" message="You do not have permission to access your courses."/>
+            <ErrorMessage
+              title="Access Denied"
+              message="You do not have permission to access your courses."
+            />
           </div>
         </main>
       </div>
