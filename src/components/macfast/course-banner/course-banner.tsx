@@ -2,28 +2,43 @@
 
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { cn } from "@/lib/utils";
 import { AlertTriangle, LayoutDashboard, Pencil } from "lucide-react";
+import { XpCircle } from "../xp-circle/xp-circle";
 
 interface CourseBannerProps {
-  course: any;
+  course: Course | undefined;
   isLoading: boolean;
   error: any;
   variant?: "instructor" | "course" | "question-edit";
-  xpLevel?: number; // Only needed if variant is "course"
+  level?: number;
+  progressPercentage?: number; // 0-100
 }
 
 export function CourseBanner({
   course,
   isLoading,
   error,
-  variant = "course", // Default to the standard course view
-  xpLevel,
+  variant = "course",
+  level = 0,
+  progressPercentage = 0,
 }: CourseBannerProps) {
+  const isCourseVariant = variant === "course";
+
   return (
     <div className="border-b border-light-gray bg-white px-6 py-8 shadow-sm">
       <div className="mx-auto max-w-7xl">
-        <div className="flex flex-col gap-4">
-          <div>
+        <div
+          className={cn("flex flex-col gap-4", {
+            "flex-row items-center justify-between gap-10": isCourseVariant,
+          })}
+        >
+          {/* Main Text Content Column */}
+          <div
+            className={cn("flex-1", {
+              "flex flex-col gap-1": isCourseVariant,
+            })}
+          >
             <div className="mb-2 flex w-full items-center gap-2">
               <Badge variant="secondary" className="font-bold text-dark-gray">
                 {isLoading || !course ? (
@@ -43,9 +58,7 @@ export function CourseBanner({
                 )}
               </span>
 
-              {/* --- DYNAMIC RIGHT SIDE BASED ON VARIANT --- */}
-
-              {variant === "instructor" && (
+              {!isCourseVariant && variant === "instructor" && (
                 <Badge
                   variant="secondary"
                   className="ml-auto font-bold text-dark-gray"
@@ -55,18 +68,12 @@ export function CourseBanner({
                 </Badge>
               )}
 
-              {variant === "course" && xpLevel !== undefined && (
-                <div
-                  className="ml-auto flex h-9 w-9 items-center justify-center rounded-full bg-blue-100 border-2 border-blue-200 text-sm font-bold text-blue-700 shadow-sm"
-                  title={`XP Level: ${xpLevel}`}
+              {!isCourseVariant && variant === "question-edit" && (
+                <Badge
+                  variant="secondary"
+                  className="ml-auto font-bold text-dark-gray"
                 >
-                  {xpLevel}
-                </div>
-              )}
-
-              {variant === "question-edit" && (
-                <Badge className="ml-auto font-bold border-orange-200 bg-orange-50 text-orange-700">
-                  <Pencil className="mr-1 inline-block h-4 w-4" />
+                  <Pencil className="mr-1 inline-block h-4 w-4 text-dark-gray" />
                   Editing Question
                 </Badge>
               )}
@@ -74,7 +81,7 @@ export function CourseBanner({
 
             <h1 className="text-3xl font-bold text-foreground">
               {isLoading || !course ? (
-                <Skeleton className="h-16 w-[120px]" />
+                <Skeleton className="h-10 w-64" />
               ) : error ? (
                 <span className="text-red-900">
                   <AlertTriangle className="mr-2 inline-block" />
@@ -85,6 +92,15 @@ export function CourseBanner({
               )}
             </h1>
           </div>
+
+          {isCourseVariant && (
+            <XpCircle
+              level={level}
+              percentage={progressPercentage}
+              isLoading={isLoading}
+              className="w-24 h-24 flex-shrink-0"
+            />
+          )}
         </div>
       </div>
     </div>

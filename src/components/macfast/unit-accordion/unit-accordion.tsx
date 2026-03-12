@@ -48,11 +48,7 @@ function UnitsAccordion({ tab, course, value, setValue }: UnitsAccordionProps) {
                   {`Unit ${unit.number}: ${unit.name}`}
                 </div>
                 {tab === "practiceProblems" && (
-                  <div className="flex flex-row items-center w-full gap-6 mt-1">
-                    <div className="flex-1">
-                      <AnimatedXPBar totalXp={rawTotalXp} />
-                    </div>
-
+                  <div className="flex flex-row items-center w-1/2 gap-6 mt-1">
                     <div className="flex-1">
                       <CompletionBar
                         correct={correctQuestions}

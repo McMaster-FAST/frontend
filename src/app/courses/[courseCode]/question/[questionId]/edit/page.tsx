@@ -26,6 +26,7 @@ import CommentsSheet from "@/components/macfast/comments/comments-sheet";
 import OptionsTab from "./tabs/options-tab";
 import QuestionTab from "./tabs/question-tab";
 import QuestionPreviewPage from "../preview/page";
+import { CourseBanner } from "@/components/macfast/course-banner/course-banner";
 
 function dataUrlToFile(dataUrl: string, baseName: string): File | null {
   const match = dataUrl.match(/^data:(image\/[a-zA-Z0-9.+-]+);base64,(.+)$/);
@@ -168,61 +169,14 @@ export default function QuestionEditPage() {
   return (
     <div className="flex flex-col h-screen bg-slate-50/50 font-poppins">
       <MacFastHeader />
-      <div className="border-b border-light-gray bg-white shadow-sm">
-        <div className="px-6 py-8">
-          <div className="mx-auto max-w-7xl">
-            <div className="flex flex-col gap-4">
-              <div className="h-full">
-                <div className="mb-2 flex w-full items-center gap-2">
-                  <Badge
-                    variant="secondary"
-                    className="font-bold text-dark-gray"
-                  >
-                    {isLoading || !course ? (
-                      <Skeleton className="h-4 w-20" />
-                    ) : courseError ? (
-                      <span>Unavailable</span>
-                    ) : (
-                      course.code
-                    )}
-                  </Badge>
 
-                  <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                    {isLoading || !course ? (
-                      <Skeleton className="h-4 w-20" />
-                    ) : courseError ? null : (
-                      course.semester
-                    )}
-                  </span>
-                  <Badge
-                    variant="secondary"
-                    className="ml-auto font-bold text-dark-gray"
-                  >
-                    <Pencil className="mr-1 inline-block h-4 w-4 text-dark-gray" />
-                    Question Editor
-                  </Badge>
-                </div>
-                <h1 className="text-3xl font-bold text-foreground">
-                  {isLoading || !course ? (
-                    <Skeleton className="h-16 w-120" />
-                  ) : courseError ? (
-                    <span className="text-red-900">
-                      <AlertTriangle className="mr-2 inline-block" />
-                      Error loading course
-                    </span>
-                  ) : (
-                    course.name
-                  )}
-                </h1>
-                <h2 className="text-lg font-semibold text-muted-foreground">
-                  Question:{" "}
-                  <span className="font-normal">{question?.public_id}</span>
-                </h2>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <CourseBanner
+        course={course}
+        isLoading={isLoading}
+        error={error}
+        variant="question-edit"
+      />
+
       <main className="mx-auto w-full max-w-7xl px-6 pt-8 flex-1 flex flex-col min-h-0 overflow-hidden">
         <Button
           className="mr-auto px-0"

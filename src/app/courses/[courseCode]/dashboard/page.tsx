@@ -3,17 +3,10 @@
 import { Questions } from "@/app/courses/[courseCode]/dashboard/tabs/questions-tab";
 import { MacFastHeader } from "@/components/macfast/macfast-header";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
-import {
-  AlertTriangle,
-  FileQuestion,
-  LayoutDashboard,
-  Users,
-} from "lucide-react";
+import { FileQuestion, Users } from "lucide-react";
 import { useCourseData } from "@/hooks/useCourseData";
-import { Skeleton } from "@/components/ui/skeleton";
 import { ClassList } from "./tabs/class-list-tab";
-import { CourseBanner } from "@/components/macfast/course-header/course-header";
+import { CourseBanner } from "@/components/macfast/course-banner/course-banner";
 
 function InstructorDashboardPage() {
   const { course, isLoading, error } = useCourseData();
@@ -22,7 +15,12 @@ function InstructorDashboardPage() {
     <div className="h-screen flex flex-col overflow-hidden bg-slate-50/50 font-poppins">
       <MacFastHeader />
 
-      <CourseBanner course={course} isLoading={isLoading} error={error} />
+      <CourseBanner
+        course={course}
+        isLoading={isLoading}
+        error={error}
+        variant="instructor"
+      />
 
       <main className="mx-auto w-full max-w-7xl px-6 py-8 flex-1 flex flex-col min-h-0">
         <Tabs className="w-full flex flex-col h-full" defaultValue="questions">
