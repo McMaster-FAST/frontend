@@ -99,8 +99,8 @@ function QuestionTestPage({ params: paramsPromise }: QuestionTestPageProps) {
   const [notes, setNotes] = useState<JSX.Element[]>([]);
   const [subtopicId, setSubtopicId] = useState("");
 
-  const showNoQuestionsDialog =
-    !question?.public_id && !isQuestionLoading && !error;
+  const showTestContinueDialog =
+    !isQuestionLoading && !error && (!question.content || actions.length > 0 || notes.length > 0);
 
   const resetState = () => {
     setIsQuestionLoading(true);
@@ -155,6 +155,7 @@ function QuestionTestPage({ params: paramsPromise }: QuestionTestPageProps) {
   ) => {
     questionPromise
       .then(({ question, continue_actions, suggested_actions }) => {
+        console.log(suggested_actions);
         setQuestion(question);
         setActions(
           generateActionsForContinueActions(continue_actions, subtopicId),
@@ -224,13 +225,13 @@ function QuestionTestPage({ params: paramsPromise }: QuestionTestPageProps) {
       </QuestionPage.Title>
       <QuestionPage.Content>
         <TestContinueDialog
-          open={showNoQuestionsDialog}
+          open={showTestContinueDialog}
           actions={actions}
           notes={notes}
         />
         <QuestionPage.QuestionBody
           error={error}
-          isLoading={isQuestionLoading || showNoQuestionsDialog}
+          isLoading={isQuestionLoading || showTestContinueDialog}
         >
           {question.content && (
             <div className="border p-4 rounded-lg shadow-md">
@@ -241,7 +242,7 @@ function QuestionTestPage({ params: paramsPromise }: QuestionTestPageProps) {
           )}
 
           <QuestionPage.Options
-            isLoading={isQuestionLoading || showNoQuestionsDialog}
+            isLoading={isQuestionLoading || showTestContinueDialog}
           >
             {question?.options && (
               <RadioGroup
@@ -279,9 +280,9 @@ function QuestionTestPage({ params: paramsPromise }: QuestionTestPageProps) {
           isLoading={
             isQuestionLoading ||
             (submitted && !submitSuccess) ||
-            showNoQuestionsDialog
+            showTestContinueDialog
           }
-          isAnswered={submitted || showNoQuestionsDialog}
+          isAnswered={submitted || showTestContinueDialog}
         >
           <QuestionPage.AnswerTitle>
             <p className="font-poppins text-2xl">

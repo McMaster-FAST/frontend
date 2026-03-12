@@ -12,7 +12,6 @@ import ActionInfo from "@/types/actions/ContinueActionInfo";
 import * as AlertDialogPrimitive from "@radix-ui/react-alert-dialog";
 import { useRouter } from "next/navigation";
 import { JSX } from "react/jsx-runtime";
-import { useEffect, useState } from "react";
 
 interface TestContinueDialogProps extends React.ComponentProps<
   typeof AlertDialogPrimitive.Root
@@ -33,8 +32,7 @@ export default function TestContinueDialog({
       <AlertDialogContent>
         <AlertDialogTitle>End of Test</AlertDialogTitle>
         <AlertDialogDescription>
-          There are no appropriate questions. You may see this message multiple
-          times.
+          There are no appropriate questions.
         </AlertDialogDescription>
         {notes &&
           notes.map((note, index) => (
