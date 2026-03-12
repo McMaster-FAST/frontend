@@ -9,6 +9,7 @@ import React, { useState } from "react";
 import { JSX } from "react/jsx-runtime";
 import {
   getNextQuestion,
+  resetSkippedQuestions,
   skipQuestion,
   submitAnswer,
 } from "@/lib/adaptive-test-api";
@@ -135,8 +136,9 @@ function QuestionTestPage({ params: paramsPromise }: QuestionTestPageProps) {
           };
         case ContinueAction.USE_SKIPPED_QUESTIONS:
           return {
-            caption: <span>Retry skipped questions</span>,
+            caption: <span>Use recently skipped questions</span>,
             action: async () => {
+              await resetSkippedQuestions(subtopic_id, authFetch);
               resetState();
               handleNextQuestion();
             },

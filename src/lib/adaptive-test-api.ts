@@ -10,7 +10,6 @@ const API_BASE_URL = "/api/core/adaptive-test";
 function convertToContinueAction(action: string): ContinueAction | undefined {
   console.log(`Converting action: ${action}`);
   if (Object.keys(ContinueAction).includes(action)) {
-    
     return ContinueAction[action as keyof typeof ContinueAction];
   }
   return undefined;
@@ -119,4 +118,16 @@ export async function skipQuestion(
   })
     .then(getJson)
     .then(convertToTestQuestion);
+}
+
+export async function resetSkippedQuestions(
+  subtopic_id: string,
+  authFetch: ReturnType<typeof useAuthFetch>,
+) {
+  const response = await authFetch(
+    `/api/adaptive-test/question-metrics/${subtopic_id}/reset/`,
+    {
+      method: "POST",
+    },
+  );
 }

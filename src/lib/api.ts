@@ -13,7 +13,7 @@ export async function getJson(response: Response) {
   }
 
   if (!response.ok) {
-    throw new Error(json?.message || "Error fetching data");
+    throw new Error(json?.error || "Error fetching data");
   }
 
   return json;
