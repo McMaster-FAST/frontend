@@ -1,7 +1,6 @@
 import { auth } from "@/auth";
-import { useAuthFetch } from "@/hooks/useFetchWithAuth";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 export async function getJson(response: Response) {
   return response
@@ -54,51 +53,3 @@ export async function ping() {
   return getJson(response);
 }
 
-export async function uploadQuestions(file: File) {
-  const formData = new FormData();
-  formData.append("file", file);
-  formData.append("group_name", "");
-
-  const response = await fetch(`${API_BASE_URL}/api/core/upload/`, {
-    method: "PUT",
-    body: formData,
-  });
-
-  return getJson(response);
-}
-
-export async function getAllQuestions() {
-  const response = await fetch(`${API_BASE_URL}/api/core/questions/`);
-
-  return getJson(response);
-}
-
-/**
- * Fetch a single question by public_id for the edit page.
- * GET /api/core/questions/<public_id>/
- */
-export async function getQuestionByPublicId(
-  publicId: string,
-  authFetch: ReturnType<typeof useAuthFetch>,
-): Promise<Question> {
-  const response = await authFetch(
-    `/api/questions/${encodeURIComponent(publicId)}/`,
-  );
-
-  if (!response.ok) {
-    throw new Error(`Failed to fetch question: ${response.status}`);
-  }
-
-  const data = await response.json();
-  return data as Question;
-}
-
-export async function uploadQuestionImage(
-  file: File,
-  authFetch: ReturnType<typeof useAuthFetch>,
-): Promise<string> {
-  void file;
-  void authFetch;
-  // TODO: Implement once backend image upload endpoint is available.
-  return "";
-}

@@ -1,6 +1,6 @@
 "use client";
 
-import { uploadQuestions } from "@/lib/api";
+import { uploadQuestions } from "@/lib/question-api";
 import { useRef, useState } from "react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Progress } from "@/components/ui/progress";

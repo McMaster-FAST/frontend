@@ -17,7 +17,7 @@ import { useAuthFetch } from "@/hooks/useFetchWithAuth";
 import { QuestionPage } from "@/components/ui/custom/question-page";
 import { isEqual } from "lodash";
 import ErrorMessage from "@/components/ui/custom/error-message";
-import { getQuestionByPublicId, uploadQuestionImage } from "@/lib/api";
+import { getQuestionByPublicId, uploadQuestionImage } from "@/lib/question-api";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useCourseData } from "@/hooks/useCourseData";
 import { Skeleton } from "@/components/ui/skeleton";

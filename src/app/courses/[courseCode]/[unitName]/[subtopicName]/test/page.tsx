@@ -33,6 +33,8 @@ import Link from "next/link";
 import { QuestionPage } from "@/components/ui/custom/question-page";
 import { MacFastHeader } from "@/components/ui/custom/macfast-header";
 import { SafeHtml, SafeHtmlInline } from "@/components/ui/custom/safe-html";
+import { ReportQuestionDialog } from "@/components/ui/custom/report-question-dialog";
+import { reportQuestion } from "@/lib/question-api";
 
 interface QuestionTestPageProps {
   params: Promise<{
@@ -121,8 +123,15 @@ function QuestionTestPage({ params: paramsPromise }: QuestionTestPageProps) {
   const handleSaveForLater = async () => {
     // Implement save for later functionality here
   };
-  const handleQuestionFlag = async () => {
-    // Implement question flagging functionality here
+
+  const handleReportQuestion = (reportAnswers: any) => {
+    reportQuestion(
+      question.public_id,
+      reportAnswers.reasons,
+      reportAnswers.additionalDetails,
+      reportAnswers.contact_consent,
+      authFetch,
+    );
   };
 
   const useSkippedQuestions = () => {
@@ -273,7 +282,7 @@ function QuestionTestPage({ params: paramsPromise }: QuestionTestPageProps) {
           className="w-full flex flex-row flex-2 justify-between items-center"
         >
           <div>
-            <QuestionFlagDialog onSubmit={handleQuestionFlag} />
+            <ReportQuestionDialog onSubmit={handleReportQuestion} />
           </div>
           <div className="inline-flex items-center gap-4">
             <div className="inline-flex gap-2">

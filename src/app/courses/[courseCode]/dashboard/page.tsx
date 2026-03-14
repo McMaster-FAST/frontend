@@ -13,6 +13,7 @@ import {
 import { useCourseData } from "@/hooks/useCourseData";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ClassList } from "./tabs/class-list-tab";
+import QuestionReportsTab from "./tabs/question-reports-tab";
 
 function InstructorDashboardPage() {
   const { course, isLoading, error } = useCourseData();
@@ -82,6 +83,10 @@ function InstructorDashboardPage() {
                 <Users />
                 Class List
               </TabsTrigger>
+              <TabsTrigger value="questionReports">
+                <AlertTriangle />
+                Question Reports
+              </TabsTrigger>
             </TabsList>
           </div>
 
@@ -94,6 +99,9 @@ function InstructorDashboardPage() {
 
           <TabsContent value="classList" className="mt-0">
             {course?.code && <ClassList courseCode={course.code} />}
+          </TabsContent>
+          <TabsContent value="questionReports" className="mt-0">
+            <QuestionReportsTab />
           </TabsContent>
         </Tabs>
       </main>
