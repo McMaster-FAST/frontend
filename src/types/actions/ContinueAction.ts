@@ -1,0 +1,12 @@
+// Keep aligned with backend
+enum ContinueAction {
+  INCREMENT_WINDOW_UPPERBOUND = "INCREMENT_WINDOW_UPPERBOUND",
+  DECREMENT_WINDOW_LOWERBOUND = "DECREMENT_WINDOW_LOWERBOUND",
+  USE_SKIPPED_QUESTIONS = "USE_SKIPPED_QUESTIONS",
+}
+
+enum SuggestedAction {
+  STOP_STUDYING = "STOP_STUDYING",
+}
+
+export { ContinueAction, SuggestedAction };

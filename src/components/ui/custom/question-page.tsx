@@ -3,8 +3,7 @@ import React from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
-import { useRouter, useParams } from "next/navigation";
-
+import { useRouter } from "next/navigation";
 interface QuestionPageProps {
   children: React.ReactNode;
   onReturn?: () => void;
@@ -31,7 +30,10 @@ function QuestionPage({ children, onReturn }: QuestionPageProps) {
     <div className="flex flex-col h-screen">
       {header}
       <div>
-          <Button variant="tertiary" onClick={onReturn ? onReturn : () => router.back()}>
+        <Button
+          variant="tertiary"
+          onClick={onReturn ? onReturn : () => router.back()}
+        >
           <ArrowLeft />
           Back
         </Button>
@@ -103,13 +105,27 @@ function Options({
 function Answer({
   children,
   isLoading,
+  isAnswered,
 }: {
   children: React.ReactNode;
   isLoading: boolean;
+  isAnswered: boolean;
 }) {
+  let placeholder, others;
+  for (const child of React.Children.toArray(children)) {
+    if (!React.isValidElement(child)) continue;
+    const type = child.type as any;
+    if (type === AnswerPlaceholder) {
+      placeholder = child;
+    } else {
+      others = others ? [...others, child] : [child];
+    }
+  }
   return (
     <div className="border-l-2 border-gray-300 pl-4 flex-1 flex flex-col gap-4">
-      {isLoading ? <Skeleton className="w-full h-40" /> : children}
+      {!isLoading && isAnswered && others}
+      {!isLoading && !isAnswered && placeholder}
+      {isLoading && <Skeleton className="w-full h-40" />}
     </div>
   );
 }
@@ -124,6 +140,7 @@ function AnswerTitle({ children }: { children: React.ReactNode }) {
     </div>
   );
 }
+
 function AnswerBody({ children }: { children: React.ReactNode }) {
   return (
     <div>
@@ -132,6 +149,11 @@ function AnswerBody({ children }: { children: React.ReactNode }) {
     </div>
   );
 }
+
+function AnswerPlaceholder({ children }: {children: React.ReactNode}) {
+  return children;
+}
+
 function Content({ children }: { children: React.ReactNode }) {
   return (
     <div id="content" className="flex flex-row gap-4 flex-1">
@@ -149,5 +171,6 @@ QuestionPage.Options = Options;
 QuestionPage.Answer = Answer;
 QuestionPage.AnswerTitle = AnswerTitle;
 QuestionPage.AnswerBody = AnswerBody;
+QuestionPage.AnswerPlaceholder = AnswerPlaceholder;
 
 export { QuestionPage };

@@ -11,13 +11,14 @@ export function useAuthFetch() {
 
   const authFetch = useCallback(
     async (endpoint: string, options: RequestInit = {}) => {
-      const headers = {
-        "Content-Type": "application/json",
-        ...(options.headers || {}),
-      } as Record<string, string>;
+      const headers = new Headers(options.headers);
+
+      if (!(options.body instanceof FormData) && !headers.has("Content-Type")) {
+        headers.set("Content-Type", "application/json");
+      }
 
       if (token) {
-        headers["Authorization"] = `Bearer ${token}`;
+        headers.set("Authorization", `Bearer ${token}`);
       }
 
       const cleanEndpoint = endpoint.startsWith("/")

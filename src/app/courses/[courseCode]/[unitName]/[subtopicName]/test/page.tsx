@@ -6,33 +6,34 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { ChevronsRight } from "lucide-react";
 import React, { useState } from "react";
+import { JSX } from "react/jsx-runtime";
 import {
   getNextQuestion,
+  resetSkippedQuestions,
   skipQuestion,
   submitAnswer,
-  resetSkippedQuestions,
-  getActiveTestSession,
 } from "@/lib/adaptive-test-api";
 import { useEffect } from "react";
 import { useAuthFetch } from "@/hooks/useFetchWithAuth";
 import { Skeleton } from "@/components/ui/skeleton";
 import { QuestionFlagDialog } from "@/components/ui/custom/question-flag-dialog";
-import DOMPurify from "dompurify";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogTitle,
-} from "@radix-ui/react-alert-dialog";
-import {
-  AlertDialogContent,
-  AlertDialogDescription,
-} from "@/components/ui/alert-dialog";
+import { resolveImages } from "@/lib/utils";
+import TestContinueDialog from "@/components/ui/custom/test-continue-dialog";
 
+import {
+  ContinueAction,
+  SuggestedAction,
+} from "@/types/actions/ContinueAction";
+import ActionInfo from "@/types/actions/ContinueActionInfo";
+import {
+  updateSelWindowLowerBound,
+  updateSelWindowUpperBound,
+} from "@/lib/api";
+import { useCourseData } from "@/hooks/useCourseData";
 import Link from "next/link";
 import { QuestionPage } from "@/components/ui/custom/question-page";
 import { MacFastHeader } from "@/components/ui/custom/macfast-header";
-import { SafeHtml, SafeHtmlInline } from "@/components/ui/custom/safe-html";
+import { SafeHtml } from "@/components/ui/custom/safe-html";
 
 interface QuestionTestPageProps {
   params: Promise<{
@@ -42,20 +43,47 @@ interface QuestionTestPageProps {
   }>;
 }
 
-interface ContinueActions {
-  use_skipped_questions: boolean;
+function generateNoteFromSuggestedActions(
+  suggested_actions: SuggestedAction[],
+): JSX.Element[] {
+  return suggested_actions.map((action) => {
+    switch (action) {
+      case SuggestedAction.STOP_STUDYING:
+        return (
+          <span>
+            <span className="block">
+              The algorithm has determined your ability with some level of
+              confidence, which you can view from the{" "}
+              <Link className="clickable-text" href="../../coursepage">
+                course page
+              </Link>
+              .
+            </span>
+            <span className="block">
+              This should give you an idea of your understanding of this
+              subtopic. If you are satisfied with your performance we suggest
+              you move on to other subtopics.
+            </span>
+          </span>
+        );
+    }
+  });
 }
 
 function QuestionTestPage({ params: paramsPromise }: QuestionTestPageProps) {
   // Get course info from URI
   const params = React.use(paramsPromise);
-  const course = decodeURI(params.courseCode);
-  const unit = decodeURI(params.unitName);
-  const subtopic = decodeURI(params.subtopicName);
-
+  const unit_name = decodeURIComponent(params.unitName);
+  const subtopic_name = decodeURIComponent(params.subtopicName);
+  const {
+    course,
+    isLoading,
+    error: courseError,
+    refetch,
+    courseCode,
+  } = useCourseData();
   const authFetch = useAuthFetch();
 
-  // Setup state
   const [question, setQuestion]: [
     TestQuestion,
     React.Dispatch<React.SetStateAction<TestQuestion>>,
@@ -67,12 +95,12 @@ function QuestionTestPage({ params: paramsPromise }: QuestionTestPageProps) {
   const [submitted, setSubmitted] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
   const [isQuestionLoading, setIsQuestionLoading] = useState<boolean>(true);
-  const [continueActions, setContinueActions] = useState<ContinueActions>({
-    use_skipped_questions: false,
-  });
+  const [actions, setActions] = useState<ActionInfo[]>([]);
+  const [notes, setNotes] = useState<JSX.Element[]>([]);
+  const [subtopicId, setSubtopicId] = useState("");
 
-  const showNoQuestionsDialog =
-    !question?.public_id && !isQuestionLoading && !error;
+  const showTestContinueDialog =
+    !isQuestionLoading && !error && (!question.content || actions.length > 0 || notes.length > 0);
 
   const resetState = () => {
     setIsQuestionLoading(true);
@@ -84,16 +112,65 @@ function QuestionTestPage({ params: paramsPromise }: QuestionTestPageProps) {
     setError("");
   };
 
-  const handleNextQuestion = async () => {
-    resetState();
-
-    getNextQuestion(course, unit, subtopic, authFetch)
-      .then((nextQuestion) => {
-        setQuestion(nextQuestion);
-        updateContinueActions();
+  const generateActionsForContinueActions = (
+    continue_actions: ContinueAction[],
+    subtopic_id: string,
+  ): ActionInfo[] => {
+    return continue_actions.map((action) => {
+      switch (action) {
+        case ContinueAction.INCREMENT_WINDOW_UPPERBOUND:
+          return {
+            caption: <span>See harder questions</span>,
+            action: async () => {
+              await updateSelWindowUpperBound(subtopic_id, authFetch);
+              handleNextQuestion();
+            },
+          };
+        case ContinueAction.DECREMENT_WINDOW_LOWERBOUND:
+          return {
+            caption: <span>See easier questions</span>,
+            action: async () => {
+              await updateSelWindowLowerBound(subtopic_id, authFetch);
+              handleNextQuestion();
+            },
+          };
+        case ContinueAction.USE_SKIPPED_QUESTIONS:
+          return {
+            caption: <span>Use recently skipped questions</span>,
+            action: async () => {
+              await resetSkippedQuestions(subtopic_id, authFetch);
+              resetState();
+              handleNextQuestion();
+            },
+          };
+      }
+    });
+  };
+  const updateWithNewQuestion = (
+    questionPromise: Promise<{
+      question: TestQuestion;
+      continue_actions: ContinueAction[];
+      suggested_actions: SuggestedAction[];
+    }>,
+  ) => {
+    questionPromise
+      .then(({ question, continue_actions, suggested_actions }) => {
+        console.log(suggested_actions);
+        setQuestion(question);
+        setActions(
+          generateActionsForContinueActions(continue_actions, subtopicId),
+        );
+        setNotes(generateNoteFromSuggestedActions(suggested_actions));
       })
       .catch((err) => setError(err.message))
       .finally(() => setIsQuestionLoading(false));
+  };
+
+  const handleNextQuestion = async () => {
+    resetState();
+    updateWithNewQuestion(
+      getNextQuestion(courseCode || "", unit_name, subtopic_name, authFetch),
+    );
   };
 
   const handleSubmit = async () => {
@@ -106,16 +183,9 @@ function QuestionTestPage({ params: paramsPromise }: QuestionTestPageProps) {
       })
       .catch((err) => setError(err.message));
   };
-
   const handleSkip = async () => {
     resetState();
-    skipQuestion(question.public_id, authFetch)
-      .then((nextQuestion) => {
-        setQuestion(nextQuestion);
-        updateContinueActions();
-      })
-      .catch((err) => setError(err.message))
-      .finally(() => setIsQuestionLoading(false));
+    updateWithNewQuestion(skipQuestion(question.public_id, authFetch));
   };
 
   const handleSaveForLater = async () => {
@@ -125,26 +195,21 @@ function QuestionTestPage({ params: paramsPromise }: QuestionTestPageProps) {
     // Implement question flagging functionality here
   };
 
-  const useSkippedQuestions = () => {
-    resetSkippedQuestions(authFetch).then(() => {
-      handleNextQuestion();
-    });
-  };
-
-  const updateContinueActions = () => {
-    getActiveTestSession(authFetch).then((session) => {
-      setContinueActions({
-        use_skipped_questions: session.skipped_questions.length > 0,
-      });
-    });
-  };
+  useEffect(() => {
+    if (!course) return;
+    const unit = course.units.find((unit) => unit.name === unit_name);
+    if (!unit || !unit.subtopics) return;
+    const subtopic = unit.subtopics.find(
+      (subtopic) => subtopic.name === subtopic_name,
+    );
+    if (!subtopic) return;
+    setSubtopicId(subtopic.public_id);
+  }, [course]);
 
   useEffect(() => {
-    (async () => {
-      await handleNextQuestion();
-      updateContinueActions();
-    })();
-  }, [course, unit, subtopic]);
+    if (!subtopicId) return;
+    handleNextQuestion();
+  }, [subtopicId]);
 
   return (
     <QuestionPage>
@@ -152,45 +217,33 @@ function QuestionTestPage({ params: paramsPromise }: QuestionTestPageProps) {
         <MacFastHeader />
       </QuestionPage.Header>
       <QuestionPage.Title>
-        <h1>{course}</h1>
+        <h1>{courseCode}</h1>
         <ChevronsRight />
-        <h1>{unit}</h1>
+        <h1>{unit_name}</h1>
         <ChevronsRight />
-        <h1>{subtopic}</h1>
+        <h1>{subtopic_name}</h1>
       </QuestionPage.Title>
       <QuestionPage.Content>
-        <QuestionPage.QuestionBody error={error} isLoading={isQuestionLoading}>
-          <AlertDialog open={!!showNoQuestionsDialog}>
-            <AlertDialogContent className="w-min">
-              <AlertDialogTitle>No available questions</AlertDialogTitle>
-              <AlertDialogDescription>
-                All questions have been skipped.
-              </AlertDialogDescription>
-              <AlertDialogDescription className="mb-4">
-                How would you like to proceed?
-              </AlertDialogDescription>
-              <div className="flex flex-col w-fit gap-2 justify-center">
-                {continueActions.use_skipped_questions && (
-                  <AlertDialogAction asChild>
-                    <Button onClick={useSkippedQuestions}>
-                      Use skipped questions
-                    </Button>
-                  </AlertDialogAction>
-                )}
-                <AlertDialogCancel asChild>
-                  <Button variant="secondary">
-                    <Link href={`/courses/${course}/coursepage`}>
-                      Return to Course Page
-                    </Link>
-                  </Button>
-                </AlertDialogCancel>
-              </div>
-            </AlertDialogContent>
-          </AlertDialog>
-          <div className="border p-4 rounded-lg shadow-md">
-            <SafeHtml html={question?.content || ""} />
-          </div>
-          <QuestionPage.Options isLoading={isQuestionLoading}>
+        <TestContinueDialog
+          open={showTestContinueDialog}
+          actions={actions}
+          notes={notes}
+        />
+        <QuestionPage.QuestionBody
+          error={error}
+          isLoading={isQuestionLoading || showTestContinueDialog}
+        >
+          {question.content && (
+            <div className="border p-4 rounded-lg shadow-md">
+              <SafeHtml
+                html={resolveImages(question.content, question.public_id)}
+              />
+            </div>
+          )}
+
+          <QuestionPage.Options
+            isLoading={isQuestionLoading || showTestContinueDialog}
+          >
             {question?.options && (
               <RadioGroup
                 value={selectedOption}
@@ -213,7 +266,9 @@ function QuestionTestPage({ params: paramsPromise }: QuestionTestPageProps) {
                           : "")
                       }
                     >
-                      <SafeHtml html={option.content} />
+                      <SafeHtml
+                        html={resolveImages(option.content, question.public_id)}
+                      />
                     </div>
                   </div>
                 ))}
@@ -222,7 +277,12 @@ function QuestionTestPage({ params: paramsPromise }: QuestionTestPageProps) {
           </QuestionPage.Options>
         </QuestionPage.QuestionBody>
         <QuestionPage.Answer
-          isLoading={isQuestionLoading || (submitted && !submitSuccess)}
+          isLoading={
+            isQuestionLoading ||
+            (submitted && !submitSuccess) ||
+            showTestContinueDialog
+          }
+          isAnswered={submitted || showTestContinueDialog}
         >
           <QuestionPage.AnswerTitle>
             <p className="font-poppins text-2xl">
@@ -235,36 +295,22 @@ function QuestionTestPage({ params: paramsPromise }: QuestionTestPageProps) {
               />
             </p>
           </QuestionPage.AnswerTitle>
-          <div className="flex flex-col gap-4">
-            {submitSuccess && correctOptionId && (
-              <div>
-                <h1 className="font-poppins font-bold text-2xl">
-                  The correct answer is:
-                </h1>
-                <p className="font-poppins text-2xl">
-                  {
-                    question?.options.find(
-                      (option) => option.public_id === correctOptionId,
-                    )?.content
-                  }
-                </p>
-              </div>
+          <QuestionPage.AnswerBody>
+            {solution && <SafeHtml html={solution} />}
+            {!solution && (
+              <p className="italic text-muted-foreground">
+                No explanation provided for this question.
+              </p>
             )}
-            {submitSuccess && solution && (
-              <div>
-                <h2 className="font-poppins font-semibold text-lg">Why?</h2>
-                <SafeHtml html={solution} />
-              </div>
-            )}
-          </div>
-          {question?.content && !submitSuccess && (
+          </QuestionPage.AnswerBody>
+          <QuestionPage.AnswerPlaceholder>
+            {question?.content && !submitSuccess && (
             <h2 className="font-poppins font-semibold text-md mt-6 mb-2">
               Submit an answer to see the solution.
             </h2>
           )}
-          {(isQuestionLoading || (!submitSuccess && submitted)) && (
-            <Skeleton className="w-full h-full" />
-          )}
+          </QuestionPage.AnswerPlaceholder>
+          
         </QuestionPage.Answer>
       </QuestionPage.Content>
       <QuestionPage.Actions>
