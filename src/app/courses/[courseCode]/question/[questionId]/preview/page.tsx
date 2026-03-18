@@ -106,7 +106,7 @@ export default function QuestionPreviewPage({
             </RadioGroup>
           </QuestionPage.Options>
         </QuestionPage.QuestionBody>
-        <QuestionPage.Answer isLoading={isLoading}>
+        <QuestionPage.Answer isLoading={isLoading} isAnswered={true}>
           <QuestionPage.AnswerTitle>
             <p className="font-poppins text-2xl">
               <SafeHtml
@@ -120,9 +120,7 @@ export default function QuestionPreviewPage({
 
           <QuestionPage.AnswerBody>
             {question?.answer_explanation && (
-              <p>
-                <SafeHtml html={question?.answer_explanation || ""} />
-              </p>
+              <SafeHtml html={question?.answer_explanation || ""} />
             )}
             {!question?.answer_explanation && (
               <p className="italic text-muted-foreground">
