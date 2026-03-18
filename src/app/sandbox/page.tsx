@@ -67,6 +67,35 @@ const questionsData: QuestionRow[] = [
 
 export default function Home() {
   const [activePage, setActivePage] = React.useState(1);
+  const [unitValue, setUnitValue] = React.useState("unit-0");
+
+  const demoCourse = {
+    code: "CS101",
+    name: "Introduction to Computer Science",
+    year: 2024,
+    semester: "1",
+    description: "Sandbox preview course for UI testing",
+    units: [
+      {
+        name: "Introduction",
+        number: "1",
+        subtopics: [
+          {
+            name: "What is Computer Science?",
+            user_ability: null,
+          },
+        ],
+      },
+      {
+        name: "Programming Basics",
+        number: "2",
+        subtopics: [
+          { name: "Variables", user_ability: null },
+          { name: "Control Structures", user_ability: null },
+        ],
+      },
+    ],
+  };
   return (
     <main>
       <div>
@@ -171,6 +200,16 @@ export default function Home() {
             ))}
           </TableBody>
         </Table>
+        <div className="h-[100px]"></div>
+        <CourseCard course={demoCourse} progress={25} />
+        <div className="h-[100px]"></div>
+        <UnitsAccordion
+          tab="practiceProblems"
+          course={demoCourse}
+          value={unitValue}
+          setValue={setUnitValue}
+        />
+        <div className="h-[100px]"></div>
         <Questions />
       </div>
     </main>
