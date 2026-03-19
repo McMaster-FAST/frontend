@@ -13,14 +13,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { signIn, signOut, useSession } from "next-auth/react";
-import {
-  Book,
-  BookText,
-  ChevronDown,
-  Loader2,
-  LogOut,
-  User,
-} from "lucide-react";
+import { ChevronDown, Loader2, LogOut, User } from "lucide-react";
 import { useUserCourses } from "@/hooks/useUserCourses";
 
 export function MacFastHeader() {
@@ -36,7 +29,7 @@ export function MacFastHeader() {
         <div className="flex items-center gap-2">
           <Link
             href="/"
-            className="font-poppins text-xl font-bold tracking-tight hover:opacity-90 transition-opacity"
+            className="font-poppins text-xl font-bold tracking-tight hover:opacity-90 transition-opacity text-primary-foreground"
           >
             MacFAST
           </Link>

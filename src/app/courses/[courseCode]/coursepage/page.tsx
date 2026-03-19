@@ -24,7 +24,7 @@ function CoursePage() {
   const [openUnits, setOpenUnits] = useState<string>("");
 
   return (
-    <div className="h-screen flex flex-col overflow-hidden bg-slate-50/50 font-poppins">
+    <div className="h-screen flex flex-col overflow-hidden font-poppins">
       <MacFastHeader />
 
       <CourseBanner
@@ -68,9 +68,7 @@ function CoursePage() {
           >
             <div className="flex flex-col gap-4">
               <div className="mb-2">
-                <h2 className="text-lg font-semibold text-slate-800">
-                  Unit Breakdown
-                </h2>
+                <h2 className="text-lg font-semibold">Unit Breakdown</h2>
                 <p className="text-sm text-dark-gray">
                   Select a unit to view practice problems.
                 </p>
