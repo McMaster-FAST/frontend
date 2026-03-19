@@ -16,11 +16,14 @@ import { SafeHtml } from "@/components/ui/custom/safe-html";
 
 interface QuestionPreviewPageProps {
   // If provided, will use this question data instead of fetching it. Useful for previewing unsaved changes.
-  useQuestion: Question | null; 
+  useQuestion: Question | null;
   // Optional callback when user wants to return from preview
-  onReturn?: () => void; 
+  onReturn?: () => void;
 }
-export default function QuestionPreviewPage({ useQuestion, onReturn }: QuestionPreviewPageProps) {
+export default function QuestionPreviewPage({
+  useQuestion,
+  onReturn,
+}: QuestionPreviewPageProps) {
   const params = useParams();
   const courseCode = decodeURIComponent(params.courseCode as string);
   const questionId = decodeURIComponent(params.questionId as string);
@@ -87,24 +90,23 @@ export default function QuestionPreviewPage({ useQuestion, onReturn }: QuestionP
               onValueChange={setSelectedOption}
             >
               {question?.options &&
-                question.options.map((option: QuestionOption, index: number) => (
-                  <div
-                    key={index}
-                    className="flex items-center gap-2 w-full"
-                  >
-                    <RadioGroupItem
-                      value={option.public_id || `option-${index}`}
-                      className="cursor-pointer"
-                    />
-                    <div className="border-2 p-6 rounded-md items-center flex gap-2 w-full">
-                      <SafeHtml html={option.content || ""} />
+                question.options.map(
+                  (option: QuestionOption, index: number) => (
+                    <div key={index} className="flex items-center gap-2 w-full">
+                      <RadioGroupItem
+                        value={option.public_id || `option-${index}`}
+                        className="cursor-pointer"
+                      />
+                      <div className="border-2 p-6 rounded-md items-center flex gap-2 w-full">
+                        <SafeHtml html={option.content || ""} />
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ),
+                )}
             </RadioGroup>
           </QuestionPage.Options>
         </QuestionPage.QuestionBody>
-        <QuestionPage.Answer isLoading={isLoading}>
+        <QuestionPage.Answer isLoading={isLoading} isAnswered={true}>
           <QuestionPage.AnswerTitle>
             <p className="font-poppins text-2xl">
               <SafeHtml
@@ -118,9 +120,7 @@ export default function QuestionPreviewPage({ useQuestion, onReturn }: QuestionP
 
           <QuestionPage.AnswerBody>
             {question?.answer_explanation && (
-              <p>
-                <SafeHtml html={question?.answer_explanation || ""} />
-              </p>
+              <SafeHtml html={question?.answer_explanation || ""} />
             )}
             {!question?.answer_explanation && (
               <p className="italic text-muted-foreground">
