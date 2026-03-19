@@ -15,8 +15,7 @@ import {
 } from "@/lib/adaptive-test-api";
 import { useEffect } from "react";
 import { useAuthFetch } from "@/hooks/useFetchWithAuth";
-import { Skeleton } from "@/components/ui/skeleton";
-import { QuestionFlagDialog } from "@/components/ui/custom/question-flag-dialog";
+import { QuestionFlagDialog } from "@/components/ui/custom/report-question-dialog";
 import { resolveImages } from "@/lib/utils";
 import TestContinueDialog from "@/components/ui/custom/test-continue-dialog";
 
@@ -193,7 +192,8 @@ function QuestionTestPage({ params: paramsPromise }: QuestionTestPageProps) {
   };
 
   const handleSaveForLater = (checked: boolean) => {
-    setSavedForLaterDebounced(course, question.public_id, checked, authFetch);
+    if (!courseCode) return;
+    setSavedForLaterDebounced(courseCode, question.public_id, checked, authFetch);
     setSavedForLaterState(checked);
   };
   const handleQuestionFlag = async () => {
