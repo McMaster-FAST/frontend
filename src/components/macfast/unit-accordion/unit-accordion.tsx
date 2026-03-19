@@ -19,7 +19,11 @@ interface UnitsAccordionProps {
 }
 
 function UnitsAccordion({ tab, course, value, setValue }: UnitsAccordionProps) {
-  const getEncodedTestURI = (courseCode: string, unitName: string, subtopicName: string) => {
+  const getEncodedTestURI = (
+    courseCode: string,
+    unitName: string,
+    subtopicName: string,
+  ) => {
     const encodedCourseCode = encodeURIComponent(courseCode);
     const encodedUnitName = encodeURIComponent(unitName);
     const encodedSubtopicName = encodeURIComponent(subtopicName);
@@ -69,7 +73,9 @@ function UnitsAccordion({ tab, course, value, setValue }: UnitsAccordionProps) {
                 {tab === "practiceProblems" && (
                   <span
                     className={`text-sm font-normal hidden sm:inline-block ${
-                      attemptedCount > 0 ? "text-dark-gray" : "text-primary"
+                      attemptedCount > 0
+                        ? "text-foreground"
+                        : "text-muted-foreground"
                     }`}
                   >
                     {attemptedCount > 0
@@ -103,8 +109,8 @@ function UnitsAccordion({ tab, course, value, setValue }: UnitsAccordionProps) {
                         <span
                           className={`flex flex-1 text-sm justify-center ${
                             subtopic.user_ability?.mastery_value
-                              ? "text-dark-gray"
-                              : "text-primary"
+                              ? "text-foreground"
+                              : "text-muted-foreground"
                           }`}
                         >
                           {subtopic.user_ability?.mastery_value
@@ -114,7 +120,11 @@ function UnitsAccordion({ tab, course, value, setValue }: UnitsAccordionProps) {
                         <div className="flex-0 flex justify-end">
                           <Button variant="secondary" className="text-sm">
                             <Link
-                              href={getEncodedTestURI(course.code, unit.name, subtopic.name)}
+                              href={getEncodedTestURI(
+                                course.code,
+                                unit.name,
+                                subtopic.name,
+                              )}
                             >
                               Practice
                             </Link>
@@ -126,7 +136,7 @@ function UnitsAccordion({ tab, course, value, setValue }: UnitsAccordionProps) {
                   {tab === "learningObjectives" &&
                     subtopic.description &&
                     subtopic.description.length > 0 && (
-                      <p className="mt-2 ml-6 leading-tight text-sm text-dark-gray font-medium">
+                      <p className="mt-2 ml-6 leading-tight text-sm text-muted-foreground font-medium">
                         {subtopic.description}
                       </p>
                     )}

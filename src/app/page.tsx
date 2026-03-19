@@ -35,10 +35,10 @@ export default function Home() {
       <main className="flex-1 px-6 py-10 md:px-8 lg:px-28">
         <div className="mx-auto">
           <div className="mb-8 flex items-baseline justify-between">
-            <h2 className="font-poppins text-2xl font-bold text-dark-gray">
+            <h2 className="font-poppins text-2xl font-bold text-muted-foreground">
               Your Courses
             </h2>
-            <span className="text-md text-primary font-semibold">
+            <span className="text-md text-primary dark:text-primary-hover font-semibold">
               {userCourses.length} Active
             </span>
           </div>
@@ -52,8 +52,8 @@ export default function Home() {
       </main>
 
       {/* Footer */}
-      <footer className="mt-auto flex flex-col items-center border-t border-light-gray bg-white py-12">
-        <h3 className="mb-6 font-['Inter'] text-sm font-semibold uppercase tracking-widest text-dark-gray">
+      <footer className="mt-auto flex flex-col items-center bg-background py-12">
+        <h3 className="mb-6 font-['Inter'] text-sm font-semibold uppercase tracking-widest text-muted-foreground">
           Supported By
         </h3>
 
@@ -63,7 +63,7 @@ export default function Home() {
             href="https://chemistry.mcmaster.ca/"
             target="_blank"
             rel="noopener noreferrer"
-            className="transition-all duration-300 hover:scale-105 hover:opacity-100 grayscale hover:grayscale-0"
+            className=""
           >
             <Image
               src="/sponsors/mcmaster-logo.png"

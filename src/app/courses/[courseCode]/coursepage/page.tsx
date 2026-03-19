@@ -69,7 +69,7 @@ function CoursePage() {
             <div className="flex flex-col gap-4">
               <div className="mb-2">
                 <h2 className="text-lg font-semibold">Unit Breakdown</h2>
-                <p className="text-sm text-dark-gray">
+                <p className="text-sm text-muted-foreground">
                   Select a unit to view practice problems.
                 </p>
               </div>
@@ -107,10 +107,10 @@ function CoursePage() {
           >
             <div className="flex flex-col gap-4">
               <div className="mb-2">
-                <h2 className="text-lg font-semibold text-slate-800">
+                <h2 className="text-lg font-semibold text-foreground">
                   Learning Objectives
                 </h2>
-                <p className="text-sm text-dark-gray">
+                <p className="text-sm text-muted-foreground">
                   Click on a unit to view detailed learning objectives.
                 </p>
               </div>
@@ -144,7 +144,7 @@ function CoursePage() {
             value="statistics"
             className="mt-0 flex-1 overflow-y-auto min-h-0 pr-2"
           >
-            <div className="rounded-lg border border-dashed border-light-gray p-10 text-center text-dark-gray">
+            <div className="rounded-lg border border-dashed border-light-gray p-10 text-center text-muted-foreground">
               Statistics Dashboard Coming Soon
             </div>
           </TabsContent>
@@ -153,7 +153,7 @@ function CoursePage() {
             value="savedQuestions"
             className="mt-0 flex-1 overflow-y-auto min-h-0 pr-2"
           >
-            <div className="rounded-lg border border-dashed border-light-gray p-10 text-center text-dark-gray">
+            <div className="rounded-lg border border-dashed border-light-gray p-10 text-center text-muted-foreground">
               No saved questions yet.
             </div>
           </TabsContent>

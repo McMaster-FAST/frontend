@@ -32,7 +32,7 @@ export function CompletionBar({
         />
       </div>
 
-      <div className="shrink-0 text-xs text-dark-gray font-medium tracking-wide">
+      <div className="shrink-0 text-xs text-muted-foreground font-medium tracking-wide">
         {correct}/{total}
       </div>
     </div>
