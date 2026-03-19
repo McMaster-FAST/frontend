@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { NotebookPen } from "lucide-react";
+import { NotebookPen, RotateCcw, Trash, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { SafeHtmlInline } from "@/components/ui/custom/safe-html";
@@ -37,11 +37,14 @@ export default function SavedQuestionItem({
           </div>
         </CardContent>
       </div>
-      <Button variant="primary">
-        <Link href={`./question/${question.public_id}`}>Review</Link>
+      <Button variant="tertiary">
+        <Link className="inline-flex items-center gap-2" href={`./question/${question.public_id}`}>
+          <RotateCcw />
+          Review
+        </Link>
       </Button>
       <Button
-        variant="secondary"
+        variant="tertiary"
         onClick={() =>
           setSavedForLater(
             question.course_code,
@@ -51,6 +54,7 @@ export default function SavedQuestionItem({
           ).then(() => onRemove())
         }
       >
+        <Trash2 />
         Remove
       </Button>
     </Card>
