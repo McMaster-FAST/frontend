@@ -40,7 +40,7 @@ export function CourseBanner({
             })}
           >
             <div className="mb-2 flex w-full items-center gap-2">
-              <Badge variant="secondary" className="font-bold text-dark-gray">
+              <Badge variant="secondary" className="font-bold text-foreground">
                 {isLoading || !course ? (
                   <Skeleton className="h-4 w-20" />
                 ) : error ? (
