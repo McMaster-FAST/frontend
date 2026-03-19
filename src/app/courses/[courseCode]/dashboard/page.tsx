@@ -100,7 +100,7 @@ function InstructorDashboardPage() {
           <TabsContent value="classList" className="mt-0">
             {course?.code && <ClassList courseCode={course.code} />}
           </TabsContent>
-          <TabsContent value="questionReports" className="mt-0">
+          <TabsContent value="questionReports" className="flex-1 flex flex-col min-h-0 mt-0">
             <QuestionReportsTab />
           </TabsContent>
         </Tabs>

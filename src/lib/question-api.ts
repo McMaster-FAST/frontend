@@ -9,22 +9,42 @@ export async function reportQuestion(
   contactConsent: boolean,
   authFetch: typeof fetchWithAuth,
 ) {
-  await authFetch(
-    `/api/questions/c6b5cc55-3a44-41a2-935a-d76598a704c9/reports/`,
+  await authFetch(`/api/questions/${questionId}/reports/`, {
+    method: "POST",
+    body: JSON.stringify({
+      report_reasons: reasons.map(
+        (reason: QuestionReportReason) =>
+          QuestionReportReason[
+            reason.toString() as keyof typeof QuestionReportReason
+          ],
+      ),
+      additional_details: additionalDetails,
+      contact_consent: contactConsent,
+    }),
+  });
+}
+
+export async function getAggregateReports(
+  courseCode: string,
+  authFetch: typeof fetchWithAuth,
+) {
+  const response = await authFetch(
+    `/api/courses/${courseCode}/aggregate-reports/`,
     {
-      method: "POST",
-      body: JSON.stringify({
-        report_reasons: reasons.map(
-          (reason: QuestionReportReason) =>
-            QuestionReportReason[
-              reason.toString() as keyof typeof QuestionReportReason
-            ],
-        ),
-        additional_details: additionalDetails,
-        contact_consent: contactConsent,
-      }),
+      method: "GET",
     },
   );
+  return getJson(response);
+}
+
+export async function getQuestionReports(
+  questionId: string,
+  authFetch: typeof fetchWithAuth,
+) {
+  const response = await authFetch(`/api/questions/${questionId}/reports/`, {
+    method: "GET",
+  });
+  return getJson(response);
 }
 
 /**

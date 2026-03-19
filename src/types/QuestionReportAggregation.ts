@@ -1,9 +1,9 @@
-interface QuestionReportAggregation {
-    question_id: string;
-    report_reasons: ReportReasonAggregation[];
-}
+import { QuestionReportReason } from "./QuestionReportReason";
 
-interface ReportReasonAggregation {
-    reason: string;
-    count: number;
+export default interface QuestionReportAggregation {
+    question: Question;
+    unit: Unit;
+    subtopic: Subtopic;
+    reason_counts: Map<QuestionReportReason, number>;
+    total_reports: number;
 }

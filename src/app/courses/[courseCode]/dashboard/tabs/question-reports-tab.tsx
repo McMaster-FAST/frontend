@@ -1,6 +1,9 @@
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import ReportsSheet from "@/components/ui/custom/reports/reports-sheet";
+import { SafeHtmlInline } from "@/components/ui/custom/safe-html";
 import { SearchBar } from "@/components/ui/custom/search-bar";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -11,35 +14,38 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { FileQuestion } from "lucide-react";
-import { useState } from "react";
+import { useCourseData } from "@/hooks/useCourseData";
+import { useAuthFetch } from "@/hooks/useFetchWithAuth";
+import { getAggregateReports } from "@/lib/question-api";
+import QuestionReportAggregation from "@/types/QuestionReportAggregation";
 
-const filteredReports = [
-  {
-    question_id: "abc123",
-    report_reasons: [
-      { reason: "Formatting of text", count: 3 },
-      { reason: "Images were incorrect", count: 1 },
-    ],
-  },
-  {
-    question_id: "def456",
-    report_reasons: [{ reason: "Formatting of images", count: 2 }],
-  },
-];
+import { FileQuestion } from "lucide-react";
+import { useEffect, useState } from "react";
+
 export default function QuestionReportsTab() {
-  const [search, setSearch] = useState("");
-  //   const [filteredReports, setFilteredReports] = useState<
-  //     QuestionReportAggregation[]
-  //   >([]);
-  // Report aggregations on a per-question basis
-  const [reportAggregations, setReportAggregations] = useState<
-    QuestionReportAggregation[]
-  >([]);
-  const isLoading = false;
+  const [reports, setReports] = useState<QuestionReportAggregation[]>([]);
+  const [selectedQuestion, setSelectedQuestion] = useState<string>("");
+  const { course, isLoading, error, refetch: _, courseCode } = useCourseData();
+  const authFetch = useAuthFetch();
+  const [reportSheetOpen, setReportSheetOpen] = useState(false);
+
+  useEffect(() => {
+    if (!courseCode) return;
+    getAggregateReports(courseCode, authFetch).then((data) => {
+      const reports = data as QuestionReportAggregation[];
+      reports.map((report) => {
+        report.total_reports = Object.values(report.reason_counts).reduce(
+          (total, count) => total + count,
+          0,
+        );
+      });
+      setReports(reports.sort((a, b) => b.total_reports - a.total_reports));
+    });
+  }, []);
+
   return (
-    <div className="w-full">
-      <Card className="w-full border-light-gray shadow-sm">
+    <div className="w-full h-full font-poppins">
+      <Card className="w-full h-full border-light-gray shadow-sm flex flex-col">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
           <div className="flex flex-col gap-1">
             <CardTitle className="text-lg font-bold text-slate-800">
@@ -49,19 +55,14 @@ export default function QuestionReportsTab() {
               View aggregated user reports for questions in this course
             </p>
           </div>
-
-          <SearchBar
-            className="w-64"
-            placeholder="Search by question..."
-            onSearch={setSearch}
-          />
         </CardHeader>
 
-        <CardContent className="p-0 border-t border-slate-100">
-          <Table>
+        <CardContent className="p-0 border-t border-slate-100 flex-1 flex flex-col overflow-hidden">
+          <Table className="h-full w-full table-fixed">
             <TableHeader className="bg-slate-50/50">
               <TableRow className="hover:bg-transparent">
-                <TableHead className="">Question ID</TableHead>
+                <TableHead className="w-1/2">Question</TableHead>
+                <TableHead className="min-w-fit">Section</TableHead>
                 <TableHead className="max-w-fit">Total reports</TableHead>
               </TableRow>
             </TableHeader>
@@ -71,45 +72,48 @@ export default function QuestionReportsTab() {
                 Array.from({ length: 5 }).map((_, i) => (
                   <TableRow key={i}>
                     <TableCell className="pl-6">
-                      <Skeleton className="h-4 w-32" />
+                      <Skeleton className="h-4 w-1/2" />
                     </TableCell>
                     <TableCell>
-                      <Skeleton className="h-4 w-16" />
+                      <Skeleton className="h-4 w-1/4" />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className="h-4 w-1/4" />
                     </TableCell>
                   </TableRow>
                 ))
-              ) : filteredReports.length === 0 ? (
+              ) : reports.length === 0 ? (
                 <TableRow>
                   <TableCell
-                    colSpan={4}
+                    colSpan={3}
                     className="h-32 text-center text-muted-foreground"
                   >
                     <div className="flex flex-col items-center justify-center gap-2">
                       <FileQuestion className="h-8 w-8 text-slate-300" />
-                      <p>
-                        {search
-                          ? "No questions matching your search"
-                          : "There are no questions."}
-                      </p>
+                      <p>There are no questions.</p>
                     </div>
                   </TableCell>
                 </TableRow>
               ) : (
-                filteredReports.map((report) => (
+                reports.map((report) => (
                   <TableRow
-                    key={report.question_id}
-                    className="group hover:bg-slate-50/50 transition-colors"
+                    key={report.question.public_id}
+                    onClick={() => {
+                      setSelectedQuestion(report.question.public_id);
+                      setReportSheetOpen(true);
+                    }}
                   >
-                    <TableCell className="pl-6">
-                      <p className="text-sm font-semibold text-slate-900">
-                        {report.question_id}
+                    <TableCell className="whitespace-normal break-words align-top truncate">
+                      <SafeHtmlInline html={report.question.content} />
+                    </TableCell>
+                    <TableCell className="whitespace-normal break-words align-top">
+                      <p className="text-sm text-slate-700">
+                        {report.subtopic.name}
                       </p>
                     </TableCell>
-                    <TableCell>
-                      {report.report_reasons.reduce(
-                        (total, reason) => total + reason.count,
-                        0,
-                      )}
+                    <TableCell className="align-top">
+                      {report?.reason_counts &&
+                        Object.entries(report.reason_counts).length}
                     </TableCell>
                   </TableRow>
                 ))
@@ -118,6 +122,11 @@ export default function QuestionReportsTab() {
           </Table>
         </CardContent>
       </Card>
+      <ReportsSheet
+        questionId={selectedQuestion}
+        open={reportSheetOpen}
+        onOpenChange={setReportSheetOpen}
+      />
     </div>
   );
 }
