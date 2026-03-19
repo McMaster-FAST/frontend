@@ -34,6 +34,7 @@ import { setSavedForLaterDebounced } from "@/lib/api";
 import { QuestionPage } from "@/components/ui/custom/question-page";
 import { MacFastHeader } from "@/components/ui/custom/macfast-header";
 import { SafeHtml } from "@/components/ui/custom/safe-html";
+import SaveForLater from "@/components/ui/custom/save-for-later";
 
 interface QuestionTestPageProps {
   params: Promise<{
@@ -191,11 +192,6 @@ function QuestionTestPage({ params: paramsPromise }: QuestionTestPageProps) {
     updateWithNewQuestion(skipQuestion(question.public_id, authFetch));
   };
 
-  const handleSaveForLater = (checked: boolean) => {
-    if (!courseCode) return;
-    setSavedForLaterDebounced(courseCode, question.public_id, checked, authFetch);
-    setSavedForLaterState(checked);
-  };
   const handleQuestionFlag = async () => {
     // Implement question flagging functionality here
   };
@@ -210,10 +206,6 @@ function QuestionTestPage({ params: paramsPromise }: QuestionTestPageProps) {
     if (!subtopic) return;
     setSubtopicId(subtopic.public_id);
   }, [course]);
-
-  useEffect(() => {
-    setSavedForLaterState(question?.saved_for_later || false);
-  }, [question]);
 
   useEffect(() => {
     if (!subtopicId) return;
@@ -331,14 +323,11 @@ function QuestionTestPage({ params: paramsPromise }: QuestionTestPageProps) {
             <QuestionFlagDialog onSubmit={handleQuestionFlag} />
           </div>
           <div className="inline-flex items-center gap-4">
-            <div className="inline-flex gap-2">
-              <Checkbox
-                disabled={!!error}
-                checked={savedForLater}
-                onCheckedChange={handleSaveForLater}
-              />
-              <Label htmlFor="save-for-later">Save for Later</Label>
-            </div>
+            <SaveForLater
+              courseCode={courseCode}
+              question={question}
+              error={error}
+            />
             <Button
               variant="secondary"
               disabled={submitted || !!error}

@@ -114,12 +114,13 @@ export async function setSavedForLater(
   saveForLater: boolean,
   authFetch: ReturnType<typeof useAuthFetch>,
 ) {
-  await authFetch(`/api/core/saved-for-later/${courseCode}/`, {
+  const repsonse = await authFetch(`/api/core/saved-for-later/${courseCode}/`, {
     method: saveForLater ? "POST" : "DELETE",
     body: JSON.stringify({
       question_public_id: questionId,
     }),
   });
+  return getJson(repsonse);
 }
 
 export async function getQuestionById(
