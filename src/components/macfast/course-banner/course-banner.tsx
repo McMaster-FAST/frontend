@@ -26,7 +26,7 @@ export function CourseBanner({
   const isCourseVariant = variant === "course";
 
   return (
-    <div className="border-b border-light-gray bg-background px-6 py-8 shadow-sm">
+    <div className="border-b border-muted-foreground bg-background px-6 py-8 shadow-sm">
       <div className="mx-auto max-w-7xl">
         <div
           className={cn("flex flex-col gap-4", {

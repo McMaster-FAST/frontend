@@ -62,7 +62,7 @@ export function MacFastHeader() {
                     <DropdownMenuItem
                       key={course.code}
                       asChild
-                      className="focus:bg-primary-hover"
+                      className="focus:bg-primary-hover dark:focus:bg-primary"
                     >
                       <Link
                         href={`/courses/${course.code}/coursepage`}
@@ -71,7 +71,7 @@ export function MacFastHeader() {
                         <div className="text-sm font-semibold leading-none">
                           {course.code}
                         </div>
-                        <div className="line-clamp-1 text-xs text-muted-foreground">
+                        <div className="line-clamp-1 text-sm text-muted-foreground">
                           {course.name}
                         </div>
                       </Link>
