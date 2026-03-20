@@ -26,7 +26,7 @@ type CourseCardProps = {
 
 function CourseCard({ course, progress }: CourseCardProps) {
   return (
-    <Card className="group relative flex w-full flex-col overflow-hidden border-light-gray bg-card-background transition-all hover:-translate-y-1 hover:shadow-lg">
+    <Card className="group relative flex w-full flex-col overflow-hidden border-light-gray dark:border-dark-gray bg-card transition-all hover:-translate-y-1 hover:shadow-lg">
       <div className="h-40 bg-gradient-to-br from-light-gray to-dark-gray p-4 transition-colors group-hover:from-text-gold group-hover:to-text-maroon">
         <div className="flex justify-between items-start">
           <Badge
@@ -54,7 +54,7 @@ function CourseCard({ course, progress }: CourseCardProps) {
           <span>{course.semester}</span>
         </div>
 
-        <p className="line-clamp-3 text-sm leading-relaxed text-muted-foreground">
+        <p className="line-clamp-3 text-sm font-medium leading-relaxed text-muted-foreground">
           {course.description}
         </p>
 

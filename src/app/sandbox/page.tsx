@@ -34,7 +34,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import CourseCard from "@/components/macfast/course-card";
+import CourseCard from "@/components/macfast/course-card/course-card";
 import UnitsAccordion from "@/components/macfast/unit-accordion/unit-accordion";
 import { Questions } from "@/app/courses/[courseCode]/dashboard/tabs/questions-tab";
 import CommentsSheet from "@/components/macfast/comments/comments-sheet";
