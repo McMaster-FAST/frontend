@@ -126,12 +126,12 @@ export function MacFastHeader() {
                 <DropdownMenuSeparator />
 
                 <DropdownMenuItem
-                  className="cursor-pointer"
+                  className="cursor-pointer py-2"
                   onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
                 >
                   <span>Toggle theme</span>
-                  <Sun className="mr-2 h-4 w-4 hidden dark:block" />
-                  <Moon className="mr-2 h-4 w-4 dark:hidden" />
+                  <Sun className="mr-2 h-4 w-4 hidden dark:block text-yellow-500" />
+                  <Moon className="mr-2 h-4 w-4 dark:hidden text-blue-500" />
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
