@@ -23,7 +23,7 @@ export function AbilityScoreBar({
           "relative h-1.5 w-full overflow-hidden rounded-full",
           isUnattempted
             ? "bg-transparent border border-dashed border-light-gray"
-            : "bg-foreground",
+            : "bg-light-gray dark:bg-dark-gray",
           className,
         )}
       >

@@ -8,7 +8,6 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import { Video } from "lucide-react";
 import Link from "next/link";
 import { AbilityScoreBar } from "../ability-score-bar/ability-score-bar";
-import { AnimatedXPBar } from "../level-xp-bar/level-xp-bar";
 import { CompletionBar } from "../completion-bar/completion-bar";
 
 interface UnitsAccordionProps {

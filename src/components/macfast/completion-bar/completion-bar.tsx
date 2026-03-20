@@ -27,7 +27,7 @@ export function CompletionBar({
       <div className="flex-1">
         <Progress
           value={percentage}
-          className="h-1.5 bg-light-gray"
+          className="h-1.5 bg-light-gray dark:bg-dark-gray"
           indicatorClassName="bg-maroon-light duration-1000 ease-out"
         />
       </div>
