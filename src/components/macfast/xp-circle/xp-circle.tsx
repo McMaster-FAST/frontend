@@ -19,7 +19,7 @@ export const XpCircle = ({
   className,
 }: XpCircleProps) => {
   if (isLoading) {
-    return <Skeleton className={cn("rounded-full bg-slate-100", className)} />;
+    return <Skeleton className={cn("rounded-full bg-background", className)} />;
   }
 
   // Define SVG constants
@@ -57,7 +57,7 @@ export const XpCircle = ({
 
         {/* Background Gray Ring */}
         <circle
-          className="stroke-slate-100 fill-none"
+          className="stroke-muted-foreground fill-none"
           cx={center}
           cy={center}
           r={radius}

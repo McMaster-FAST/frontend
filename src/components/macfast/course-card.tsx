@@ -4,7 +4,7 @@ import {
   CardFooter,
   CardHeader,
 } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
+import { CompletionBar } from "@/components/macfast/completion-bar/completion-bar";
 import { ArrowRight, BookOpen, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -59,11 +59,7 @@ function CourseCard({ course, progress }: CourseCardProps) {
         </p>
 
         <div className="mt-auto space-y-2 pt-2">
-          <div className="flex justify-between text-xs font-medium text-muted-foreground">
-            <span>Progress</span>
-            <span>{progress}%</span>
-          </div>
-          <Progress value={progress} className="h-2" />
+          <CompletionBar correct={progress} total={100} className="h-2" />
         </div>
       </CardContent>
 

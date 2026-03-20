@@ -13,7 +13,7 @@ const buttonVariants = cva(
         secondary:
           "bg-secondary text-secondary-foreground dark:bg-background dark:text-foreground shadow-[inset_0_0_0_2px_var(--color-secondary-foreground)] hover:bg-secondary-hover hover:text-white dark:hover:bg-secondary-hover dark:hover:text-white disabled:bg-disabled-primary disabled:shadow-[inset_0_0_0_2px_var(--color-disabled-secondary)]",
         tertiary:
-          "text-tertiary-foreground hover:text-tertiary-hover-foreground focus:ring-0 [&_svg]:text-primary [&_svg]:stroke-sm",
+          "text-tertiary-foreground dark:text-foreground hover:text-tertiary-hover-foreground dark:hover:text-primary-hover focus:ring-0 [&_svg]:text-primary [&_svg]:stroke-sm",
       },
       size: {
         default:

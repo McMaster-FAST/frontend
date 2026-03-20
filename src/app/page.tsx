@@ -13,7 +13,7 @@ export default function Home() {
 
   if (error && (error as any).status === 403) {
     return (
-      <div className="flex min-h-screen flex-col bg-slate-50/50">
+      <div className="flex min-h-screen flex-col bg-background">
         <MacFastHeader />
         <main className="flex-1 px-6 py-10 md:px-12">
           <div className="mx-auto max-w-7xl">

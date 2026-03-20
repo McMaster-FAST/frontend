@@ -53,7 +53,7 @@ function Header({ children }: { children: React.ReactNode }) {
 
 function Title({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex flex-row font-poppins font-semibold text-xl items-center gap-2 text-dark-gray">
+    <div className="flex flex-row font-poppins font-semibold text-xl items-center gap-2 text-foreground">
       {children}
     </div>
   );
@@ -78,7 +78,7 @@ function QuestionBody({
 
 function Actions({ children }: { children: React.ReactNode }) {
   return (
-    <footer className="flex flex-row gap-4 sticky bottom-0 left-0 w-full p-4 border-t-2 bg-white">
+    <footer className="flex flex-row gap-4 sticky bottom-0 left-0 w-full p-4 border-t-2 bg-background">
       {children}
     </footer>
   );

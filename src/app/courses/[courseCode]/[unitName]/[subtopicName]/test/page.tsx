@@ -258,13 +258,13 @@ function QuestionTestPage({ params: paramsPromise }: QuestionTestPageProps) {
                   >
                     <RadioGroupItem
                       value={option.public_id}
-                      className="cursor-pointer"
+                      className="cursor-pointer dark:data-[state=checked]:bg-primary-hover data-[state=checked]:bg-primary peer"
                     />
                     <div
                       className={
                         "border-2 p-6 rounded-md items-center flex gap-2 w-full" +
                         (correctOptionId === option.public_id
-                          ? " border-primary"
+                          ? " border-primary dark:border-primary-hover"
                           : "")
                       }
                     >

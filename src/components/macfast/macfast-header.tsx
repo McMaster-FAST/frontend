@@ -13,13 +13,15 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { signIn, signOut, useSession } from "next-auth/react";
-import { ChevronDown, Loader2, LogOut, User } from "lucide-react";
+import { ChevronDown, Loader2, LogOut, Moon, Sun, User } from "lucide-react";
 import { useUserCourses } from "@/hooks/useUserCourses";
+import { useTheme } from "next-themes";
 
 export function MacFastHeader() {
   const { courses: userCourses, isLoading: isLoadingCourses } =
     useUserCourses();
   const { data: session, status } = useSession();
+  const { theme, setTheme } = useTheme();
   const isLoading = status === "loading";
   const isAuthenticated = status === "authenticated";
 
@@ -123,15 +125,17 @@ export function MacFastHeader() {
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
 
-                <DropdownMenuItem asChild>
-                  <Link href="/profile" className="cursor-pointer">
-                    <User className="mr-2 h-4 w-4" />
-                    <span>Profile</span>
-                  </Link>
+                <DropdownMenuItem
+                  className="cursor-pointer"
+                  onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                >
+                  <span>Toggle theme</span>
+                  <Sun className="mr-2 h-4 w-4 hidden dark:block" />
+                  <Moon className="mr-2 h-4 w-4 dark:hidden" />
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
-                  className="text-red-600 focus:text-red-600 cursor-pointer"
+                  className="text-red-600 dark:text-red-400 cursor-pointer"
                   onClick={() => signOut({ redirectTo: "/" })}
                 >
                   <LogOut className="mr-2 h-4 w-4" />

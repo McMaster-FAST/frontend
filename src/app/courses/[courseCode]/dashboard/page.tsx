@@ -12,7 +12,7 @@ function InstructorDashboardPage() {
   const { course, isLoading, error } = useCourseData();
 
   return (
-    <div className="h-screen flex flex-col overflow-hidden bg-slate-50/50 font-poppins">
+    <div className="h-screen flex flex-col overflow-hidden bg-background font-poppins">
       <MacFastHeader />
 
       <CourseBanner

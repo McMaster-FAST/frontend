@@ -45,7 +45,7 @@ export function ClassList({ courseCode }: ClassListProps) {
       <Card className="w-full border-light-gray shadow-sm">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
           <div className="flex flex-col gap-1">
-            <CardTitle className="text-lg font-bold text-slate-800">
+            <CardTitle className="text-lg font-bold text-foreground">
               Enrolled Students
             </CardTitle>
             <p className="text-sm text-muted-foreground">
@@ -60,12 +60,16 @@ export function ClassList({ courseCode }: ClassListProps) {
           />
         </CardHeader>
 
-        <CardContent className="p-0 border-t border-slate-100">
+        <CardContent className="p-0 border-t border-foreground">
           <Table>
-            <TableHeader className="bg-slate-50/50">
+            <TableHeader className="bg-background">
               <TableRow className="hover:bg-transparent">
-                <TableHead className="w-[70%] pl-6">User Name</TableHead>
-                <TableHead className="w-[30%]">Role</TableHead>
+                <TableHead className="w-[70%] pl-6 text-primary-hover uppercase font-bold">
+                  username
+                </TableHead>
+                <TableHead className="w-[30%] text-primary-hover uppercase font-bold">
+                  role
+                </TableHead>
               </TableRow>
             </TableHeader>
 
@@ -88,7 +92,7 @@ export function ClassList({ courseCode }: ClassListProps) {
                     className="h-32 text-center text-muted-foreground"
                   >
                     <div className="flex flex-col items-center justify-center gap-2">
-                      <User className="h-8 w-8 text-slate-300" />
+                      <User className="h-8 w-8 text-muted-foreground" />
                       <p>
                         {search
                           ? "No students found matching your search."
@@ -101,12 +105,12 @@ export function ClassList({ courseCode }: ClassListProps) {
                 filteredStudents.map((student) => (
                   <TableRow
                     key={student.id}
-                    className="group hover:bg-slate-50/50 transition-colors"
+                    className="group transition-colors"
                   >
                     <TableCell className="font-medium pl-6 py-4">
                       <div className="flex items-center gap-3">
                         <div>
-                          <p className="text-sm font-semibold text-slate-900">
+                          <p className="text-sm font-semibold text-foreground">
                             {student.user_name}
                           </p>
                         </div>
@@ -124,7 +128,7 @@ export function ClassList({ courseCode }: ClassListProps) {
                       ) : (
                         <Badge
                           variant="secondary"
-                          className="bg-slate-100 text-slate-600 hover:bg-slate-200"
+                          className="bg-background text-foreground hover:text-primary-hover"
                         >
                           Student
                         </Badge>
@@ -137,8 +141,8 @@ export function ClassList({ courseCode }: ClassListProps) {
           </Table>
         </CardContent>
 
-        <div className="flex items-center justify-between border-t border-slate-100 px-6 py-4 bg-slate-50/50">
-          <p className="text-xs text-muted-foreground">
+        <div className="flex items-center justify-between border-t border-muted-foreground px-6 py-4 bg-background">
+          <p className="text-sm text-muted-foreground">
             Showing {filteredStudents.length} of {enrolments?.length || 0}{" "}
             enrolled users
           </p>

@@ -50,7 +50,7 @@ export function CourseBanner({
                 )}
               </Badge>
 
-              <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+              <span className="text-xs font-medium uppercase tracking-wider text-foreground">
                 {isLoading || !course ? (
                   <Skeleton className="h-4 w-20" />
                 ) : error ? null : (
@@ -61,9 +61,9 @@ export function CourseBanner({
               {!isCourseVariant && variant === "instructor" && (
                 <Badge
                   variant="secondary"
-                  className="ml-auto font-bold text-dark-gray"
+                  className="ml-auto font-bold text-foreground"
                 >
-                  <LayoutDashboard className="mr-1 inline-block h-4 w-4 text-dark-gray" />
+                  <LayoutDashboard className="mr-1 inline-block h-4 w-4 text-foreground" />
                   Instructor Dashboard
                 </Badge>
               )}
@@ -71,9 +71,9 @@ export function CourseBanner({
               {!isCourseVariant && variant === "question-edit" && (
                 <Badge
                   variant="secondary"
-                  className="ml-auto font-bold text-dark-gray"
+                  className="ml-auto font-bold text-foreground"
                 >
-                  <Pencil className="mr-1 inline-block h-4 w-4 text-dark-gray" />
+                  <Pencil className="mr-1 inline-block h-4 w-4 text-foreground" />
                   Editing Question
                 </Badge>
               )}
