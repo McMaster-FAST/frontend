@@ -22,7 +22,17 @@ export default function Home() {
     setResumeNotice(null);
     try {
       const target = await getResumeTarget(courseCode, authFetch);
-      const url = `/courses/${encodeURIComponent(target.course_code)}/${encodeURIComponent(target.unit_name)}/${encodeURIComponent(target.subtopic_name)}/test`;
+      if (
+        !target.course_code?.trim() ||
+        !target.unit_name?.trim() ||
+        !target.subtopic_name?.trim()
+      ) {
+        setResumeNotice(
+          "Resume data from the server was incomplete. Please open the course and pick a subtopic.",
+        );
+        return;
+      }
+      const url = `/courses/${encodeURIComponent(target.course_code.trim())}/${encodeURIComponent(target.unit_name.trim())}/${encodeURIComponent(target.subtopic_name.trim())}/test`;
       router.push(url);
     } catch (err) {
       if (err instanceof NoResumeStateError) {

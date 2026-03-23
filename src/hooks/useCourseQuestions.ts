@@ -11,6 +11,22 @@ interface UseCourseQuestionsOptions {
   filters?: QuestionFilters;
 }
 
+/** Backend may return a raw array or a paginated object ({ results: [...] }). */
+function normalizeQuestionsPayload(data: unknown): Question[] {
+  if (Array.isArray(data)) {
+    return data;
+  }
+  if (
+    data &&
+    typeof data === "object" &&
+    "results" in data &&
+    Array.isArray((data as { results: unknown }).results)
+  ) {
+    return (data as { results: Question[] }).results;
+  }
+  return [];
+}
+
 export function useCourseQuestions({
   manualCode,
   searchQuery = "",
@@ -22,18 +38,15 @@ export function useCourseQuestions({
   const rawCode = manualCode || (params?.courseCode as string);
   const courseCode = rawCode ? decodeURIComponent(rawCode) : null;
 
-  const fetcher = useCallback(
-    async (url: string): Promise<Question[]> => {
-      const res = await authFetch(url);
-      if (!res.ok) {
-        const error = new Error("Failed to fetch questions");
-        (error as any).status = res.status;
-        throw error;
-      }
-      return res.json();
-    },
-    [authFetch],
-  );
+  const fetcher = useCallback(async (url: string): Promise<unknown> => {
+    const res = await authFetch(url);
+    if (!res.ok) {
+      const error = new Error("Failed to fetch questions");
+      (error as any).status = res.status;
+      throw error;
+    }
+    return res.json();
+  }, [authFetch]);
 
   let endpoint = null;
 
@@ -69,7 +82,7 @@ export function useCourseQuestions({
     endpoint = queryString ? `${baseUrl}?${queryString}` : baseUrl;
   }
 
-  const { data, error, isLoading, mutate } = useSWR<Question[]>(
+  const { data, error, isLoading, mutate } = useSWR<unknown>(
     endpoint,
     fetcher,
     {
@@ -80,7 +93,7 @@ export function useCourseQuestions({
   );
 
   return {
-    questions: data || [],
+    questions: normalizeQuestionsPayload(data),
     isLoading,
     error,
     refetch: mutate,

@@ -35,7 +35,12 @@ export async function getResumeTarget(
   );
 
   if (response.ok) {
-    return (await response.json()) as ResumeTarget;
+    const data = (await response.json()) as ResumeTarget;
+    return {
+      course_code: data.course_code?.trim() ?? "",
+      unit_name: data.unit_name?.trim() ?? "",
+      subtopic_name: data.subtopic_name?.trim() ?? "",
+    };
   }
 
   if (response.status === 404) {

@@ -1,5 +1,4 @@
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { auth } from "@/auth";
 import { useAuthFetch } from "@/hooks/useFetchWithAuth";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
@@ -14,7 +13,15 @@ export async function getJson(response: Response) {
   }
 
   if (!response.ok) {
-    throw new Error(json?.error || "Error fetching data");
+    const detail = json?.detail;
+    const detailStr = Array.isArray(detail)
+      ? detail.map(String).join(" ")
+      : typeof detail === "string"
+        ? detail
+        : undefined;
+    throw new Error(
+      detailStr || json?.error || json?.message || "Error fetching data",
+    );
   }
 
   return json;
@@ -24,10 +31,8 @@ export async function fetchWithAuth(
   endpoint: string,
   options: RequestInit = {},
 ) {
-  const session = await getServerSession(authOptions);
-  const token = session?.accessToken;
-
-  console.log(token);
+  const session = await auth();
+  const token = session?.id_token;
 
   const headers = new Headers(options.headers);
 
