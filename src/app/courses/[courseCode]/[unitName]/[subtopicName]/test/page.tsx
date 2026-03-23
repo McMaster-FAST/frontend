@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { ChevronsRight } from "lucide-react";
+import { CheckCircle2, ChevronsRight, XCircle } from "lucide-react";
 import React, { useState } from "react";
 import { JSX } from "react/jsx-runtime";
 import {
@@ -248,30 +248,48 @@ function QuestionTestPage({ params: paramsPromise }: QuestionTestPageProps) {
               <RadioGroup
                 value={selectedOption}
                 onValueChange={setSelectedOption}
+                disabled={submitSuccess}
               >
-                {question?.options.map((option) => (
-                  <div
-                    key={option.public_id}
-                    className="flex items-center gap-2 w-full"
-                  >
-                    <RadioGroupItem
-                      value={option.public_id}
-                      className="cursor-pointer"
-                    />
+                {question?.options.map((option) => {
+                  const isCorrect =
+                    submitSuccess && correctOptionId === option.public_id;
+                  const isWrongSelection =
+                    submitSuccess &&
+                    selectedOption === option.public_id &&
+                    correctOptionId !== option.public_id;
+
+                  return (
                     <div
-                      className={
-                        "border-2 p-6 rounded-md items-center flex gap-2 w-full" +
-                        (correctOptionId === option.public_id
-                          ? " border-primary"
-                          : "")
-                      }
+                      key={option.public_id}
+                      className="flex items-center gap-2 w-full"
                     >
-                      <SafeHtml
-                        html={resolveImages(option.content, question.public_id)}
+                      <RadioGroupItem
+                        value={option.public_id}
+                        className="cursor-pointer"
                       />
+                      <div
+                        className={
+                          "border-2 p-6 rounded-md items-center flex gap-2 w-full" +
+                          (isCorrect
+                            ? " border-green-500"
+                            : isWrongSelection
+                              ? " border-red-500"
+                              : "")
+                        }
+                      >
+                        <SafeHtml
+                          html={resolveImages(option.content, question.public_id)}
+                        />
+                        {isCorrect && (
+                          <CheckCircle2 className="ml-auto shrink-0 text-green-500" />
+                        )}
+                        {isWrongSelection && (
+                          <XCircle className="ml-auto shrink-0 text-red-500" />
+                        )}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </RadioGroup>
             )}
           </QuestionPage.Options>
@@ -305,12 +323,11 @@ function QuestionTestPage({ params: paramsPromise }: QuestionTestPageProps) {
           </QuestionPage.AnswerBody>
           <QuestionPage.AnswerPlaceholder>
             {question?.content && !submitSuccess && (
-            <h2 className="font-poppins font-semibold text-md mt-6 mb-2">
-              Submit an answer to see the solution.
-            </h2>
-          )}
+              <h2 className="font-poppins font-semibold text-md mt-6 mb-2">
+                Submit an answer to see the solution.
+              </h2>
+            )}
           </QuestionPage.AnswerPlaceholder>
-          
         </QuestionPage.Answer>
       </QuestionPage.Content>
       <QuestionPage.Actions>
