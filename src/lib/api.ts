@@ -26,8 +26,6 @@ export async function fetchWithAuth(
   const session = await auth();
   const token = session?.id_token;
 
-  console.log(token);
-
   const headers = new Headers(options.headers);
 
   if (!(options.body instanceof FormData) && !headers.has("Content-Type")) {

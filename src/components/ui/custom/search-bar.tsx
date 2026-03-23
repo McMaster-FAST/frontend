@@ -1,12 +1,14 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useCallback } from "react";
 import { Search } from "lucide-react";
 import {
   InputGroup,
   InputGroupAddon,
   InputGroupInput,
 } from "@/components/ui/input-group";
+
+import { debounce } from "lodash";
 
 interface SearchBarProps {
   onSearch: (value: string) => void;
@@ -23,16 +25,11 @@ export function SearchBar({
 }: SearchBarProps) {
   const [value, setValue] = useState("");
 
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      onSearch(value);
-    }, debounceMs);
-
-    return () => {
-      clearTimeout(handler);
-    };
-  }, [value, debounceMs, onSearch]);
-
+  const debouncedSearch = useCallback(
+    debounce(onSearch, debounceMs),
+    [onSearch, debounceMs]
+  );
+    
   return (
     <div className={className}>
       <InputGroup>
@@ -43,7 +40,10 @@ export function SearchBar({
           className="text-sm"
           placeholder={placeholder}
           value={value}
-          onChange={(e) => setValue(e.target.value)}
+          onChange={(e) => {
+            setValue(e.target.value);
+            debouncedSearch(e.target.value);
+          }}
         />
       </InputGroup>
     </div>

@@ -71,7 +71,7 @@ function InstructorDashboardPage() {
 
       <main className="mx-auto w-full max-w-7xl px-6 py-8 flex-1 flex flex-col min-h-0">
         <Tabs className="w-full flex flex-col h-full" defaultValue="questions">
-          <div className="mb-8 overflow-x-auto pb-2 mx-auto">
+          <div className="overflow-x-auto pb-2 mx-auto">
             <TabsList className="h-12 w-auto justify-start gap-2 p-0">
               <TabsTrigger value="questions">
                 <FileQuestion />
