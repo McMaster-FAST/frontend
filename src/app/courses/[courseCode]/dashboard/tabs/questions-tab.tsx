@@ -51,7 +51,6 @@ export function Questions({ course }: QuestionsProps) {
 
   const determineEndMessage = () => {
     if (questions.length === 0 && !isLoading) {
-      console.log(filters);
       if (filters) return "No questions found. Try changing the filters.";
       return "No questions! Click the button above to upload some.";
     } else if (pageNumber === totalPages) {
@@ -123,7 +122,6 @@ export function Questions({ course }: QuestionsProps) {
           className=""
           placeholder="Search questions..."
           onSearch={(query) => {
-            console.log("Search query:", query);
             setPageNumber(1);
             setSearchQuery(query);
           }}

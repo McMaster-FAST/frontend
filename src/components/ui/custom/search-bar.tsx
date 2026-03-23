@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useCallback } from "react";
 import { Search } from "lucide-react";
 import {
   InputGroup,
@@ -24,11 +24,11 @@ export function SearchBar({
   debounceMs = 500,
 }: SearchBarProps) {
   const [value, setValue] = useState("");
-  const debouncedSearch = debounce(onSearch, debounceMs);
-  
-  useEffect(() => {
-    debouncedSearch(value);
-  }, [value]);
+
+  const debouncedSearch = useCallback(
+    debounce(onSearch, debounceMs),
+    [onSearch, debounceMs]
+  );
     
   return (
     <div className={className}>
@@ -40,7 +40,10 @@ export function SearchBar({
           className="text-sm"
           placeholder={placeholder}
           value={value}
-          onChange={(e) => setValue(e.target.value)}
+          onChange={(e) => {
+            setValue(e.target.value);
+            debouncedSearch(e.target.value);
+          }}
         />
       </InputGroup>
     </div>
