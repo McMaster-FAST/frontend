@@ -7,9 +7,7 @@ import { useUserCourses } from "@/hooks/useUserCourses";
 import ErrorMessage from "@/components/ui/custom/error-message";
 
 export default function Home() {
-  const { courses: userCourses, isLoading, error } = useUserCourses();
-
-  console.log("Error:", error);
+  const { courses: userCourses, error } = useUserCourses();
 
   if (error && (error as any).status === 403) {
     return (
