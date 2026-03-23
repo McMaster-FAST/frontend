@@ -2,32 +2,45 @@
 
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { MacFastHeader } from "@/components/ui/custom/macfast-header";
 import CourseCard from "@/components/ui/custom/course-card";
 import { useUserCourses } from "@/hooks/useUserCourses";
 import { useAuthFetch } from "@/hooks/useFetchWithAuth";
-import { getResumeTarget } from "@/lib/resume-api";
+import { getResumeTarget, NoResumeStateError } from "@/lib/resume-api";
 import ErrorMessage from "@/components/ui/custom/error-message";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Info } from "lucide-react";
 
 export default function Home() {
   const router = useRouter();
   const authFetch = useAuthFetch();
-  const { courses: userCourses, isLoading, error } = useUserCourses();
+  const { courses: userCourses, error } = useUserCourses();
+  const [resumeNotice, setResumeNotice] = useState<string | null>(null);
 
   const handleResume = async (courseCode: string) => {
+    setResumeNotice(null);
     try {
       const target = await getResumeTarget(courseCode, authFetch);
       const url = `/courses/${encodeURIComponent(target.course_code)}/${encodeURIComponent(target.unit_name)}/${encodeURIComponent(target.subtopic_name)}/test`;
       router.push(url);
-    } catch {
-      // Fallback to course page if resume fails (e.g. when backend not ready)
-      router.push(`/courses/${encodeURIComponent(courseCode)}/coursepage`);
+    } catch (err) {
+      if (err instanceof NoResumeStateError) {
+        setResumeNotice(err.message);
+        return;
+      }
+      const message =
+        err instanceof Error ? err.message : "Could not resume. Please try again.";
+      setResumeNotice(message);
     }
   };
 
-  console.log("Error:", error);
+  const coursesErrorStatus =
+    error && typeof error === "object" && error !== null && "status" in error
+      ? (error as { status: number }).status
+      : undefined;
 
-  if (error && (error as any).status === 403) {
+  if (error && coursesErrorStatus === 403) {
     return (
       <div className="flex min-h-screen flex-col bg-slate-50/50">
         <MacFastHeader />
@@ -55,6 +68,16 @@ export default function Home() {
               {userCourses.length} Active
             </span>
           </div>
+
+          {resumeNotice && (
+            <div className="mb-6">
+              <Alert variant="warning" className="max-w-2xl">
+                <Info className="h-4 w-4" />
+                <AlertTitle>Resume</AlertTitle>
+                <AlertDescription>{resumeNotice}</AlertDescription>
+              </Alert>
+            </div>
+          )}
 
           <div className="grid grid-cols-1 gap-6 pb-10 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-5">
             {userCourses.map((course, index) => (

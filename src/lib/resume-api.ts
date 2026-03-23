@@ -1,37 +1,61 @@
 import type { useAuthFetch } from "@/hooks/useFetchWithAuth";
 
-
+/**
+ * Response shape from GET /api/core/resume/?course_code=...
+ * (backend: CourseResumeState → ResumeTargetSerializer)
+ */
 export type ResumeTarget = {
   course_code: string;
   unit_name: string;
   subtopic_name: string;
 };
 
-
+/**
+ * Thrown when the backend returns 404 (no resume state for this course yet).
+ */
+export class NoResumeStateError extends Error {
+  constructor(message = "No progress to resume for this course.") {
+    super(message);
+    this.name = "NoResumeStateError";
+  }
+}
 
 /**
- * 
- * For now returns dummy data; to be replaced with real API call.
+ * Fetches the last studied subtopic for the current user and course.
+ * Backend: GET /api/core/resume/?course_code=...
  *
- * @param courseCode 
- * @param authFetch 
- * @returns 
+ * @see https://github.com/McMaster-FAST/backend/issues/66
  */
 export async function getResumeTarget(
   courseCode: string,
   authFetch: ReturnType<typeof useAuthFetch>,
 ): Promise<ResumeTarget> {
-  // TODO(ticket #66): Replace with real API call when backend resume endpoint is ready.
-  // Example (uncomment and use getJson from @/lib/api when ready):
-  // const response = await authFetch(`/api/core/resume/?course_code=${encodeURIComponent(courseCode)}`);
-  // if (!response.ok) throw new Error("Failed to get resume target");
-  // return getJson(response) as Promise<ResumeTarget>;
+  const response = await authFetch(
+    `/api/core/resume/?course_code=${encodeURIComponent(courseCode)}`,
+  );
 
-  // Dummy data
-  const dummy: ResumeTarget = {
-    course_code: courseCode,
-    unit_name: "Unit 1",
-    subtopic_name: "Introduction",
-  };
-  return Promise.resolve(dummy);
+  if (response.ok) {
+    return (await response.json()) as ResumeTarget;
+  }
+
+  if (response.status === 404) {
+    let detail = "No resume state found for this course.";
+    try {
+      const body = (await response.json()) as { detail?: string };
+      if (body?.detail) detail = body.detail;
+    } catch {
+      /* ignore parse errors */
+    }
+    throw new NoResumeStateError(detail);
+  }
+
+  let message = "Failed to get resume target";
+  try {
+    const body = (await response.json()) as { detail?: string; message?: string };
+    if (body?.detail) message = body.detail;
+    else if (body?.message) message = body.message;
+  } catch {
+    /* ignore */
+  }
+  throw new Error(message);
 }
