@@ -117,7 +117,7 @@ export function Questions({ course }: QuestionsProps) {
         </Alert>
       )}
 
-      <div className="flex flex-row flex-0 gap-4 mb-6 items-center">
+      <div className="flex flex-row flex-0 gap-4 mb-6 items-center justify-between">
         <SearchBar
           className=""
           placeholder="Search questions..."
