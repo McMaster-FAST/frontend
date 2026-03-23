@@ -8,6 +8,8 @@ import {
   InputGroupInput,
 } from "@/components/ui/input-group";
 
+import { debounce } from "lodash";
+
 interface SearchBarProps {
   onSearch: (value: string) => void;
   placeholder?: string;
@@ -22,17 +24,12 @@ export function SearchBar({
   debounceMs = 500,
 }: SearchBarProps) {
   const [value, setValue] = useState("");
-
+  const debouncedSearch = debounce(onSearch, debounceMs);
+  
   useEffect(() => {
-    const handler = setTimeout(() => {
-      onSearch(value);
-    }, debounceMs);
-
-    return () => {
-      clearTimeout(handler);
-    };
-  }, [value, debounceMs, onSearch]);
-
+    debouncedSearch(value);
+  }, [value]);
+    
   return (
     <div className={className}>
       <InputGroup>

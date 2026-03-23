@@ -122,7 +122,11 @@ export function Questions({ course }: QuestionsProps) {
         <SearchBar
           className=""
           placeholder="Search questions..."
-          onSearch={setSearchQuery}
+          onSearch={(query) => {
+            console.log("Search query:", query);
+            setPageNumber(1);
+            setSearchQuery(query);
+          }}
         />
         <span className="text-sm text-muted-foreground">
           Showing {questions.length} of {totalQuestions} questions
