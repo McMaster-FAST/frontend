@@ -1,6 +1,6 @@
 "use client";
 
-import useSWR from "swr";
+import useSwr from "swr";
 import { useCallback } from "react";
 import { useParams } from "next/navigation";
 import { useAuthFetch } from "@/hooks/useFetchWithAuth";
@@ -9,28 +9,14 @@ interface UseCourseQuestionsOptions {
   manualCode?: string;
   searchQuery?: string;
   filters?: QuestionFilters;
-}
-
-/** Backend may return a raw array or a paginated object ({ results: [...] }). */
-function normalizeQuestionsPayload(data: unknown): Question[] {
-  if (Array.isArray(data)) {
-    return data;
-  }
-  if (
-    data &&
-    typeof data === "object" &&
-    "results" in data &&
-    Array.isArray((data as { results: unknown }).results)
-  ) {
-    return (data as { results: Question[] }).results;
-  }
-  return [];
+  pageNumber?: number;
 }
 
 export function useCourseQuestions({
   manualCode,
   searchQuery = "",
   filters = {},
+  pageNumber,
 }: UseCourseQuestionsOptions = {}) {
   const authFetch = useAuthFetch();
   const params = useParams();
@@ -38,15 +24,18 @@ export function useCourseQuestions({
   const rawCode = manualCode || (params?.courseCode as string);
   const courseCode = rawCode ? decodeURIComponent(rawCode) : null;
 
-  const fetcher = useCallback(async (url: string): Promise<unknown> => {
-    const res = await authFetch(url);
-    if (!res.ok) {
-      const error = new Error("Failed to fetch questions");
-      (error as any).status = res.status;
-      throw error;
-    }
-    return res.json();
-  }, [authFetch]);
+  const fetcher = useCallback(
+    async (url: string): Promise<Paginated<Question>> => {
+      const res = await authFetch(url);
+      if (!res.ok) {
+        const error = new Error("Failed to fetch questions");
+        (error as any).status = res.status;
+        throw error;
+      }
+      return res.json();
+    },
+    [authFetch],
+  );
 
   let endpoint = null;
 
@@ -78,11 +67,14 @@ export function useCourseQuestions({
       queryParams.append("subtopic__name__icontains", filters.subtopic_name);
     }
 
+    if (pageNumber) {
+      queryParams.append("page", pageNumber.toString());
+    }
     const queryString = queryParams.toString();
     endpoint = queryString ? `${baseUrl}?${queryString}` : baseUrl;
   }
-
-  const { data, error, isLoading, mutate } = useSWR<unknown>(
+  
+  const { data, error, isLoading, mutate } = useSwr<Paginated<Question>>(
     endpoint,
     fetcher,
     {
@@ -92,10 +84,23 @@ export function useCourseQuestions({
     },
   );
 
+  const invariants = {error, isLoading, refetch: mutate};
+  if (data) {
+    return {
+      questions: data.results,
+      totalQuestions: data.count,
+      totalPages: data.totalPages,
+      nextPage: data.next,
+      previousPage: data.previous,
+      ...invariants
+    };
+  }
   return {
-    questions: normalizeQuestionsPayload(data),
-    isLoading,
-    error,
-    refetch: mutate,
+    questions: [],
+    totalQuestions: 0,
+    totalPages: 0,
+    nextPage: -1,
+    previousPage: -1,
+    ...invariants
   };
 }
