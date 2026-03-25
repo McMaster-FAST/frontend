@@ -71,7 +71,7 @@ function UnitsAccordion({ tab, course, value, setValue }: UnitsAccordionProps) {
               <div className="flex items-center gap-4 flex-shrink-0">
                 {tab === "practiceProblems" && (
                   <span
-                    className={`text-sm font-normal hidden sm:inline-block ${
+                    className={`text-sm font-normal text-foreground hidden sm:inline-block ${
                       attemptedCount > 0
                         ? "text-foreground"
                         : "text-muted-foreground"

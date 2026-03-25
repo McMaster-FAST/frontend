@@ -250,30 +250,55 @@ function QuestionTestPage({ params: paramsPromise }: QuestionTestPageProps) {
               <RadioGroup
                 value={selectedOption}
                 onValueChange={setSelectedOption}
+                className="flex flex-col gap-3"
+                disabled={submitted}
               >
-                {question?.options.map((option) => (
-                  <div
-                    key={option.public_id}
-                    className="flex items-center gap-2 w-full"
-                  >
-                    <RadioGroupItem
-                      value={option.public_id}
-                      className="cursor-pointer dark:data-[state=checked]:bg-primary-hover data-[state=checked]:bg-primary peer"
-                    />
-                    <div
-                      className={
-                        "border-2 p-6 rounded-md items-center flex gap-2 w-full" +
-                        (correctOptionId === option.public_id
-                          ? " border-primary dark:border-primary-hover"
-                          : "")
-                      }
+                {question?.options.map((option) => {
+                  const isCorrect = option.public_id === correctOptionId;
+                  const isSelected = option.public_id === selectedOption;
+                  const isWrongSelection = isSelected && !isCorrect;
+
+                  let boxClasses =
+                    "border-2 p-6 rounded-md items-center flex gap-2 w-full transition-all duration-200 ";
+
+                  if (!submitSuccess) {
+                    boxClasses +=
+                      "border-border peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/5 ";
+                    if (!submitted) boxClasses += "hover:bg-muted/50 ";
+                  } else {
+                    if (isCorrect) {
+                      boxClasses += "border-primary-hover";
+                    } else if (isWrongSelection) {
+                      boxClasses += "border-primary";
+                    } else {
+                      boxClasses += "border-border opacity-50 ";
+                    }
+                  }
+
+                  return (
+                    <Label
+                      key={option.public_id}
+                      htmlFor={option.public_id}
+                      className={`w-full ${submitted ? "cursor-default" : "cursor-pointer"}`}
                     >
-                      <SafeHtml
-                        html={resolveImages(option.content, question.public_id)}
+                      <RadioGroupItem
+                        value={option.public_id}
+                        id={option.public_id}
+                        className="sr-only peer"
+                        disabled={submitted}
                       />
-                    </div>
-                  </div>
-                ))}
+
+                      <div className={boxClasses}>
+                        <SafeHtml
+                          html={resolveImages(
+                            option.content,
+                            question.public_id,
+                          )}
+                        />
+                      </div>
+                    </Label>
+                  );
+                })}
               </RadioGroup>
             )}
           </QuestionPage.Options>
