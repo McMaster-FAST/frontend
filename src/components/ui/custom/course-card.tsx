@@ -7,28 +7,40 @@ import {
   CardHeader,
 } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { ArrowRight, BookOpen, Calendar } from "lucide-react";
+import { BookOpen, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
-
-export type Course = {
-  code: string;
-  name: string;
-  year: number;
-  semester: string;
-  description: string;
-  units: any[];
-};
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 type CourseCardProps = {
   course: Course;
   progress: number;
-  /** Called when user clicks Resume; if provided, Resume uses this instead of a static link. */
-  onResume?: (courseCode: string) => void;
 };
 
-function CourseCard({ course, progress, onResume }: CourseCardProps) {
+function CourseCard({ course, progress }: CourseCardProps) {
+  const router = useRouter();
+  const [resumeNotice, setResumeNotice] = useState<string | null>(null);
+  const onResume = () => {
+    const target = course.resume_target;
+    if (!target) {
+      throw new Error("No resume target available for this course.");
+    }
+
+    const courseCode = target.course_code?.trim();
+    const unitName = target.unit_name?.trim();
+    const subtopicName = target.subtopic_name?.trim();
+    if (!courseCode || !unitName || !subtopicName) {
+      setResumeNotice(
+        "Resume data from the server was incomplete. Please open the course and pick a subtopic.",
+      );
+      return;
+    }
+    const url = `/courses/${encodeURIComponent(courseCode)}/${encodeURIComponent(unitName)}/${encodeURIComponent(subtopicName)}/test`;
+    router.push(url);
+  };
+
   return (
     <Card className="group relative flex w-full flex-col overflow-hidden border-light-gray bg-white transition-all hover:-translate-y-1 hover:shadow-lg">
       <div className="h-40 bg-gradient-to-br from-slate-50 to-slate-200 p-4 transition-colors group-hover:from-text-gold group-hover:to-text-maroon">
@@ -71,24 +83,21 @@ function CourseCard({ course, progress, onResume }: CourseCardProps) {
         </div>
       </CardContent>
 
-      <CardFooter className="flex gap-2 border-t border-dark-gray-50 bg-dark-gray-50/50 p-4">
-        <Button variant="secondary" className="flex-1 text-xs font-bold">
-          <Link href={`/courses/${course.code}/coursepage`}>Details</Link>
-        </Button>
-        {onResume ? (
+      <CardFooter className="flex flex-col gap-2 border-t border-dark-gray-50 bg-dark-gray-50/50 p-4">
+        {onResume && course.resume_target && (
           <Button
-            className="flex-1 gap-2 text-xs shadow-sm font-bold"
-            onClick={() => onResume(course.code)}
+            className="gap-2 text-xs shadow-sm font-bold w-full"
+            onClick={onResume}
           >
-            Resume <ArrowRight className="h-3 w-3" />
-          </Button>
-        ) : (
-          <Button className="flex-1 gap-2 text-xs shadow-sm font-bold" asChild>
-            <Link href={`/courses/${course.code}/coursepage`}>
-              Resume <ArrowRight className="h-3 w-3" />
-            </Link>
+            <div>
+              <div>Resume</div>
+              <div>{`(${course.resume_target.subtopic_name})`}</div>
+            </div>
           </Button>
         )}
+        <Button variant="secondary" className="text-xs font-bold w-full">
+          <Link href={`/courses/${course.code}/coursepage`}>Details</Link>
+        </Button>
       </CardFooter>
     </Card>
   );

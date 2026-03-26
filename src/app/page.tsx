@@ -2,48 +2,16 @@
 
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
 import { MacFastHeader } from "@/components/ui/custom/macfast-header";
 import CourseCard from "@/components/ui/custom/course-card";
 import { useUserCourses } from "@/hooks/useUserCourses";
 import { useAuthFetch } from "@/hooks/useFetchWithAuth";
-import { getResumeTarget, NoResumeStateError } from "@/lib/resume-api";
 import ErrorMessage from "@/components/ui/custom/error-message";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Info } from "lucide-react";
 
 export default function Home() {
   const router = useRouter();
   const authFetch = useAuthFetch();
   const { courses: userCourses, error } = useUserCourses();
-  const [resumeNotice, setResumeNotice] = useState<string | null>(null);
-
-  const handleResume = async (courseCode: string) => {
-    setResumeNotice(null);
-    try {
-      const target = await getResumeTarget(courseCode, authFetch);
-      if (
-        !target.course_code?.trim() ||
-        !target.unit_name?.trim() ||
-        !target.subtopic_name?.trim()
-      ) {
-        setResumeNotice(
-          "Resume data from the server was incomplete. Please open the course and pick a subtopic.",
-        );
-        return;
-      }
-      const url = `/courses/${encodeURIComponent(target.course_code.trim())}/${encodeURIComponent(target.unit_name.trim())}/${encodeURIComponent(target.subtopic_name.trim())}/test`;
-      router.push(url);
-    } catch (err) {
-      if (err instanceof NoResumeStateError) {
-        setResumeNotice(err.message);
-        return;
-      }
-      const message =
-        err instanceof Error ? err.message : "Could not resume. Please try again.";
-      setResumeNotice(message);
-    }
-  };
 
   const coursesErrorStatus =
     error && typeof error === "object" && error !== null && "status" in error
@@ -56,7 +24,10 @@ export default function Home() {
         <MacFastHeader />
         <main className="flex-1 px-6 py-10 md:px-12">
           <div className="mx-auto max-w-7xl">
-            <ErrorMessage title="Access Denied" message="You do not have permission to access your courses."/>
+            <ErrorMessage
+              title="Access Denied"
+              message="You do not have permission to access your courses."
+            />
           </div>
         </main>
       </div>
@@ -79,24 +50,9 @@ export default function Home() {
             </span>
           </div>
 
-          {resumeNotice && (
-            <div className="mb-6">
-              <Alert variant="warning" className="max-w-2xl">
-                <Info className="h-4 w-4" />
-                <AlertTitle>Resume</AlertTitle>
-                <AlertDescription>{resumeNotice}</AlertDescription>
-              </Alert>
-            </div>
-          )}
-
           <div className="grid grid-cols-1 gap-6 pb-10 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-5">
             {userCourses.map((course, index) => (
-              <CourseCard
-                key={index}
-                course={course}
-                progress={50}
-                onResume={handleResume}
-              />
+              <CourseCard key={index} course={course} progress={50} />
             ))}
           </div>
         </div>
