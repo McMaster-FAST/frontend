@@ -22,8 +22,11 @@ type CourseCardProps = {
 function CourseCard({ course, progress }: CourseCardProps) {
   const router = useRouter();
   const [resumeNotice, setResumeNotice] = useState<string | null>(null);
+  const target = course.resume_target;
+  const hasFullResumeTarget =
+    target && target.course_code && target.unit_name && target.subtopic_name;
+
   const onResume = () => {
-    const target = course.resume_target;
     if (!target) {
       throw new Error("No resume target available for this course.");
     }
@@ -31,12 +34,7 @@ function CourseCard({ course, progress }: CourseCardProps) {
     const courseCode = target.course_code?.trim();
     const unitName = target.unit_name?.trim();
     const subtopicName = target.subtopic_name?.trim();
-    if (!courseCode || !unitName || !subtopicName) {
-      setResumeNotice(
-        "Resume data from the server was incomplete. Please open the course and pick a subtopic.",
-      );
-      return;
-    }
+
     const url = `/courses/${encodeURIComponent(courseCode)}/${encodeURIComponent(unitName)}/${encodeURIComponent(subtopicName)}/test`;
     router.push(url);
   };
@@ -84,14 +82,14 @@ function CourseCard({ course, progress }: CourseCardProps) {
       </CardContent>
 
       <CardFooter className="flex flex-col gap-2 border-t border-dark-gray-50 bg-dark-gray-50/50 p-4">
-        {onResume && course.resume_target && (
+        {onResume && hasFullResumeTarget && (
           <Button
             className="gap-2 text-xs shadow-sm font-bold w-full"
             onClick={onResume}
           >
             <div>
               <div>Resume</div>
-              <div>{`(${course.resume_target.subtopic_name})`}</div>
+              <div>{`(${target.subtopic_name})`}</div>
             </div>
           </Button>
         )}
