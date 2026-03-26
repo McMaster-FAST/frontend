@@ -329,6 +329,9 @@ function QuestionTestPage({ params: paramsPromise }: QuestionTestPageProps) {
                   const isSelected = option.public_id === selectedOption;
                   const isWrongSelection = isSelected && !isCorrect;
 
+                  // Did the user successfully answer the whole question?
+                  const userGotItRight = selectedOption === correctOptionId;
+
                   let boxClasses =
                     "border-2 p-6 rounded-md items-center flex gap-2 w-full transition-all duration-200 ";
 
@@ -360,7 +363,6 @@ function QuestionTestPage({ params: paramsPromise }: QuestionTestPageProps) {
                       />
 
                       <div className={boxClasses}>
-                        {/* Added flex-1 to keep text to the left and push icons to the right */}
                         <div className="flex-1">
                           <SafeHtml
                             html={resolveImages(
@@ -370,14 +372,27 @@ function QuestionTestPage({ params: paramsPromise }: QuestionTestPageProps) {
                           />
                         </div>
 
-                        {/* Icon logic: Correct option gets Check, Wrong selection gets X */}
+                        {/* Status Labels and Icons */}
                         {submitSuccess && (
-                          <div className="flex-shrink-0 ml-2">
+                          <div className="flex flex-shrink-0 items-center gap-3 ml-4">
+                            {/* CORRECT OPTION BLOCK */}
                             {isCorrect && (
-                              <CheckCircle2 className="h-6 w-6 text-primary-hover" />
+                              <div className="flex items-center gap-2 text-primary-hover">
+                                <span className="text-xs font-bold uppercase tracking-wider">
+                                  {userGotItRight ? "Great Job!" : "Correct"}
+                                </span>
+                                <CheckCircle2 className="h-6 w-6" />
+                              </div>
                             )}
+
+                            {/* WRONG SELECTION BLOCK */}
                             {isWrongSelection && (
-                              <XCircle className="h-6 w-6 text-primary" />
+                              <div className="flex items-center gap-2 text-primary">
+                                <span className="text-xs font-bold uppercase tracking-wider">
+                                  Incorrect
+                                </span>
+                                <XCircle className="h-6 w-6" />
+                              </div>
                             )}
                           </div>
                         )}
