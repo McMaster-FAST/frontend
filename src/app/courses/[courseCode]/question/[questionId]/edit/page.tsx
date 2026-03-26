@@ -5,13 +5,11 @@ import { useParams, useRouter } from "next/navigation";
 import { MacFastHeader } from "@/components/macfast/macfast-header";
 import { Button } from "@/components/ui/button";
 import {
-  AlertTriangle,
   ArrowLeft,
   Eye,
   List,
   MessageSquare,
   NotebookPen,
-  Pencil,
 } from "lucide-react";
 import { useAuthFetch } from "@/hooks/useFetchWithAuth";
 import { QuestionPage } from "@/components/macfast/question-page";
