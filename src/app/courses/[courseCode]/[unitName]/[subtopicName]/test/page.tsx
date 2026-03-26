@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { ChevronsRight } from "lucide-react";
+import { CheckCircle2, ChevronsRight, XCircle } from "lucide-react";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { JSX } from "react/jsx-runtime";
 import {
@@ -338,9 +338,9 @@ function QuestionTestPage({ params: paramsPromise }: QuestionTestPageProps) {
                     if (!submitted) boxClasses += "hover:bg-muted/50 ";
                   } else {
                     if (isCorrect) {
-                      boxClasses += "border-primary-hover";
+                      boxClasses += "border-primary-hover ";
                     } else if (isWrongSelection) {
-                      boxClasses += "border-primary";
+                      boxClasses += "border-primary ";
                     } else {
                       boxClasses += "border-border opacity-50 ";
                     }
@@ -360,12 +360,27 @@ function QuestionTestPage({ params: paramsPromise }: QuestionTestPageProps) {
                       />
 
                       <div className={boxClasses}>
-                        <SafeHtml
-                          html={resolveImages(
-                            option.content,
-                            question.public_id,
-                          )}
-                        />
+                        {/* Added flex-1 to keep text to the left and push icons to the right */}
+                        <div className="flex-1">
+                          <SafeHtml
+                            html={resolveImages(
+                              option.content,
+                              question.public_id,
+                            )}
+                          />
+                        </div>
+
+                        {/* Icon logic: Correct option gets Check, Wrong selection gets X */}
+                        {submitSuccess && (
+                          <div className="flex-shrink-0 ml-2">
+                            {isCorrect && (
+                              <CheckCircle2 className="h-6 w-6 text-primary-hover" />
+                            )}
+                            {isWrongSelection && (
+                              <XCircle className="h-6 w-6 text-primary" />
+                            )}
+                          </div>
+                        )}
                       </div>
                     </Label>
                   );
