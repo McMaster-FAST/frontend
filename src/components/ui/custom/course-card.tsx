@@ -21,7 +21,6 @@ type CourseCardProps = {
 
 function CourseCard({ course, progress }: CourseCardProps) {
   const router = useRouter();
-  const [resumeNotice, setResumeNotice] = useState<string | null>(null);
   const target = course.resume_target;
   const hasFullResumeTarget =
     target && target.course_code && target.unit_name && target.subtopic_name;
