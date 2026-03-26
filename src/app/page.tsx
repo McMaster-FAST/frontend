@@ -1,6 +1,8 @@
 "use client";
 
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useAuthFetch } from "@/hooks/useFetchWithAuth";
 import { MacFastHeader } from "@/components/macfast/macfast-header";
 import CourseCard from "@/components/macfast/course-card/course-card";
 import { useUserCourses } from "@/hooks/useUserCourses";
@@ -8,11 +10,16 @@ import ErrorMessage from "@/components/macfast/error-message";
 import { CourseCardSkeleton } from "@/components/macfast/course-card/course-card-skeleton";
 
 export default function Home() {
+  const router = useRouter();
+  const authFetch = useAuthFetch();
   const { courses: userCourses, isLoading, error } = useUserCourses();
 
-  console.log("Error:", error);
+  const coursesErrorStatus =
+    error && typeof error === "object" && error !== null && "status" in error
+      ? (error as { status: number }).status
+      : undefined;
 
-  if (error && (error as any).status === 403) {
+  if (error && coursesErrorStatus === 403) {
     return (
       <div className="flex min-h-screen flex-col bg-background">
         <MacFastHeader />

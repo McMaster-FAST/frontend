@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Card,
   CardContent,
@@ -5,19 +7,11 @@ import {
   CardHeader,
 } from "@/components/ui/card";
 import { CompletionBar } from "@/components/macfast/completion-bar/completion-bar";
-import { ArrowRight, BookOpen, Calendar } from "lucide-react";
+import { BookOpen, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
-
-export type Course = {
-  code: string;
-  name: string;
-  year: number;
-  semester: string;
-  description: string;
-  units: any[];
-};
+import { useRouter } from "next/navigation";
 
 type CourseCardProps = {
   course: Course;
@@ -25,6 +19,24 @@ type CourseCardProps = {
 };
 
 function CourseCard({ course, progress }: CourseCardProps) {
+  const router = useRouter();
+  const target = course.resume_target;
+  const hasFullResumeTarget =
+    target && target.course_code && target.unit_name && target.subtopic_name;
+
+  const onResume = () => {
+    if (!target) {
+      throw new Error("No resume target available for this course.");
+    }
+
+    const courseCode = target.course_code?.trim();
+    const unitName = target.unit_name?.trim();
+    const subtopicName = target.subtopic_name?.trim();
+
+    const url = `/courses/${encodeURIComponent(courseCode)}/${encodeURIComponent(unitName)}/${encodeURIComponent(subtopicName)}/test`;
+    router.push(url);
+  };
+
   return (
     <Card className="group relative flex w-full flex-col overflow-hidden border-light-gray dark:border-dark-gray bg-card transition-all hover:-translate-y-1 hover:shadow-lg">
       <div className="h-40 bg-gradient-to-br from-light-gray to-dark-gray p-4 transition-colors group-hover:from-text-gold group-hover:to-text-maroon">
@@ -63,12 +75,20 @@ function CourseCard({ course, progress }: CourseCardProps) {
         </div>
       </CardContent>
 
-      <CardFooter className="flex gap-2 border-t border-dark-gray-50 bg-dark-gray-50/50 p-4">
-        <Button variant="secondary" className="flex-1 text-xs font-bold">
+      <CardFooter className="flex flex-col gap-2 border-t border-dark-gray-50 bg-dark-gray-50/50 p-4">
+        {onResume && hasFullResumeTarget && (
+          <Button
+            className="gap-2 text-xs shadow-sm font-bold w-full"
+            onClick={onResume}
+          >
+            <div>
+              <div>Resume</div>
+              <div>{`(${target.subtopic_name})`}</div>
+            </div>
+          </Button>
+        )}
+        <Button variant="secondary" className="text-xs font-bold w-full">
           <Link href={`/courses/${course.code}/coursepage`}>Details</Link>
-        </Button>
-        <Button className="flex-1 gap-2 text-xs shadow-sm font-bold">
-          Resume <ArrowRight className="h-3 w-3" />
         </Button>
       </CardFooter>
     </Card>

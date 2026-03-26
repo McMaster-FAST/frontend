@@ -173,7 +173,7 @@ export function Questions({ course }: QuestionsProps) {
           <div className="flex flex-col gap-4 mb-4">
             {isLoading
               ? [...Array(3)].map((_, i) => <QuestionItemSkeleton key={i} />)
-              : questions.map((question) => (
+              : (Array.isArray(questions) ? questions : []).map((question) => (
                   <QuestionItem
                     key={question.serial_number}
                     question={question}

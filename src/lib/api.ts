@@ -13,7 +13,15 @@ export async function getJson(response: Response) {
   }
 
   if (!response.ok) {
-    throw new Error(json?.error || "Error fetching data");
+    const detail = json?.detail;
+    const detailStr = Array.isArray(detail)
+      ? detail.map(String).join(" ")
+      : typeof detail === "string"
+        ? detail
+        : undefined;
+    throw new Error(
+      detailStr || json?.error || json?.message || "Error fetching data",
+    );
   }
 
   return json;
