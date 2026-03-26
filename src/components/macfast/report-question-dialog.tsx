@@ -15,8 +15,6 @@ import { Label } from "@/components/ui/label";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 
-
-
 enum QuestionFlagReason {
   TEXT_FORMATTING = "Formatting of text",
   IMAGE_FORMATTING = "Formatting of images",
@@ -43,7 +41,10 @@ interface FormValidityState {
   additionalDetails: boolean;
 }
 
-export function QuestionFlagDialog({ onSubmit, disabled }: QuestionFlagDialogProps) {
+export function QuestionFlagDialog({
+  onSubmit,
+  disabled,
+}: QuestionFlagDialogProps) {
   const [open, setOpen] = useState(false);
   const [reportAnswers, setReportAnswers] = useState<ReportAnswers>({
     reasons: [],

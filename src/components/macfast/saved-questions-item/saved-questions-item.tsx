@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { NotebookPen, RotateCcw, Trash, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { SafeHtmlInline } from "@/components/ui/custom/safe-html";
+import { SafeHtmlInline } from "@/components/macfast/safe-html";
 import { setSavedForLater } from "@/lib/api";
 import { useAuthFetch } from "@/hooks/useFetchWithAuth";
 

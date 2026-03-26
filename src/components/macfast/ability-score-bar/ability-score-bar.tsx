@@ -23,7 +23,7 @@ export function AbilityScoreBar({
           "relative h-1.5 w-full overflow-hidden rounded-full",
           isUnattempted
             ? "bg-transparent border border-dashed border-light-gray"
-            : "bg-light-gray",
+            : "bg-light-gray dark:bg-dark-gray",
           className,
         )}
       >
@@ -39,7 +39,7 @@ export function AbilityScoreBar({
       </div>
 
       {ability_score?.mastery_caption && (
-        <p className="text-xs text-dark-gray flex justify-between">
+        <p className="text-xs text-foreground flex justify-between">
           <span>{ability_score.mastery_caption}</span>
         </p>
       )}

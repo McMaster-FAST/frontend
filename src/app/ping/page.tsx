@@ -1,4 +1,4 @@
-import { PingButton } from "@/components/ui/custom/ping-button";
+import { PingButton } from "@/components/macfast/ping-button";
 
 export default function PingPage() {
   return <PingButton />;

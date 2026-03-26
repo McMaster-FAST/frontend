@@ -3,18 +3,18 @@
 import { uploadQuestions } from "@/lib/api";
 import { useRef, useState } from "react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Progress } from "@/components/ui/progress";
-import { QuestionItem } from "@/components/ui/custom/questions-item/questions-item";
+import { QuestionItem } from "@/components/macfast/questions-item/questions-item";
 import { Button } from "@/components/ui/button";
 import { AlertCircle } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import CommentsSheet from "@/components/ui/custom/comments/comments-sheet";
+import CommentsSheet from "@/components/macfast/comments/comments-sheet";
 import { useCourseQuestions } from "@/hooks/useCourseQuestions";
-import { QuestionItemSkeleton } from "@/components/ui/custom/questions-item/questions-item-skeleton";
-import { SearchBar } from "@/components/ui/custom/search-bar";
-import { QuestionsFilter } from "@/components/ui/custom/questions-filter";
+import { QuestionItemSkeleton } from "@/components/macfast/questions-item/questions-item-skeleton";
+import { SearchBar } from "@/components/macfast/search-bar";
+import { QuestionsFilter } from "@/components/macfast/questions-filter";
 import { useAuthFetch } from "@/hooks/useFetchWithAuth";
 import { useRouter } from "next/navigation";
+import MacFastPaginator from "@/components/macfast/macfast-paginator";
 
 interface QuestionsProps {
   course?: Course | null;
@@ -29,6 +29,8 @@ export function Questions({ course }: QuestionsProps) {
     null,
   );
   const [commentsSheetOpen, setCommentsSheetOpen] = useState(false);
+  // Pagination is 1-indexed
+  const [pageNumber, setPageNumber] = useState<number>(1);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const authFetch = useAuthFetch();
   const router = useRouter();
@@ -38,10 +40,24 @@ export function Questions({ course }: QuestionsProps) {
 
   const {
     questions,
+    totalQuestions,
+    totalPages,
+    nextPage,
+    previousPage,
     isLoading,
     error: questionsError,
     refetch,
-  } = useCourseQuestions({ searchQuery, filters });
+  } = useCourseQuestions({ searchQuery, filters, pageNumber });
+
+  const determineEndMessage = () => {
+    if (questions.length === 0 && !isLoading) {
+      if (filters) return "No questions found. Try changing the filters.";
+      return "No questions! Click the button above to upload some.";
+    } else if (pageNumber === totalPages) {
+      return "End of questions";
+    }
+    return "End of page";
+  };
 
   const handleUploadClick = () => {
     fileInputRef.current?.click();
@@ -85,16 +101,13 @@ export function Questions({ course }: QuestionsProps) {
   const fetchError = getFetchErrorDetails();
 
   const navigateToPreview = (questionId: string) => {
-    router.push(
-      `/courses/${course?.code}/question/${questionId}/preview`,
-    );
+    router.push(`/courses/${course?.code}/question/${questionId}/preview`);
   };
 
   const navigateToEdit = (questionId: string) => {
-    router.push(
-      `/courses/${course?.code}/question/${questionId}/edit`,
-    );
+    router.push(`/courses/${course?.code}/question/${questionId}/edit`);
   };
+
   return (
     <div className="flex flex-col h-full">
       {error && (
@@ -104,12 +117,18 @@ export function Questions({ course }: QuestionsProps) {
         </Alert>
       )}
 
-      <div className="flex flex-row flex-0 gap-4 mb-6 items-center">
+      <div className="flex flex-row flex-0 gap-4 mb-6 items-center justify-between">
         <SearchBar
           className=""
           placeholder="Search questions..."
-          onSearch={setSearchQuery}
+          onSearch={(query) => {
+            setPageNumber(1);
+            setSearchQuery(query);
+          }}
         />
+        <span className="text-sm text-muted-foreground">
+          Showing {questions.length} of {totalQuestions} questions
+        </span>
         <div className="flex flex-1 gap-3 justify-end ">
           <input
             type="file"
@@ -129,7 +148,10 @@ export function Questions({ course }: QuestionsProps) {
           <QuestionsFilter
             subtopics={allSubtopics}
             filters={filters}
-            onFilterChange={setFilters}
+            onFilterChange={(filters) => {
+              setPageNumber(1);
+              setFilters(filters);
+            }}
           />
         </div>
       </div>
@@ -151,7 +173,7 @@ export function Questions({ course }: QuestionsProps) {
           <div className="flex flex-col gap-4 mb-4">
             {isLoading
               ? [...Array(3)].map((_, i) => <QuestionItemSkeleton key={i} />)
-              : questions.map((question) => (
+              : (Array.isArray(questions) ? questions : []).map((question) => (
                   <QuestionItem
                     key={question.public_id}
                     question={question}
@@ -166,12 +188,22 @@ export function Questions({ course }: QuestionsProps) {
                     }
                   />
                 ))}
+
             <span className="text-sm mx-auto text-muted-foreground">
-              End of questions
+              {determineEndMessage()}
             </span>
           </div>
         </ScrollArea>
       </div>
+      <div className="border-t pt-2 bg-background">
+        <MacFastPaginator
+          pageNumber={pageNumber}
+          totalPages={totalPages}
+          onPageChange={setPageNumber}
+          refetch={refetch}
+        />
+      </div>
+
       <CommentsSheet
         open={commentsSheetOpen}
         onOpenChange={setCommentsSheetOpen}

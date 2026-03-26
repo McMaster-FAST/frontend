@@ -1,10 +1,8 @@
 import { setSavedForLaterDebounced } from "@/lib/api";
-import { Checkbox } from "../checkbox";
-import { Label } from "../label";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 import { useAuthFetch } from "@/hooks/useFetchWithAuth";
 import { useEffect, useState } from "react";
-import { Alert } from "../alert";
-import { set } from "lodash";
 
 interface SaveForLaterProps {
   courseCode: string | null;

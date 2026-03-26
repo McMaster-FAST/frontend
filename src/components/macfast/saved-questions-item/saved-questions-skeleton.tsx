@@ -4,8 +4,6 @@ import {
   CardContent,
   CardHeader,
 } from "@/components/ui/card";
-import { CircleDashed, NotebookPen, Trash2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 
 import { Skeleton } from "@/components/ui/skeleton";
 
