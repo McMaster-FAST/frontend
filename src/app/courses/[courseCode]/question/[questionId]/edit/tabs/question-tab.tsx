@@ -76,7 +76,7 @@ export default function QuestionTab({
               </Label>
               <Input
                 id="difficulty"
-                className="w-1/4 bg-slate-50/50"
+                className="w-1/4"
                 value={question?.difficulty ?? "0.0000"}
                 disabled
                 readOnly

@@ -3,18 +3,18 @@
 import { uploadQuestions } from "@/lib/api";
 import { useRef, useState } from "react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { QuestionItem } from "@/components/ui/custom/questions-item/questions-item";
+import { QuestionItem } from "@/components/macfast/questions-item/questions-item";
 import { Button } from "@/components/ui/button";
 import { AlertCircle } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import CommentsSheet from "@/components/ui/custom/comments/comments-sheet";
+import CommentsSheet from "@/components/macfast/comments/comments-sheet";
 import { useCourseQuestions } from "@/hooks/useCourseQuestions";
-import { QuestionItemSkeleton } from "@/components/ui/custom/questions-item/questions-item-skeleton";
-import { SearchBar } from "@/components/ui/custom/search-bar";
-import { QuestionsFilter } from "@/components/ui/custom/questions-filter";
+import { QuestionItemSkeleton } from "@/components/macfast/questions-item/questions-item-skeleton";
+import { SearchBar } from "@/components/macfast/search-bar";
+import { QuestionsFilter } from "@/components/macfast/questions-filter";
 import { useAuthFetch } from "@/hooks/useFetchWithAuth";
 import { useRouter } from "next/navigation";
-import MacFastPaginator from "@/components/ui/custom/macfast-paginator";
+import MacFastPaginator from "@/components/macfast/macfast-paginator";
 
 interface QuestionsProps {
   course?: Course | null;

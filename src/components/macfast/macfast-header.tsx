@@ -13,20 +13,15 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { signIn, signOut, useSession } from "next-auth/react";
-import {
-  Book,
-  BookText,
-  ChevronDown,
-  Loader2,
-  LogOut,
-  User,
-} from "lucide-react";
+import { ChevronDown, Loader2, LogOut, Moon, Sun, User } from "lucide-react";
 import { useUserCourses } from "@/hooks/useUserCourses";
+import { useTheme } from "next-themes";
 
 export function MacFastHeader() {
   const { courses: userCourses, isLoading: isLoadingCourses } =
     useUserCourses();
   const { data: session, status } = useSession();
+  const { theme, setTheme } = useTheme();
   const isLoading = status === "loading";
   const isAuthenticated = status === "authenticated";
 
@@ -36,7 +31,7 @@ export function MacFastHeader() {
         <div className="flex items-center gap-2">
           <Link
             href="/"
-            className="font-poppins text-xl font-bold tracking-tight hover:opacity-90 transition-opacity"
+            className="font-poppins text-xl font-bold tracking-tight hover:opacity-90 transition-opacity text-primary-foreground"
           >
             MacFAST
           </Link>
@@ -69,7 +64,7 @@ export function MacFastHeader() {
                     <DropdownMenuItem
                       key={course.code}
                       asChild
-                      className="focus:bg-primary-hover"
+                      className="focus:bg-primary-hover dark:focus:bg-primary"
                     >
                       <Link
                         href={`/courses/${course.code}/coursepage`}
@@ -78,7 +73,7 @@ export function MacFastHeader() {
                         <div className="text-sm font-semibold leading-none">
                           {course.code}
                         </div>
-                        <div className="line-clamp-1 text-xs text-muted-foreground">
+                        <div className="line-clamp-1 text-sm text-muted-foreground">
                           {course.name}
                         </div>
                       </Link>
@@ -130,15 +125,17 @@ export function MacFastHeader() {
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
 
-                <DropdownMenuItem asChild>
-                  <Link href="/profile" className="cursor-pointer">
-                    <User className="mr-2 h-4 w-4" />
-                    <span>Profile</span>
-                  </Link>
+                <DropdownMenuItem
+                  className="cursor-pointer py-2"
+                  onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                >
+                  <span>Toggle theme</span>
+                  <Sun className="mr-2 h-4 w-4 hidden dark:block text-yellow-500" />
+                  <Moon className="mr-2 h-4 w-4 dark:hidden text-blue-500" />
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
-                  className="text-red-600 focus:text-red-600 cursor-pointer"
+                  className="text-red-600 dark:text-red-400 cursor-pointer"
                   onClick={() => signOut({ redirectTo: "/" })}
                 >
                   <LogOut className="mr-2 h-4 w-4" />

@@ -191,7 +191,7 @@ function FilterToggle({
   labelFalse: string;
 }) {
   return (
-    <div className="flex p-1 bg-slate-100 rounded-lg dark:bg-slate-800">
+    <div className="flex p-1 bg-background rounded-lg">
       <ToggleBtn
         isActive={value === true}
         onClick={() => onChange(true)}
@@ -226,8 +226,8 @@ function ToggleBtn({
       className={cn(
         "flex-1 text-xs font-medium py-1.5 px-2 rounded-md transition-all duration-200",
         isActive
-          ? "bg-white text-slate-900 shadow-sm dark:bg-slate-700 dark:text-slate-100"
-          : "text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200",
+          ? "bg-background text-foreground shadow-sm"
+          : "text-muted-foreground hover:text-primary dark:hover:text-primary-hover",
       )}
     >
       {label}

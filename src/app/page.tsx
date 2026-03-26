@@ -2,16 +2,17 @@
 
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { MacFastHeader } from "@/components/ui/custom/macfast-header";
-import CourseCard from "@/components/ui/custom/course-card";
-import { useUserCourses } from "@/hooks/useUserCourses";
 import { useAuthFetch } from "@/hooks/useFetchWithAuth";
-import ErrorMessage from "@/components/ui/custom/error-message";
+import { MacFastHeader } from "@/components/macfast/macfast-header";
+import CourseCard from "@/components/macfast/course-card/course-card";
+import { useUserCourses } from "@/hooks/useUserCourses";
+import ErrorMessage from "@/components/macfast/error-message";
+import { CourseCardSkeleton } from "@/components/macfast/course-card/course-card-skeleton";
 
 export default function Home() {
   const router = useRouter();
   const authFetch = useAuthFetch();
-  const { courses: userCourses, error } = useUserCourses();
+  const { courses: userCourses, isLoading, error } = useUserCourses();
 
   const coursesErrorStatus =
     error && typeof error === "object" && error !== null && "status" in error
@@ -20,7 +21,7 @@ export default function Home() {
 
   if (error && coursesErrorStatus === 403) {
     return (
-      <div className="flex min-h-screen flex-col bg-slate-50/50">
+      <div className="flex min-h-screen flex-col bg-background">
         <MacFastHeader />
         <main className="flex-1 px-6 py-10 md:px-12">
           <div className="mx-auto max-w-7xl">
@@ -42,25 +43,33 @@ export default function Home() {
       <main className="flex-1 px-6 py-10 md:px-8 lg:px-28">
         <div className="mx-auto">
           <div className="mb-8 flex items-baseline justify-between">
-            <h2 className="font-poppins text-2xl font-bold text-dark-gray">
+            <h2 className="font-poppins text-2xl font-bold text-foreground">
               Your Courses
             </h2>
-            <span className="text-md text-primary font-semibold">
+            <span className="text-md text-primary dark:text-primary-hover font-semibold">
               {userCourses.length} Active
             </span>
           </div>
 
-          <div className="grid grid-cols-1 gap-6 pb-10 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-5">
-            {userCourses.map((course, index) => (
-              <CourseCard key={index} course={course} progress={50} />
-            ))}
+          <div className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-6 pb-10">
+            {isLoading
+              ? Array.from({ length: 5 }).map((_, index) => (
+                  <CourseCardSkeleton key={`skeleton-${index}`} />
+                ))
+              : userCourses.map((course, index) => (
+                  <CourseCard
+                    key={course.code || index}
+                    course={course}
+                    progress={50}
+                  />
+                ))}
           </div>
         </div>
       </main>
 
       {/* Footer */}
-      <footer className="mt-auto flex flex-col items-center border-t border-light-gray bg-white py-12">
-        <h3 className="mb-6 font-['Inter'] text-sm font-semibold uppercase tracking-widest text-dark-gray">
+      <footer className="mt-auto flex flex-col items-center bg-background py-12">
+        <h3 className="mb-6 font-['Inter'] text-sm font-semibold uppercase tracking-widest text-muted-foreground">
           Supported By
         </h3>
 
@@ -70,7 +79,7 @@ export default function Home() {
             href="https://chemistry.mcmaster.ca/"
             target="_blank"
             rel="noopener noreferrer"
-            className="transition-all duration-300 hover:scale-105 hover:opacity-100 grayscale hover:grayscale-0"
+            className="transition-all duration-300 hover:scale-105 hover:opacity-100"
           >
             <Image
               src="/sponsors/mcmaster-logo.png"
@@ -87,7 +96,7 @@ export default function Home() {
             href="https://mi.mcmaster.ca/"
             target="_blank"
             rel="noopener noreferrer"
-            className="transition-all duration-300 hover:scale-105 hover:opacity-100 grayscale hover:grayscale-0"
+            className="transition-all duration-300 hover:scale-105 hover:opacity-100"
           >
             <Image
               src="/sponsors/macpherson-institute-logo.png"
@@ -100,7 +109,7 @@ export default function Home() {
           </a>
 
           {/* McCall MacBain Foundation Logo */}
-          <div className="transition-all duration-300 hover:scale-105 hover:opacity-100 grayscale hover:grayscale-0">
+          <div className="transition-all duration-300 hover:scale-105 hover:opacity-100">
             <Image
               src="/sponsors/mccall-macbain-logo.png"
               alt="McCall MacBain Foundation"

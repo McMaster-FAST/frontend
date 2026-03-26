@@ -5,6 +5,7 @@ import "@/styles/globals.css";
 
 import { SessionProvider } from "next-auth/react";
 import { auth } from "@/auth";
+import { ThemeProvider } from "@/components/theme-provider";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -30,12 +31,19 @@ export default async function RootLayout({
   const session = await auth();
 
   return (
-    <html lang="en" className="h-full">
+    <html lang="en" className="h-full bg-background" suppressHydrationWarning>
       <SessionProvider session={session}>
         <body
           className={`${inter.variable} ${poppins.variable} antialiased h-full`}
         >
-          {children}
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            {children}
+          </ThemeProvider>
         </body>
       </SessionProvider>
     </html>
