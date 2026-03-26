@@ -1,16 +1,6 @@
 import type { useAuthFetch } from "@/hooks/useFetchWithAuth";
 
 /**
- * Response shape from GET /api/core/resume/?course_code=...
- * (backend: CourseResumeState → ResumeTargetSerializer)
- */
-export type ResumeTarget = {
-  course_code: string;
-  unit_name: string;
-  subtopic_name: string;
-};
-
-/**
  * Thrown when the backend returns 404 (no resume state for this course yet).
  */
 export class NoResumeStateError extends Error {
