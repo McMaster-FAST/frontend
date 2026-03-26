@@ -5,8 +5,8 @@ import {
   SheetTitle,
   SheetFooter,
 } from "@/components/ui/sheet";
-import CommentCard from "@/components/ui/custom/comments/comment-card/comment-card";
-import CommentCardSkeleton from "@/components/ui/custom/comments/comment-card/comment-card-skeleton";
+import CommentCard from "@/components/macfast/comments/comment-card/comment-card";
+import CommentCardSkeleton from "@/components/macfast/comments/comment-card/comment-card-skeleton";
 import {
   InputGroup,
   InputGroupAddon,

@@ -13,7 +13,7 @@ import { Flag } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
-import { Input } from "../input";
+import { Input } from "../ui/input";
 
 enum QuestionFlagReason {
   TEXT_FORMATTING = "Formatting of text",
@@ -28,7 +28,10 @@ interface QuestionFlagDialogProps {
   onSubmit?: (reasons: QuestionFlagReason[]) => void;
   disabled?: boolean;
 }
-export function QuestionFlagDialog({ onSubmit, disabled }: QuestionFlagDialogProps) {
+export function QuestionFlagDialog({
+  onSubmit,
+  disabled,
+}: QuestionFlagDialogProps) {
   const [open, setOpen] = useState(false);
   const [selectedReasons, setSelectedReasons] = useState<QuestionFlagReason[]>(
     [],

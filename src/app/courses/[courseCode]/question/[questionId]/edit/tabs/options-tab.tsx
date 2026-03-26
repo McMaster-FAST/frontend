@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { SafeHtmlInline } from "@/components/ui/custom/safe-html";
+import { SafeHtmlInline } from "@/components/macfast/safe-html";
 import { Label } from "@/components/ui/label";
 import { TabsContent } from "@/components/ui/tabs";
 import { Check, CirclePlus, Trash2 } from "lucide-react";
@@ -67,7 +67,7 @@ export default function OptionsTab({ question, setQuestion }: OptionsTabProps) {
 
   const addQuestionOption = () => {
     const newOption: QuestionOption = {
-      public_id: "", 
+      public_id: "",
       content: "",
       is_answer: false,
       selection_frequency: 0,

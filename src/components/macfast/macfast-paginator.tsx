@@ -1,10 +1,10 @@
-import { Badge } from "../badge";
+import { Badge } from "@/components/ui/badge";
 import {
   Pagination,
   PaginationContent,
   PaginationNext,
   PaginationPrevious,
-} from "../pagination";
+} from "@/components/ui/pagination";
 
 interface MacFastPaginatorProps {
   pageNumber: number;

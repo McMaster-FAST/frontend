@@ -6,7 +6,7 @@ export function UnitsAccordionSkeleton() {
       {[1, 2, 3, 4, 5].map((index) => (
         <div
           key={index}
-          className="flex items-center justify-between gap-4 rounded-lg border border-slate-200 bg-white px-4 py-3 shadow-sm"
+          className="flex items-center justify-between gap-4 rounded-lg border border-muted-foreground bg-white px-4 py-3 shadow-sm"
         >
           <div className="w-full max-w-[75%] space-y-2">
             <Skeleton className="h-5 w-48 rounded-md" />

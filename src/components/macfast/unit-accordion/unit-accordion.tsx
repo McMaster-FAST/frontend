@@ -8,7 +8,6 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import { Video } from "lucide-react";
 import Link from "next/link";
 import { AbilityScoreBar } from "../ability-score-bar/ability-score-bar";
-import { AnimatedXPBar } from "../level-xp-bar/level-xp-bar";
 import { CompletionBar } from "../completion-bar/completion-bar";
 
 interface UnitsAccordionProps {
@@ -19,7 +18,11 @@ interface UnitsAccordionProps {
 }
 
 function UnitsAccordion({ tab, course, value, setValue }: UnitsAccordionProps) {
-  const getEncodedTestURI = (courseCode: string, unitName: string, subtopicName: string) => {
+  const getEncodedTestURI = (
+    courseCode: string,
+    unitName: string,
+    subtopicName: string,
+  ) => {
     const encodedCourseCode = encodeURIComponent(courseCode);
     const encodedUnitName = encodeURIComponent(unitName);
     const encodedSubtopicName = encodeURIComponent(subtopicName);
@@ -54,11 +57,7 @@ function UnitsAccordion({ tab, course, value, setValue }: UnitsAccordionProps) {
                   {`Unit ${unit.number}: ${unit.name}`}
                 </div>
                 {tab === "practiceProblems" && (
-                  <div className="flex flex-row items-center w-full gap-6 mt-1">
-                    <div className="flex-1">
-                      <AnimatedXPBar totalXp={rawTotalXp} />
-                    </div>
-
+                  <div className="flex flex-row items-center w-1/2 gap-6 mt-1">
                     <div className="flex-1">
                       <CompletionBar
                         correct={correctQuestions}
@@ -72,8 +71,10 @@ function UnitsAccordion({ tab, course, value, setValue }: UnitsAccordionProps) {
               <div className="flex items-center gap-4 flex-shrink-0">
                 {tab === "practiceProblems" && (
                   <span
-                    className={`text-sm font-normal hidden sm:inline-block ${
-                      attemptedCount > 0 ? "text-dark-gray" : "text-primary"
+                    className={`text-sm font-normal text-foreground hidden sm:inline-block ${
+                      attemptedCount > 0
+                        ? "text-foreground"
+                        : "text-muted-foreground"
                     }`}
                   >
                     {attemptedCount > 0
@@ -107,8 +108,8 @@ function UnitsAccordion({ tab, course, value, setValue }: UnitsAccordionProps) {
                         <span
                           className={`flex flex-1 text-sm justify-center ${
                             subtopic.user_ability?.mastery_value
-                              ? "text-dark-gray"
-                              : "text-primary"
+                              ? "text-foreground"
+                              : "text-muted-foreground"
                           }`}
                         >
                           {subtopic.user_ability?.mastery_value
@@ -118,7 +119,11 @@ function UnitsAccordion({ tab, course, value, setValue }: UnitsAccordionProps) {
                         <div className="flex-0 flex justify-end">
                           <Button variant="secondary" className="text-sm">
                             <Link
-                              href={getEncodedTestURI(course.code, unit.name, subtopic.name)}
+                              href={getEncodedTestURI(
+                                course.code,
+                                unit.name,
+                                subtopic.name,
+                              )}
                             >
                               Practice
                             </Link>
@@ -130,7 +135,7 @@ function UnitsAccordion({ tab, course, value, setValue }: UnitsAccordionProps) {
                   {tab === "learningObjectives" &&
                     subtopic.description &&
                     subtopic.description.length > 0 && (
-                      <p className="mt-2 ml-6 leading-tight text-sm text-dark-gray font-medium">
+                      <p className="mt-2 ml-6 leading-tight text-sm text-muted-foreground font-medium">
                         {subtopic.description}
                       </p>
                     )}
