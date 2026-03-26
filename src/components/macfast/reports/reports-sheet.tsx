@@ -4,11 +4,11 @@ import {
   SheetContent,
   SheetHeader,
   SheetTitle,
-} from "../../sheet";
+} from "@/components/ui/sheet";
 import { getQuestionReports } from "@/lib/question-api";
 import { useAuthFetch } from "@/hooks/useFetchWithAuth";
 import ReportCard from "./report-card";
-import { ScrollArea } from "../../scroll-area";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface ReportsSheetProps {
   questionId: string;

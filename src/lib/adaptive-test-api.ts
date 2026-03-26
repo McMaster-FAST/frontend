@@ -8,7 +8,6 @@ import {
 const API_BASE_URL = "/api/core/adaptive-test";
 
 function convertToContinueAction(action: string): ContinueAction | undefined {
-  console.log(`Converting action: ${action}`);
   if (Object.keys(ContinueAction).includes(action)) {
     return ContinueAction[action as keyof typeof ContinueAction];
   }
@@ -41,7 +40,6 @@ function convertToTestQuestion(data: any): {
   continue_actions: ContinueAction[];
   suggested_actions: SuggestedAction[];
 } {
-  console.log(data);
   const question_data = data.question;
   if (!question_data) {
     return {

@@ -5,8 +5,8 @@ import {
   CardDescription,
   CardFooter,
   CardTitle,
-} from "../../card";
-import { Badge } from "../../badge";
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import Link from "next/dist/client/link";
 
 interface ReportCardProps {

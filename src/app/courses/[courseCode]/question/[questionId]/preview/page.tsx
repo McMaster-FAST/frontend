@@ -2,17 +2,17 @@
 
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { MacFastHeader } from "@/components/ui/custom/macfast-header";
+import { MacFastHeader } from "@/components/macfast/macfast-header";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { ChevronsRight } from "lucide-react";
 import { useAuthFetch } from "@/hooks/useFetchWithAuth";
-import { getQuestionByPublicId } from "@/lib/question-api";
-import { QuestionPage } from "@/components/ui/custom/question-page";
-import { QuestionFlagDialog } from "@/components/ui/custom/question-flag-dialog";
+import { getQuestionByPublicId } from "@/lib/api";
+import { QuestionPage } from "@/components/macfast/question-page";
+import { QuestionFlagDialog } from "@/components/macfast/question-flag-dialog";
 import { Checkbox } from "@/components/ui/checkbox";
-import { SafeHtml } from "@/components/ui/custom/safe-html";
+import { SafeHtml } from "@/components/macfast/safe-html";
 
 interface QuestionPreviewPageProps {
   // If provided, will use this question data instead of fetching it. Useful for previewing unsaved changes.

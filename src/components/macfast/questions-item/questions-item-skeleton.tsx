@@ -9,7 +9,7 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Skeleton } from "../../skeleton";
+import { Skeleton } from "../../ui/skeleton";
 
 function QuestionItemSkeleton() {
   return (

@@ -30,7 +30,9 @@ export default function CommentCard({
 
   return (
     <div className="flex flex-row w-full gap-2">
-      {!replies && <CornerDownRight className="text-primary ml-auto" />}
+      {!replies && (
+        <CornerDownRight className="text-primary dark:text-primary-hover ml-auto" />
+      )}
       <div className="flex flex-col gap-2 w-full">
         <Card className="w-full px-4">
           <CardContent>
@@ -60,7 +62,7 @@ export default function CommentCard({
               {onReply && (
                 <p
                   onClick={() => onReply(comment.public_id)}
-                  className="text-primary ml-auto cursor-pointer hover:underline select-none"
+                  className="text-primary dark:text-primary-hover ml-auto cursor-pointer hover:underline select-none"
                 >
                   Reply
                 </p>
@@ -72,7 +74,7 @@ export default function CommentCard({
           <>
             {replies.length > 0 && (
               <Label
-                className="text-sm flex items-center gap-1 cursor-pointer select-none ml-auto text-primary"
+                className="text-sm flex items-center gap-1 cursor-pointer select-none ml-auto text-primary dark:text-primary-hover"
                 onClick={() => setAreRepliesOpen(!areRepliesOpen)}
               >
                 {areRepliesOpen ? "Hide" : "View"} {replies.length}{" "}
