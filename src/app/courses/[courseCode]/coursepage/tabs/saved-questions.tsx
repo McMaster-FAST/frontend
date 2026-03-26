@@ -1,5 +1,5 @@
-import SavedQuestionItem from "@/components/ui/custom/saved-questions-item/saved-questions-item";
-import SavedQuestionItemSkeleton from "@/components/ui/custom/saved-questions-item/saved-questions-skeleton";
+import SavedQuestionItem from "@/components/macfast/saved-questions-item/saved-questions-item";
+import SavedQuestionItemSkeleton from "@/components/macfast/saved-questions-item/saved-questions-skeleton";
 import { TabsContent } from "@/components/ui/tabs";
 import { useSavedForLaters } from "@/hooks/useSavedForLaters";
 
@@ -20,10 +20,10 @@ export default function SavedQuestionsTab({
     >
       <div className="flex flex-col gap-4">
         <div className="mb-2">
-          <h2 className="text-lg font-semibold text-slate-800">
+          <h2 className="text-lg font-semibold text-foreground">
             Saved Questions
           </h2>
-          <p className="text-sm text-dark-gray">
+          <p className="text-sm text-muted-foreground">
             Manage the questions you've saved for review.
           </p>
         </div>
@@ -57,7 +57,7 @@ export default function SavedQuestionsTab({
           )}
         </div>
         {savedForLaters?.length === 0 && (
-          <div className="rounded-lg border border-dashed border-light-gray p-10 text-center text-dark-gray">
+          <div className="rounded-lg border border-dashed border-light-gray p-10 text-center text-muted-foreground">
             When you save questions, they'll appear here.
           </div>
         )}
