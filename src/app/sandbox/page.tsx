@@ -14,7 +14,7 @@ import {
   DropdownMenuLabel,
 } from "@radix-ui/react-dropdown-menu";
 import { Progress } from "@/components/ui/progress";
-import { AlertCircle, ChevronDown } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import React from "react";
 import {
   Table,
@@ -37,6 +37,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import CourseCard from "@/components/macfast/course-card/course-card";
 import UnitsAccordion from "@/components/macfast/unit-accordion/unit-accordion";
 import { Questions } from "@/app/courses/[courseCode]/dashboard/tabs/questions-tab";
+import debounce from "lodash/debounce";
 import CommentsSheet from "@/components/macfast/comments/comments-sheet";
 
 interface QuestionRow {
@@ -69,10 +70,15 @@ export default function Home() {
   return (
     <main>
       <div>
-        <CommentsSheet
-          open={true}
-          onOpenChange={(open) => console.log("Comments sheet open:", open)}
-        />
+        <Button
+          variant="secondary"
+          className="w-[300px]"
+          onClick={debounce((event) => console.log("Debounced!"), 1000)}
+        >
+          Content
+        </Button>
+
+        <MacFastHeader />
         <Button variant="primary">Primary</Button>
         <Button variant="secondary">Secondary</Button>
         <Button variant="tertiary">Tertiary</Button>

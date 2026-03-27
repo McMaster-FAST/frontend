@@ -5,17 +5,20 @@ import * as TabsPrimitive from "@radix-ui/react-tabs";
 
 import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/dist/client/components/navigation";
 
 function Tabs({
   className,
   ...props
 }: React.ComponentProps<typeof TabsPrimitive.Root>) {
+  const router = useRouter();
   const [currentTab, setCurrentTab] = useState("");
 
   const updateTab = (value: string) => {
-    window.location.hash = value;
+    router.replace(`#${value}`);
     setCurrentTab(value);
   };
+
   useEffect(() => {
     const tabFromHash = window.location.hash.substring(1);
     updateTab(tabFromHash || props.defaultValue || "");
