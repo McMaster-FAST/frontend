@@ -8,7 +8,7 @@ import { Spinner } from "@/components/ui/spinner";
 
 interface SavedQuestionItemProps {
   question: SavedForLaterQuestion;
-  onRemove: () => void;
+  onRemove: () => Promise<void> | void;
   props?: React.ComponentPropsWithoutRef<"div">;
 }
 
@@ -44,7 +44,14 @@ export default function SavedQuestionItem({
           Review
         </Link>
       </Button>
-      <Button variant="tertiary" onClick={onRemove}>
+      <Button
+        variant="tertiary"
+        onClick={async () => {
+          setIsRemoving(true);
+          await onRemove();
+          setIsRemoving(false);
+        }}
+      >
         {isRemoving ? <Spinner /> : <Trash2 />}
         Remove
       </Button>
