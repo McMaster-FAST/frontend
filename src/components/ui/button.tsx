@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Slot } from "@radix-ui/react-slot";
+import { Slot, Slottable } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
@@ -9,11 +9,11 @@ const buttonVariants = cva(
     variants: {
       variant: {
         primary:
-          "bg-primary text-primary-foreground dark:bg-foreground dark:text-primary hover:bg-primary-hover hover:text-black dark:hover:bg-primary-hover dark:hover:text-black disabled:bg-disabled-primary",
+          "bg-primary text-primary-foreground dark:bg-foreground hover:bg-primary-hover hover:text-black dark:hover:bg-primary-hover dark:hover:text-black dark:hover:shadow-[inset_0_0_0_2px_var(--color-gold)] disabled:bg-disabled-primary disabled:shadow-[inset_0_0_0_2px_var(--color-disabled-secondary)] disabled:dark:text-disabled-secondary dark:text-primary",
         secondary:
-          "bg-secondary text-secondary-foreground dark:bg-background dark:text-foreground shadow-[inset_0_0_0_2px_var(--color-secondary-foreground)] hover:bg-secondary-hover hover:text-white dark:hover:bg-secondary-hover dark:hover:text-white disabled:bg-disabled-primary disabled:shadow-[inset_0_0_0_2px_var(--color-disabled-secondary)]",
+          "bg-secondary text-secondary-foreground dark:bg-background dark:text-foreground shadow-[inset_0_0_0_2px_var(--color-secondary-foreground)] dark:hover:shadow-[inset_0_0_0_2px_var(--color-primary)] hover:bg-secondary-hover hover:text-white dark:hover:bg-secondary-hover dark:hover:border-primary dark:hover:text-white disabled:bg-disabled-primary disabled:shadow-[inset_0_0_0_2px_var(--color-disabled-secondary)]",
         tertiary:
-          "text-tertiary-foreground dark:text-foreground hover:text-tertiary-hover-foreground dark:hover:text-primary-hover focus:ring-0 [&_svg]:text-primary [&_svg]:stroke-sm",
+          "text-tertiary-foreground dark:text-foreground hover:text-tertiary-hover-foreground dark:text-white dark:[&_svg]:text-gold dark:hover:text-primary-hover dark:hover:[&_svg]:text-primary-hover focus:ring-0 [&_svg]:text-primary [&_svg]:stroke-sm",
       },
       size: {
         default:

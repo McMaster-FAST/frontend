@@ -9,11 +9,11 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Flag } from "lucide-react";
+import { AlertTriangle } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
-import { Input } from "../ui/input";
+import { Input } from "@/components/ui/input";
 
 enum QuestionFlagReason {
   TEXT_FORMATTING = "Formatting of text",
@@ -28,50 +28,69 @@ interface QuestionFlagDialogProps {
   onSubmit?: (reasons: QuestionFlagReason[]) => void;
   disabled?: boolean;
 }
+
+interface ReportAnswers {
+  reasons: QuestionFlagReason[];
+  additionalDetails: string;
+  email: string;
+}
+
+interface FormValidityState {
+  reasons: boolean;
+  email: boolean;
+  additionalDetails: boolean;
+}
+
 export function QuestionFlagDialog({
   onSubmit,
   disabled,
 }: QuestionFlagDialogProps) {
   const [open, setOpen] = useState(false);
-  const [selectedReasons, setSelectedReasons] = useState<QuestionFlagReason[]>(
-    [],
-  );
-  const [additionalDetails, setAdditionalDetails] = useState("");
-  const [email, setEmail] = useState("");
+  const [reportAnswers, setReportAnswers] = useState<ReportAnswers>({
+    reasons: [],
+    additionalDetails: "",
+    email: "",
+  });
 
-  const handleSubmitReport = () => {
+  const handleSubmitReport = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSubmit?.(reportAnswers.reasons);
     setOpen(false);
-    onSubmit?.(selectedReasons);
   };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <form>
         <DialogTrigger asChild>
-          <Button variant="primary" disabled={disabled}>
-            <Flag className="size-4" />
+          <Button variant="secondary" disabled={disabled}>
+            Report question
+            <AlertTriangle className="size-4" />
           </Button>
         </DialogTrigger>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>Flag Question</DialogTitle>
+            <DialogTitle>Report Question</DialogTitle>
             <DialogDescription>Please select a reason.</DialogDescription>
           </DialogHeader>
           {Object.entries(QuestionFlagReason).map(([key, reason]) => (
             <div key={key} className="inline-flex gap-2">
               <Checkbox
                 id={key}
-                checked={selectedReasons.includes(key as QuestionFlagReason)}
+                checked={reportAnswers.reasons.includes(key as QuestionFlagReason)}
                 onCheckedChange={(checked) => {
                   if (checked) {
-                    setSelectedReasons([
-                      ...selectedReasons,
-                      key as QuestionFlagReason,
-                    ]);
+                    setReportAnswers({
+                      ...reportAnswers,
+                      reasons: [...reportAnswers.reasons, key as QuestionFlagReason],
+                    });
+
                   } else {
-                    setSelectedReasons(
-                      selectedReasons.filter((reason) => reason !== key),
-                    );
+                    setReportAnswers({
+                      ...reportAnswers,
+                      reasons: reportAnswers.reasons.filter(
+                        (reason) => reason !== key,
+                      ),
+                    });
                   }
                 }}
               />
@@ -86,8 +105,11 @@ export function QuestionFlagDialog({
             id="additional-details"
             placeholder="Additional details"
             className="mt-2"
-            value={additionalDetails}
-            onChange={(e) => setAdditionalDetails(e.target.value)}
+            value={reportAnswers.additionalDetails}
+            onChange={(e) => setReportAnswers({
+              ...reportAnswers,
+              additionalDetails: e.target.value
+            })}
           />
           <Label htmlFor="email" className="mt-4">
             Can we reach out to you if we have more questions? Please provide
@@ -98,8 +120,11 @@ export function QuestionFlagDialog({
             type="email"
             placeholder="Email address"
             className="mt-2"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            value={reportAnswers.email}
+            onChange={(e) => setReportAnswers({
+              ...reportAnswers,
+              email: e.target.value
+            })}
           />
           <DialogFooter>
             <DialogClose asChild>
@@ -108,7 +133,7 @@ export function QuestionFlagDialog({
             <Button
               type="submit"
               onClick={handleSubmitReport}
-              disabled={selectedReasons.length === 0}
+              disabled={reportAnswers.reasons.length === 0}
             >
               Report
             </Button>

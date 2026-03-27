@@ -5,11 +5,19 @@ import * as CheckboxPrimitive from "@radix-ui/react-checkbox";
 import { CheckIcon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
+import { Spinner } from "./spinner"
 
+interface CheckboxProps  extends React.ComponentProps<typeof CheckboxPrimitive.Root> {
+  isActionLoading?: boolean;
+}
 function Checkbox({
   className,
+  isActionLoading,
   ...props
-}: React.ComponentProps<typeof CheckboxPrimitive.Root>) {
+}: CheckboxProps) {
+  if (isActionLoading) {
+    return <Spinner className="size-5 text-primary" />
+  }
   return (
     <CheckboxPrimitive.Root
       data-slot="checkbox"
