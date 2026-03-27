@@ -38,6 +38,6 @@ export function useSavedForLaters(manualCode?: string) {
     savedForLaters: data,
     isLoading,
     error,
-    setSavedForLaters: mutate,
+    refetchSavedForLaters: mutate,
   };
 }

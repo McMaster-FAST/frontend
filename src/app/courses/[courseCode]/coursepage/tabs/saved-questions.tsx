@@ -1,7 +1,9 @@
 import SavedQuestionItem from "@/components/macfast/saved-questions-item/saved-questions-item";
 import SavedQuestionItemSkeleton from "@/components/macfast/saved-questions-item/saved-questions-skeleton";
 import { TabsContent } from "@/components/ui/tabs";
+import { useAuthFetch } from "@/hooks/useFetchWithAuth";
 import { useSavedForLaters } from "@/hooks/useSavedForLaters";
+import { setSavedForLater } from "@/lib/api";
 
 interface SavedQuestionsTabProps {
   courseCode: string;
@@ -10,8 +12,9 @@ interface SavedQuestionsTabProps {
 export default function SavedQuestionsTab({
   courseCode,
 }: SavedQuestionsTabProps) {
-  const { savedForLaters, isLoading, error, setSavedForLaters } =
+  const { savedForLaters, isLoading, error, refetchSavedForLaters } =
     useSavedForLaters(courseCode);
+  const authFetch = useAuthFetch();
 
   return (
     <TabsContent
@@ -42,14 +45,14 @@ export default function SavedQuestionsTab({
                     key={savedForLater.question.public_id}
                     question={savedForLater.question}
                     onRemove={() => {
-                      setSavedForLaters(
-                        savedForLaters.filter(
-                          (s) =>
-                            s.question.public_id !==
-                            savedForLater.question.public_id,
-                        ),
-                        { revalidate: false },
-                      );
+                      setSavedForLater(
+                        courseCode,
+                        savedForLater.question.public_id,
+                        false,
+                        authFetch,
+                      ).then(() => {
+                        refetchSavedForLaters();
+                      });
                     }}
                   />
                 ))}
