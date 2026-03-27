@@ -104,15 +104,7 @@ export async function getSavedQuestions(
   return getJson(response);
 }
 
-export const setSavedForLaterDebounced = debounce(
-  (
-    courseCode: string,
-    questionId: string,
-    saveForLater: boolean,
-    authFetch: ReturnType<typeof useAuthFetch>,
-  ) => setSavedForLater(courseCode, questionId, saveForLater, authFetch),
-  500,
-);
+export const setSavedForLaterDebounced = () => debounce(setSavedForLater, 300);
 
 export async function setSavedForLater(
   courseCode: string,
@@ -120,13 +112,19 @@ export async function setSavedForLater(
   saveForLater: boolean,
   authFetch: ReturnType<typeof useAuthFetch>,
 ) {
-  const repsonse = await authFetch(`/api/core/saved-for-later/${courseCode}/`, {
+  const response = await authFetch(`/api/core/saved-for-later/${courseCode}/`, {
     method: saveForLater ? "POST" : "DELETE",
     body: JSON.stringify({
       question_public_id: questionId,
     }),
   });
-  return getJson(repsonse);
+  if (!response.ok) {
+    throw new Error(
+      `Failed to ${saveForLater ? "save" : "unsave"} question for later: ${
+        response.statusText
+      }`,
+    );
+  }
 }
 
 export async function getQuestionById(

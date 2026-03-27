@@ -1,8 +1,9 @@
-import { setSavedForLaterDebounced } from "@/lib/api";
+import { setSavedForLater, setSavedForLaterDebounced } from "@/lib/api";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { useAuthFetch } from "@/hooks/useFetchWithAuth";
 import { useEffect, useState } from "react";
+import { debounce, set } from "lodash";
 
 interface SaveForLaterProps {
   courseCode: string | null;
@@ -20,23 +21,28 @@ export default function SaveForLater({
   const [isActionLoading, setIsActionLoading] = useState(false);
   const disabled = !!error || !courseCode || !question;
 
-  const handleSaveForLater = (checked: boolean) => {
+  const handleSaveForLater = async (checked: boolean) => {
     if (!courseCode || !question?.public_id) {
-      setSaved(!checked);
       return;
     }
-    setSavedForLaterDebounced(
-      courseCode,
-      question.public_id,
-      checked,
-      authFetch,
-    );
+
+    const setSavedForLaterWithLoading = () => {
+      setSaved(checked);
+      setIsActionLoading(true);
+      setSavedForLater(courseCode, question.public_id, checked, authFetch)
+        .catch(() => {
+          setSaved(!checked);
+        })
+        .finally(() => setIsActionLoading(false));
+    };
+
+    debounce(setSavedForLaterWithLoading, 300)();
   };
 
   useEffect(() => {
     if (!question) return;
     setSaved(question.saved_for_later);
-  }, [question]);
+  }, [question?.public_id]);
 
   return (
     <div className="inline-flex gap-2">

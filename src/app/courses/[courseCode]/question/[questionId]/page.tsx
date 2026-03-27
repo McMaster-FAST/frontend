@@ -1,20 +1,18 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { QuestionFlagDialog } from "@/components/ui/custom/report-question-dialog";
-import { Label } from "@/components/ui/label";
+import { QuestionFlagDialog } from "@/components/macfast/report-question-dialog";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import Link from "next/link";
-import DOMPurify from "dompurify";
-import { MacFastHeader } from "@/components/ui/custom/macfast-header";
+import { MacFastHeader } from "@/components/macfast/macfast-header";
 import { useEffect, useState } from "react";
 import { getQuestionById, setSavedForLaterDebounced } from "@/lib/api";
 import { useAuthFetch } from "@/hooks/useFetchWithAuth";
 import React from "react";
-import { SafeHtml } from "@/components/ui/custom/safe-html";
-import { QuestionPage } from "@/components/ui/custom/question-page";
+import { SafeHtml } from "@/components/macfast/safe-html";
+import { QuestionPage } from "@/components/macfast/question-page";
 import { ChevronsRight } from "lucide-react";
+import SaveForLater from "@/components/macfast/save-for-later";
+import QuestionOption from "@/components/macfast/question-option/question-option";
 
 interface QuestionPageProps {
   params: Promise<{
@@ -65,26 +63,15 @@ function SingleQuestionPage({ params: paramsPromise }: QuestionPageProps) {
             >
               {question?.options &&
                 question.options.map((option) => (
-                  <div
+                  <QuestionOption
                     key={option.public_id}
-                    className="flex items-center gap-2 w-full"
-                  >
-                    <RadioGroupItem
-                      value={option.public_id}
-                      className="cursor-pointer"
-                    />
-                    <Label
-                      className={
-                        "border-2 p-6 rounded-md items-center flex gap-2 w-full" +
-                        (correctOptionId === option.public_id
-                          ? " border-primary"
-                          : "")
-                      }
-                      dangerouslySetInnerHTML={{
-                        __html: DOMPurify.sanitize(option.content),
-                      }}
-                    ></Label>
-                  </div>
+                    option={option}
+                    selectedOption={selectedOption}
+                    correctOptionId={correctOptionId}
+                    submitted={submitted}
+                    isSubmitSuccess={submitSuccess}
+                    question={question}
+                  />
                 ))}
             </RadioGroup>
           </QuestionPage.Options>
@@ -106,11 +93,7 @@ function SingleQuestionPage({ params: paramsPromise }: QuestionPageProps) {
           </QuestionPage.AnswerTitle>
           <QuestionPage.AnswerBody>
             <p className="font-poppins text-2xl">
-              <SafeHtml
-                html={
-                  solution || ""
-                }
-              />
+              <SafeHtml html={solution || ""} />
             </p>
           </QuestionPage.AnswerBody>
           <QuestionPage.AnswerPlaceholder>
@@ -128,19 +111,11 @@ function SingleQuestionPage({ params: paramsPromise }: QuestionPageProps) {
           <QuestionFlagDialog onSubmit={() => {}} />
           <div className="inline-flex items-center gap-4">
             <div className="inline-flex gap-2">
-              <Checkbox
-                id="save-for-later"
-                checked={question?.saved_for_later || false}
-                onCheckedChange={(checked: boolean) =>
-                  setSavedForLaterDebounced(
-                    courseCode,
-                    question.public_id,
-                    checked,
-                    authFetch,
-                  )
-                }
+              <SaveForLater
+                courseCode={courseCode}
+                question={question}
+                error={""}
               />
-              <Label htmlFor="save-for-later">Save for Later</Label>
             </div>
             <Button variant="secondary" disabled={submitted}>
               Skip
@@ -154,13 +129,7 @@ function SingleQuestionPage({ params: paramsPromise }: QuestionPageProps) {
             </Button>
           </div>
         </div>
-        <div id="answer-section" className="flex-1 flex justify-end">
-          <Button variant="primary" asChild>
-            <Link href={`../coursepage#savedQuestions`}>
-              Back to saved questions
-            </Link>
-          </Button>
-        </div>
+        <div id="answer-section" className="flex-1 flex justify-end"></div>
       </QuestionPage.Actions>
     </QuestionPage>
   );
