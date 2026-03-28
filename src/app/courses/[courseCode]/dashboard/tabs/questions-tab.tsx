@@ -175,7 +175,7 @@ export function Questions({ course }: QuestionsProps) {
               ? [...Array(3)].map((_, i) => <QuestionItemSkeleton key={i} />)
               : (Array.isArray(questions) ? questions : []).map((question) => (
                   <QuestionItem
-                    key={question.serial_number}
+                    key={question.public_id}
                     question={question}
                     onPreview={() => navigateToPreview(question.public_id)}
                     onEdit={() => navigateToEdit(question.public_id)}
@@ -184,7 +184,7 @@ export function Questions({ course }: QuestionsProps) {
                       setCommentsSheetOpen(true);
                     }}
                     onDelete={() =>
-                      console.log("Delete:", question.serial_number)
+                      console.log("Delete:", question.public_id)
                     }
                   />
                 ))}

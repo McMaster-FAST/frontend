@@ -1,5 +1,6 @@
-import { auth } from "@/auth";
 import { useAuthFetch } from "@/hooks/useFetchWithAuth";
+import debounce from "lodash/debounce";
+import { auth } from "@/auth";
 
 export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
@@ -92,6 +93,55 @@ export async function getAllQuestions() {
   return getJson(response);
 }
 
+export async function getSavedQuestions(
+  courseCode: string,
+  authFetch: ReturnType<typeof useAuthFetch>,
+) {
+  const response = await authFetch(`/api/core/saved-for-later/${courseCode}/`, {
+    method: "GET",
+  });
+
+  return getJson(response);
+}
+
+export const setSavedForLaterDebounced = () => debounce(setSavedForLater, 300);
+
+export async function setSavedForLater(
+  courseCode: string,
+  questionId: string,
+  saveForLater: boolean,
+  authFetch: ReturnType<typeof useAuthFetch>,
+) {
+  const response = await authFetch(`/api/core/saved-for-later/${courseCode}/`, {
+    method: saveForLater ? "POST" : "DELETE",
+    body: JSON.stringify({
+      question_public_id: questionId,
+    }),
+  });
+  if (!response.ok) {
+    throw new Error(
+      `Failed to ${saveForLater ? "save" : "unsave"} question for later: ${
+        response.statusText
+      }`,
+    );
+  }
+}
+
+export async function getQuestionById(
+  courseCode: string,
+  questionId: string,
+  authFetch: ReturnType<typeof useAuthFetch>,
+) {
+  const response = await authFetch(
+    `/api/courses/${courseCode}/questions/${questionId}/`,
+    {
+      method: "GET",
+    },
+  );
+
+  return getJson(response);
+}
+
 export async function updateSelWindowUpperBound(
   subtopic_id: string,
   authFetch: typeof fetchWithAuth,
@@ -104,7 +154,9 @@ export async function updateSelWindowUpperBound(
     },
   );
   if (!response.ok) {
-    throw new Error(`Failed to update selection window upper bound: ${response.statusText}`);
+    throw new Error(
+      `Failed to update selection window upper bound: ${response.statusText}`,
+    );
   }
 }
 
@@ -121,7 +173,9 @@ export async function updateSelWindowLowerBound(
   );
 
   if (!response.ok) {
-    throw new Error(`Failed to update selection window lower bound: ${response.statusText}`);
+    throw new Error(
+      `Failed to update selection window lower bound: ${response.statusText}`,
+    );
   }
 }
 

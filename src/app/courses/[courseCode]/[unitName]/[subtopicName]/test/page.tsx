@@ -14,8 +14,6 @@ import {
   submitAnswer,
 } from "@/lib/adaptive-test-api";
 import { useAuthFetch } from "@/hooks/useFetchWithAuth";
-import { Skeleton } from "@/components/ui/skeleton";
-import { QuestionFlagDialog } from "@/components/macfast/question-flag-dialog";
 import { resolveImages } from "@/lib/utils";
 import TestContinueDialog from "@/components/macfast/test-continue-dialog";
 
@@ -33,9 +31,11 @@ import Link from "next/link";
 
 import { ReportQuestionDialog } from "@/components/macfast/report-question-dialog";
 import { reportQuestion } from "@/lib/question-api";
+import SaveForLater from "@/components/macfast/save-for-later";
 import { QuestionPage } from "@/components/macfast/question-page";
 import { MacFastHeader } from "@/components/macfast/macfast-header";
 import { SafeHtml } from "@/components/macfast/safe-html";
+import QuestionOption from "@/components/macfast/question-option/question-option";
 
 interface QuestionTestPageProps {
   params: Promise<{
@@ -222,7 +222,9 @@ function QuestionTestPage({ params: paramsPromise }: QuestionTestPageProps) {
         );
         setNotes(generateNoteFromSuggestedActions(suggested_actions));
       })
-      .catch((err) => setError(err.message))
+      .catch((err: Error) => {
+        setError(err.message);
+      })
       .finally(() => setIsQuestionLoading(false));
   };
 
@@ -334,52 +336,17 @@ function QuestionTestPage({ params: paramsPromise }: QuestionTestPageProps) {
                 className="flex flex-col gap-3"
                 disabled={submitted}
               >
-                {question?.options.map((option) => {
-                  const isCorrect = option.public_id === correctOptionId;
-                  const isSelected = option.public_id === selectedOption;
-                  const isWrongSelection = isSelected && !isCorrect;
-
-                  let boxClasses =
-                    "border-2 p-6 rounded-md items-center flex gap-2 w-full transition-all duration-200 ";
-
-                  if (!submitSuccess) {
-                    boxClasses +=
-                      "border-border peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/5 ";
-                    if (!submitted) boxClasses += "hover:bg-muted/50 ";
-                  } else {
-                    if (isCorrect) {
-                      boxClasses += "border-primary-hover";
-                    } else if (isWrongSelection) {
-                      boxClasses += "border-primary";
-                    } else {
-                      boxClasses += "border-border opacity-50 ";
-                    }
-                  }
-
-                  return (
-                    <Label
+                {question?.options.map((option) => 
+                    <QuestionOption
                       key={option.public_id}
-                      htmlFor={option.public_id}
-                      className={`w-full ${submitted ? "cursor-default" : "cursor-pointer"}`}
-                    >
-                      <RadioGroupItem
-                        value={option.public_id}
-                        id={option.public_id}
-                        className="sr-only peer"
-                        disabled={submitted}
-                      />
-
-                      <div className={boxClasses}>
-                        <SafeHtml
-                          html={resolveImages(
-                            option.content,
-                            question.public_id,
-                          )}
-                        />
-                      </div>
-                    </Label>
-                  );
-                })}
+                      option={option}
+                      correctOptionId={correctOptionId}
+                      submitted={submitted}
+                      isSubmitSuccess={submitSuccess}
+                      selectedOption={selectedOption}
+                      question={question}
+                    />
+                )}
               </RadioGroup>
             )}
           </QuestionPage.Options>
@@ -430,23 +397,21 @@ function QuestionTestPage({ params: paramsPromise }: QuestionTestPageProps) {
             <ReportQuestionDialog onSubmit={handleReportQuestion} />
           </div>
           <div className="inline-flex items-center gap-4">
-            <div className="inline-flex gap-2">
-              <Checkbox
-                id="save-for-later"
-                onCheckedChange={handleSaveForLater}
-              />
-              <Label htmlFor="save-for-later">Save for Later</Label>
-            </div>
+            <SaveForLater
+              courseCode={courseCode}
+              question={question}
+              error={error}
+            />
             <Button
               variant="secondary"
-              disabled={submitted}
+              disabled={submitted || !!error}
               onClick={handleSkip}
             >
               Skip
             </Button>
             <Button
               variant="primary"
-              disabled={!selectedOption || submitted}
+              disabled={!selectedOption || submitted || !!error}
               onClick={handleSubmit}
             >
               Submit

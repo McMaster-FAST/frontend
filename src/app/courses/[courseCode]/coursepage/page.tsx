@@ -1,12 +1,9 @@
 "use client";
-
-import { MacFastHeader } from "@/components/macfast/macfast-header";
+import { AlertCircle } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { MacFastHeader } from "@/components/macfast/macfast-header";
 import UnitsAccordion from "@/components/macfast/unit-accordion/unit-accordion";
-import { Badge } from "@/components/ui/badge";
 import {
-  AlertCircle,
-  AlertTriangle,
   BookOpen,
   GraduationCap,
   LineChart,
@@ -14,7 +11,7 @@ import {
 } from "lucide-react";
 import { useCourseData } from "@/hooks/useCourseData";
 import { useState } from "react";
-import { Skeleton } from "@/components/ui/skeleton";
+import SavedQuestionsTab from "./tabs/saved-questions";
 import { UnitsAccordionSkeleton } from "@/components/macfast/unit-accordion/unit-accordion-skeleton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { CourseBanner } from "@/components/macfast/course-banner/course-banner";
@@ -149,14 +146,7 @@ function CoursePage() {
             </div>
           </TabsContent>
 
-          <TabsContent
-            value="savedQuestions"
-            className="mt-0 flex-1 overflow-y-auto min-h-0 pr-2"
-          >
-            <div className="rounded-lg border border-dashed border-light-gray p-10 text-center text-muted-foreground">
-              No saved questions yet.
-            </div>
-          </TabsContent>
+          <SavedQuestionsTab courseCode={course?.code || ""} />
         </Tabs>
       </main>
     </div>
