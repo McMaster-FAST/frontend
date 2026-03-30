@@ -1,6 +1,7 @@
 import { QuestionReportReason } from "@/types/QuestionReportReason";
 import { API_BASE_URL, fetchWithAuth, getJson } from "./api";
 import { useAuthFetch } from "@/hooks/useFetchWithAuth";
+import { debounce } from "lodash";
 
 export async function reportQuestion(
   questionId: string,
@@ -77,21 +78,81 @@ export async function uploadQuestionImage(
   return "";
 }
 
-export async function uploadQuestions(file: File) {
+interface CourseIdentifier extends Course {
+  code: string;
+  year: number;
+  semester: string;
+}
+
+export async function uploadQuestions(
+  file: File,
+  course: CourseIdentifier,
+  authFetch: typeof fetchWithAuth,
+) {
   const formData = new FormData();
   formData.append("file", file);
-  formData.append("group_name", "");
+  formData.append("create_required", "true");
+  formData.append("course_code", course.code);
+  formData.append("course_year", course.year.toString());
+  formData.append("course_semester", course.semester.toString());
 
-  const response = await fetch(`${API_BASE_URL}/api/core/upload/`, {
+  const response = await authFetch(`/api/core/upload/`, {
     method: "PUT",
     body: formData,
   });
-
   return getJson(response);
 }
 
 export async function getAllQuestions() {
   const response = await fetch(`${API_BASE_URL}/api/core/questions/`);
+
+  return getJson(response);
+}
+
+export async function getSavedQuestions(
+  courseCode: string,
+  authFetch: ReturnType<typeof useAuthFetch>,
+) {
+  const response = await authFetch(`/api/core/saved-for-later/${courseCode}/`, {
+    method: "GET",
+  });
+
+  return getJson(response);
+}
+
+
+export async function setSavedForLater(
+  courseCode: string,
+  questionId: string,
+  saveForLater: boolean,
+  authFetch: ReturnType<typeof useAuthFetch>,
+) {
+  const response = await authFetch(`/api/core/saved-for-later/${courseCode}/`, {
+    method: saveForLater ? "POST" : "DELETE",
+    body: JSON.stringify({
+      question_public_id: questionId,
+    }),
+  });
+  if (!response.ok) {
+    throw new Error(
+      `Failed to ${saveForLater ? "save" : "unsave"} question for later: ${
+        response.statusText
+      }`,
+    );
+  }
+}
+
+export async function getQuestionById(
+  courseCode: string,
+  questionId: string,
+  authFetch: ReturnType<typeof useAuthFetch>,
+) {
+  const response = await authFetch(
+    `/api/courses/${courseCode}/questions/${questionId}/`,
+    {
+      method: "GET",
+    },
+  );
 
   return getJson(response);
 }

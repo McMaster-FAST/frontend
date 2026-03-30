@@ -1,10 +1,11 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { ReportQuestionDialog } from "@/components/macfast/report-question-dialog";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { MacFastHeader } from "@/components/macfast/macfast-header";
 import { useEffect, useState } from "react";
-import { getQuestionById } from "@/lib/api";
+import { getQuestionById } from "@/lib/question-api";
 import { useAuthFetch } from "@/hooks/useFetchWithAuth";
 import React from "react";
 import { SafeHtml } from "@/components/macfast/safe-html";
@@ -12,7 +13,6 @@ import { QuestionPage } from "@/components/macfast/question-page";
 import { ChevronsRight } from "lucide-react";
 import SaveForLater from "@/components/macfast/save-for-later";
 import QuestionOption from "@/components/macfast/question-option/question-option";
-import { ReportQuestionDialog } from "@/components/macfast/report-question-dialog";
 
 interface QuestionPageProps {
   params: Promise<{

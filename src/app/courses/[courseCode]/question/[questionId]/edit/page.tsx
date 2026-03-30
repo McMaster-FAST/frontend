@@ -15,7 +15,7 @@ import { useAuthFetch } from "@/hooks/useFetchWithAuth";
 import { QuestionPage } from "@/components/macfast/question-page";
 import { isEqual } from "lodash";
 import ErrorMessage from "@/components/macfast/error-message";
-import { getQuestionByPublicId, uploadQuestionImage } from "@/lib/api";
+import { getQuestionByPublicId, uploadQuestionImage } from "@/lib/question-api";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useCourseData } from "@/hooks/useCourseData";
 import CommentsSheet from "@/components/macfast/comments/comments-sheet";
