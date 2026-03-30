@@ -17,7 +17,7 @@ import { Input } from "@/components/ui/input";
 import { QuestionReportReason } from "@/types/QuestionReportReason";
 
 interface QuestionFlagDialogProps {
-  onSubmit?: (reportAnswers: ReportAnswers) => (Promise<void> | void);
+  onSubmit?: (reportAnswers: ReportAnswers) => Promise<void> | void;
   disabled?: boolean;
 }
 
@@ -37,13 +37,13 @@ export function ReportQuestionDialog({
   onSubmit,
   disabled,
 }: QuestionFlagDialogProps) {
+  const [open, setOpen] = useState(false);
   const [reportAnswers, setReportAnswers] = useState<ReportAnswers>({
     reasons: [],
     additionalDetails: "",
     contact_consent: false,
   });
   const [submitLoading, setSubmitLoading] = useState(false);
-  
 
   const resetState = () => {
     setReportAnswers({
@@ -52,15 +52,17 @@ export function ReportQuestionDialog({
       contact_consent: false,
     });
   };
+
   const handleSubmitReport = async () => {
     setSubmitLoading(true);
     await onSubmit?.(reportAnswers);
-    resetState();
     setSubmitLoading(false);
+    resetState();
+    setOpen(false);
   };
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant="secondary" disabled={disabled}>
           Report question

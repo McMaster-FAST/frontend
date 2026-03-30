@@ -10,7 +10,7 @@ import { ChevronsRight } from "lucide-react";
 import { useAuthFetch } from "@/hooks/useFetchWithAuth";
 import { getQuestionByPublicId } from "@/lib/api";
 import { QuestionPage } from "@/components/macfast/question-page";
-import { QuestionFlagDialog } from "@/components/macfast/question-flag-dialog";
+import { ReportQuestionDialog } from "@/components/macfast/report-question-dialog";
 import { Checkbox } from "@/components/ui/checkbox";
 import { SafeHtml } from "@/components/macfast/safe-html";
 
@@ -137,7 +137,7 @@ export default function QuestionPreviewPage({
           className="w-full flex flex-row flex-2 justify-between items-center"
         >
           <div>
-            <QuestionFlagDialog disabled={true} />
+            <ReportQuestionDialog disabled={true} />
           </div>
           <div className="inline-flex items-center gap-4">
             <div className="inline-flex gap-2">

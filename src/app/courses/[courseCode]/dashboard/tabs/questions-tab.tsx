@@ -126,9 +126,6 @@ export function Questions({ course }: QuestionsProps) {
             setSearchQuery(query);
           }}
         />
-        <span className="text-sm text-muted-foreground">
-          Showing {questions.length} of {totalQuestions} questions
-        </span>
         <div className="flex flex-1 gap-3 justify-end ">
           <input
             type="file"
@@ -183,9 +180,7 @@ export function Questions({ course }: QuestionsProps) {
                       setSelectedQuestionId(question.public_id);
                       setCommentsSheetOpen(true);
                     }}
-                    onDelete={() =>
-                      console.log("Delete:", question.public_id)
-                    }
+                    onDelete={() => console.log("Delete:", question.public_id)}
                   />
                 ))}
 
@@ -199,6 +194,8 @@ export function Questions({ course }: QuestionsProps) {
         <MacFastPaginator
           pageNumber={pageNumber}
           totalPages={totalPages}
+          showingCount={questions.length}
+          totalCount={totalQuestions}
           onPageChange={setPageNumber}
           refetch={refetch}
         />

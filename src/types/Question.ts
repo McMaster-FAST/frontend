@@ -33,3 +33,11 @@ interface SavedForLater {
   question: SavedForLaterQuestion;
   timestamp: string;
 }
+
+interface QuestionReportAggregate {
+  public_id: string;
+  content: string;
+  subtopic_name: string;
+  unit_name: string;
+  total_reports: number;
+}

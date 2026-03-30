@@ -46,6 +46,10 @@
   --accent: oklch(0.97 0 0);
   --accent-foreground: oklch(0.205 0 0);
   --destructive: #7a003c;
+  --primary-icon: var(--maroon);
+  --secondary-icon: var(--gold);
+  --primary-link: var(--maroon);
+  --secondary-link: var(--gold);
   --border: oklch(0.922 0 0);
   --input: #495965;
   --ring: oklch(0.708 0 0);
@@ -120,6 +124,10 @@
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
+  --color-primary-link: var(--primary-link);
+  --color-secondary-link: var(--secondary-link);
+  --color-primary-icon: var(--primary-icon);
+  --color-secondary-icon: var(--secondary-icon);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
@@ -154,6 +162,10 @@
   --accent: oklch(0.269 0 0);
   --accent-foreground: oklch(0.985 0 0);
   --destructive: oklch(0.704 0.191 22.216);
+  --primary-icon: var(--gold);
+  --secondary-icon: var(--maroon);
+  --primary-link: var(--gold);
+  --secondary-link: var(--maroon);
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
   --ring: oklch(0.556 0 0);
@@ -181,6 +193,10 @@
   }
 }
 
-a.clickable-text {
-  @apply text-primary underline;
+.clickable-text {
+  @apply text-primary-link underline;
+}
+
+.text-button {
+  @apply cursor-pointer text-primary-link hover:underline select-none text-primary;
 }
