@@ -1,9 +1,9 @@
 "use client";
-import { AlertCircle } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { MacFastHeader } from "@/components/macfast/macfast-header";
 import UnitsAccordion from "@/components/macfast/unit-accordion/unit-accordion";
 import {
+  AlertCircle,
   BookOpen,
   GraduationCap,
   LineChart,
@@ -15,10 +15,16 @@ import SavedQuestionsTab from "./tabs/saved-questions";
 import { UnitsAccordionSkeleton } from "@/components/macfast/unit-accordion/unit-accordion-skeleton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { CourseBanner } from "@/components/macfast/course-banner/course-banner";
+import { useCourseXP } from "@/hooks/useCourseXP";
 
 function CoursePage() {
   const { course, isLoading, error } = useCourseData();
+  const { courseXP, isLoading: isXPLoading, error: xpError } = useCourseXP();
   const [openUnits, setOpenUnits] = useState<string>("");
+
+  const xpLeft = courseXP
+    ? courseXP.xp_for_next_level - courseXP.xp_in_current_level
+    : 100;
 
   return (
     <div className="h-screen flex flex-col overflow-hidden font-poppins">
@@ -29,8 +35,10 @@ function CoursePage() {
         isLoading={isLoading}
         error={error}
         variant="course"
-        level={3}
-        progressPercentage={90}
+        level={courseXP?.level ?? 1}
+        progressPercentage={courseXP?.progress_percentage ?? 0}
+        isXPLoading={isXPLoading}
+        xpLeft={xpLeft}
       />
 
       <main className="mx-auto w-full max-w-7xl px-6 py-8 flex-1 flex flex-col min-h-0">

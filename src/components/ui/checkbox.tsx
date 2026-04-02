@@ -1,10 +1,10 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import * as CheckboxPrimitive from "@radix-ui/react-checkbox"
-import { CheckIcon } from "lucide-react"
+import * as React from "react";
+import * as CheckboxPrimitive from "@radix-ui/react-checkbox";
+import { CheckIcon } from "lucide-react";
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 import { Spinner } from "./spinner"
 
 interface CheckboxProps  extends React.ComponentProps<typeof CheckboxPrimitive.Root> {
@@ -22,8 +22,8 @@ function Checkbox({
     <CheckboxPrimitive.Root
       data-slot="checkbox"
       className={cn(
-        "peer border-input dark:bg-input/30 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground dark:data-[state=checked]:bg-primary data-[state=checked]:border-primary focus-visible:border-ring focus-visible:ring-primary/30 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive size-5 shrink-0 rounded-[6px] border shadow-xs transition-shadow outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:bg-disabled-primary disabled:border-select disabled:shadow-none bg-background text-foreground grid place-items-center hover:cursor-pointer",
-        className
+        "peer border-input dark:bg-input/30 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground dark:data-[state=checked]:bg-primary-hover data-[state=checked]:border-primary focus-visible:border-ring focus-visible:ring-primary/30 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive size-5 shrink-0 rounded-[6px] border shadow-xs transition-shadow outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:bg-disabled-primary disabled:border-select disabled:shadow-none bg-background text-foreground grid place-items-center hover:cursor-pointer",
+        className,
       )}
       {...props}
     >
@@ -34,7 +34,7 @@ function Checkbox({
         <CheckIcon className="size-4" strokeWidth={3} />
       </CheckboxPrimitive.Indicator>
     </CheckboxPrimitive.Root>
-  )
+  );
 }
 
-export { Checkbox }
+export { Checkbox };
