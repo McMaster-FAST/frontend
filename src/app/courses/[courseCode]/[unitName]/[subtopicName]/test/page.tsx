@@ -322,17 +322,17 @@ function QuestionTestPage({ params: paramsPromise }: QuestionTestPageProps) {
                 className="flex flex-col gap-3"
                 disabled={submitted}
               >
-                {question?.options.map((option) => 
-                    <QuestionOption
-                      key={option.public_id}
-                      option={option}
-                      correctOptionId={correctOptionId}
-                      submitted={submitted}
-                      isSubmitSuccess={submitSuccess}
-                      selectedOption={selectedOption}
-                      question={question}
-                    />
-                )}
+                {question?.options.map((option) => (
+                  <QuestionOption
+                    key={option.public_id}
+                    option={option}
+                    correctOptionId={correctOptionId}
+                    submitted={submitted}
+                    isSubmitSuccess={submitSuccess}
+                    selectedOption={selectedOption}
+                    question={question}
+                  />
+                ))}
               </RadioGroup>
             )}
           </QuestionPage.Options>
