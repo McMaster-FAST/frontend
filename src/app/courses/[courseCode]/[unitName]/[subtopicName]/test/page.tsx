@@ -95,6 +95,7 @@ function QuestionTestPage({ params: paramsPromise }: QuestionTestPageProps) {
   const [isQuestionLoading, setIsQuestionLoading] = useState<boolean>(true);
   const [actions, setActions] = useState<ActionInfo[]>([]);
   const [notes, setNotes] = useState<JSX.Element[]>([]);
+  const [devAnswerId, setDevAnswerId] = useState<string>("");
 
   const courseErrorMessage = useMemo(() => {
     if (courseLoading || !courseLoadError) return null;
@@ -154,6 +155,7 @@ function QuestionTestPage({ params: paramsPromise }: QuestionTestPageProps) {
     setCorrectOptionId("");
     setSolution("");
     setError("");
+    setDevAnswerId("");
   };
 
   const generateActionsForContinueActions = (
@@ -208,7 +210,6 @@ function QuestionTestPage({ params: paramsPromise }: QuestionTestPageProps) {
   ) => {
     questionPromise
       .then(({ question, continue_actions, suggested_actions }) => {
-        console.log(suggested_actions);
         setQuestion(question);
         setActions(
           generateActionsForContinueActions(
@@ -278,17 +279,30 @@ function QuestionTestPage({ params: paramsPromise }: QuestionTestPageProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps -- run once when URL subtopic id becomes available
   }, [resolvedSubtopicId]);
 
+  useEffect(() => {
+    if (process.env.NODE_ENV === "production" || !question.public_id) return;
+    authFetch(`/api/core/questions/${question.public_id}/answer/`)
+      .then((res) => res.json())
+      .then((data) => setDevAnswerId(data.correct_option_id ?? ""))
+      .catch(() => {});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [question.public_id]);
+
   return (
-    <QuestionPage>
+    <QuestionPage courseCode={courseCode || ""}>
       <QuestionPage.Header>
         <MacFastHeader />
       </QuestionPage.Header>
       <QuestionPage.Title>
-        <h1>{courseCode}</h1>
-        <ChevronsRight />
-        <h1>{unit_name}</h1>
-        <ChevronsRight />
-        <h1>{subtopic_name}</h1>
+        <div className="flex flex-col gap-3 w-full">
+          <div className="flex items-center gap-2 min-w-0">
+            <h1>{courseCode}</h1>
+            <ChevronsRight />
+            <h1>{unit_name}</h1>
+            <ChevronsRight />
+            <h1>{subtopic_name}</h1>
+          </div>
+        </div>
       </QuestionPage.Title>
       <QuestionPage.Content>
         <TestContinueDialog
@@ -335,6 +349,17 @@ function QuestionTestPage({ params: paramsPromise }: QuestionTestPageProps) {
                 ))}
               </RadioGroup>
             )}
+            {process.env.NODE_ENV !== "production" && devAnswerId && (
+              <p className="text-xs text-muted-foreground/40 italic mt-1">
+                debug log:{" "}
+                <SafeHtml
+                  html={
+                    question.options?.find((o) => o.public_id === devAnswerId)
+                      ?.content ?? devAnswerId
+                  }
+                />
+              </p>
+            )}
           </QuestionPage.Options>
         </QuestionPage.QuestionBody>
         <QuestionPage.Answer
@@ -367,8 +392,8 @@ function QuestionTestPage({ params: paramsPromise }: QuestionTestPageProps) {
           </QuestionPage.AnswerBody>
           <QuestionPage.AnswerPlaceholder>
             {question?.content && !submitSuccess && (
-              <h2 className="font-poppins font-semibold text-md mt-6 mb-2">
-                Submit an answer to see the solution.
+              <h2 className="font-poppins text-center font-semibold text-lg mt-6 mb-2">
+                Submit an answer to see the solution!
               </h2>
             )}
           </QuestionPage.AnswerPlaceholder>

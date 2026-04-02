@@ -7,11 +7,12 @@ import {
   CardHeader,
 } from "@/components/ui/card";
 import { CompletionBar } from "@/components/macfast/completion-bar/completion-bar";
-import { BookOpen, Calendar } from "lucide-react";
+import { BookOpen, Calendar, Play, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 type CourseCardProps = {
   course: Course;
@@ -23,6 +24,17 @@ function CourseCard({ course, progress }: CourseCardProps) {
   const target = course.resume_target;
   const hasFullResumeTarget =
     target && target.course_code && target.unit_name && target.subtopic_name;
+
+  // TODO: remove once endpoint to update course info is ready
+    const courseName = (course.name ?? "").toLowerCase();
+  let bannerImageSrc = "/images/chemistry.jpg";
+  if (courseName.includes("natural") && courseName.includes("disaster")) {
+    bannerImageSrc = "/images/natural%20disasters.jpg";
+  } else if (courseName.includes("debug")) {
+    bannerImageSrc = "/images/debug.jpg";
+  } else if (courseName.includes("chemistry")) {
+    bannerImageSrc = "/images/chemistry.jpg";
+  }
 
   const onResume = () => {
     if (!target) {
@@ -39,15 +51,25 @@ function CourseCard({ course, progress }: CourseCardProps) {
 
   return (
     <Card className="group relative flex w-full flex-col overflow-hidden border-light-gray dark:border-dark-gray bg-card transition-all hover:-translate-y-1 hover:shadow-lg">
-      <div className="h-40 bg-gradient-to-br from-light-gray to-dark-gray p-4 transition-colors group-hover:from-text-gold group-hover:to-text-maroon">
-        <div className="flex justify-between items-start">
+      <div className="relative h-40 overflow-hidden">
+        <Image
+          src={bannerImageSrc} // TODO: to be changed once endpoint to update course info is ready
+          alt={`${course.name} banner`}
+          fill
+          sizes="(max-width: 768px) 100vw, 33vw"
+          className="object-cover transition-transform duration-300 group-hover:scale-105 opacity-95 brightness-110 saturate-110"
+          priority={false}
+        />
+        <div className="absolute inset-0 bg-gradient-to-br from-light-gray/45 to-dark-gray/45 transition-colors group-hover:from-text-gold/25 group-hover:to-text-maroon/25" />
+
+        <div className="relative z-10 flex h-full justify-between items-start p-4">
           <Badge
             variant="secondary"
             className="bg-background font-poppins text-sm font-extrabold text-foreground backdrop-blur-sm"
           >
             {course.code}
           </Badge>
-          <div className="flex items-center gap-1 text-sm uppercase font-bold tracking-wider text-foreground">
+          <div className="flex items-center gap-1 text-sm uppercase font-bold tracking-wider text-white">
             <Calendar className="h-3 w-3" />
             <span>{course.year}</span>
           </div>
@@ -77,18 +99,21 @@ function CourseCard({ course, progress }: CourseCardProps) {
 
       <CardFooter className="flex flex-col gap-2 border-t border-dark-gray-50 bg-dark-gray-50/50 p-4">
         {onResume && hasFullResumeTarget && (
-          <Button
-            className="gap-2 text-xs shadow-sm font-bold w-full"
-            onClick={onResume}
-          >
+          <Button className="font-bold gap-2 w-full" onClick={onResume}>
             <div>
               <div>Resume</div>
-              <div>{`(${target.subtopic_name})`}</div>
             </div>
+            <Play className="h-4 w-4" />
           </Button>
         )}
-        <Button variant="secondary" className="text-xs font-bold w-full">
-          <Link href={`/courses/${course.code}/coursepage`}>Details</Link>
+        <Button
+          variant="secondary"
+          className="font-bold w-full"
+          asChild
+        >
+          <Link href={`/courses/${course.code}/coursepage`}>
+            <span>Details</span>
+          </Link>
         </Button>
       </CardFooter>
     </Card>

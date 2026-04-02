@@ -6,10 +6,11 @@ import { ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 interface QuestionPageProps {
   children: React.ReactNode;
+  courseCode: string;
   onReturn?: () => void;
 }
 
-function QuestionPage({ children, onReturn }: QuestionPageProps) {
+function QuestionPage({ children, courseCode, onReturn }: QuestionPageProps) {
   const router = useRouter();
   let header, content, footer, title;
   for (const child of React.Children.toArray(children)) {
@@ -31,11 +32,12 @@ function QuestionPage({ children, onReturn }: QuestionPageProps) {
       {header}
       <div>
         <Button
+          className="gap-2"
           variant="tertiary"
-          onClick={onReturn ? onReturn : () => router.back()}
+          onClick={onReturn ? onReturn : () => router.push(`/courses/${courseCode}/coursepage`)}
         >
-          <ArrowLeft />
-          Back
+          <ArrowLeft/>
+          Back to Course Page
         </Button>
       </div>
       <div className="flex flex-col gap-4 p-8 flex-1">
@@ -122,7 +124,7 @@ function Answer({
     }
   }
   return (
-    <div className="border-l-2 border-gray-300 pl-4 flex-1 flex flex-col gap-4">
+    <div className="border-t-2 pt-4 md:border-t-0 md:border-l-2 md:pt-0 border-gray-300 md:pl-4 flex-1 flex flex-col gap-4">
       {!isLoading && isAnswered && others}
       {!isLoading && !isAnswered && placeholder}
       {isLoading && <Skeleton className="w-full h-40" />}
@@ -156,7 +158,7 @@ function AnswerPlaceholder({ children }: { children: React.ReactNode }) {
 
 function Content({ children }: { children: React.ReactNode }) {
   return (
-    <div id="content" className="flex flex-row gap-4 flex-1">
+    <div id="content" className="flex flex-col md:flex-row gap-4 flex-1">
       {children}
     </div>
   );
