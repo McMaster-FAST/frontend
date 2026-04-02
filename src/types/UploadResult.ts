@@ -1,4 +1,4 @@
-interface UploadProgress {
+export interface UploadProgress {
   public_id: string;
   result: UploadCompletedStatus | UploadInProgressStatus;
   success_count: number;
@@ -6,12 +6,12 @@ interface UploadProgress {
   progress: number;
 }
 
-enum UploadCompletedStatus {
+export enum UploadCompletedStatus {
   SUCCESS = "SUCCESS",
   FAILED = "FAILED",
 }
 
-enum UploadInProgressStatus {
+export enum UploadInProgressStatus {
   RUNNING = "RUNNING",
 }
 

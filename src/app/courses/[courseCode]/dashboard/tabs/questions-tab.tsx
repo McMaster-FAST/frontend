@@ -17,6 +17,8 @@ import { useRouter } from "next/navigation";
 import MacFastPaginator from "@/components/macfast/macfast-paginator";
 import { Progress } from "@/components/ui/progress";
 import { Spinner } from "@/components/ui/spinner";
+import { set } from "lodash";
+import { UploadCompletedStatus, UploadProgress } from "@/types/UploadResult";
 
 interface QuestionsProps {
   course?: Course | null;
@@ -116,6 +118,22 @@ export function Questions({ course }: QuestionsProps) {
     router.push(`/courses/${course?.code}/question/${questionId}/edit`);
   };
 
+  const uploadResultMessage = () => {
+    switch (uploadResult?.result) {
+      case UploadCompletedStatus.SUCCESS:
+        return "Upload completed successfully!";
+      case UploadCompletedStatus.FAILED:
+        return "Upload failed. Please check the file and try again.";
+      default:
+        return (
+          <>
+            <span>Uploading questions</span>
+            <Spinner className="ml-2" />
+          </>
+        );
+    }
+  };
+
   return (
     <div className="flex flex-col h-full">
       {error && (
@@ -127,15 +145,9 @@ export function Questions({ course }: QuestionsProps) {
       {uploadResult && (
         <div className="flex flex-col gap-2">
           <div className="inline-flex justify-between w-full">
-            <h2 className="font-semibold inline-flex gap-2 items-center">
-              Upload progress:{" "}
-              <span className="font-normal">{uploadResult?.result}</span>
-              {Object.values(UploadCompletedStatus).includes(
-                uploadResult?.result as UploadCompletedStatus,
-              ) ? null : (
-                <Spinner />
-              )}
-            </h2>
+            <div className="inline-flex gap-2 items-center">
+              {uploadResultMessage()}
+            </div>
             <span className="text-sm text-muted-foreground">
               {uploadResult.success_count} succeeded,{" "}
               {uploadResult.failure_count} failed

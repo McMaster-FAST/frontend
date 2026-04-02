@@ -2,6 +2,7 @@ import { QuestionReportReason } from "@/types/QuestionReportReason";
 import { API_BASE_URL, fetchWithAuth, getJson } from "./api";
 import { useAuthFetch } from "@/hooks/useFetchWithAuth";
 import { debounce, get } from "lodash";
+import { UploadCompletedStatus, UploadProgress } from "@/types/UploadResult";
 
 export async function reportQuestion(
   questionId: string,
@@ -169,9 +170,14 @@ export async function pollForUploadUpdates(
   authFetch: ReturnType<typeof useAuthFetch>,
   callback: (uploadResult: UploadProgress) => void,
   interval: number = 2000,
-  maxFailures: number = 10,
+  maxFailures: number = 3,
+  maxChecks: number = 10,
 ) {
+  // If we fail `maxFailures` times in a row stop polling
+  // We reset the failure count if a call succeeds
+  // If we haven't heard success after `maxChecks` stop polling anyway
   let failedFetchCount = 0;
+  let sucessfullChecks = 0;
 
   const timerId = setInterval(() => {
     fetchUploadProgress(courseCode, authFetch, uploadResultId)
@@ -184,10 +190,14 @@ export async function pollForUploadUpdates(
           clearInterval(timerId);
         }
         callback(uploadResult);
+        failedFetchCount = 0;
       })
-      .catch(() => failedFetchCount++)
+      .catch((err) => {
+        console.log(err);
+        failedFetchCount++;
+      })
       .finally(() => {
-        if (failedFetchCount >= maxFailures) {
+        if (failedFetchCount >= maxFailures || sucessfullChecks >= maxChecks) {
           clearInterval(timerId);
         }
       });
