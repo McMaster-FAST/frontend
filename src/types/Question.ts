@@ -3,6 +3,7 @@ interface Question {
   serial_number: string;
   content: string;
   difficulty: number;
+  selection_frequency: number;
   is_flagged: boolean;
   is_active: boolean;
   is_verified: boolean;

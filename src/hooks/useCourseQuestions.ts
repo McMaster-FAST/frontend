@@ -55,12 +55,12 @@ export function useCourseQuestions({
       queryParams.append("is_flagged", filters.is_flagged.toString());
     }
 
-    if (filters.min_difficulty !== undefined) {
-      queryParams.append("difficulty__gte", filters.min_difficulty.toString());
+    if (filters.min_selection_frequency !== undefined) {
+      queryParams.append("selection_frequency__gte", filters.min_selection_frequency.toString());
     }
 
-    if (filters.max_difficulty !== undefined) {
-      queryParams.append("difficulty__lte", filters.max_difficulty.toString());
+    if (filters.max_selection_frequency !== undefined) {
+      queryParams.append("selection_frequency__lte", filters.max_selection_frequency.toString());
     }
 
     if (filters.subtopic_name) {

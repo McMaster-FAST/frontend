@@ -56,16 +56,27 @@ function QuestionItem({
               </Badge>
             )}
 
-            <Badge
-              variant="secondary"
-              className="text-muted-foreground whitespace-nowrap"
-            >
-              <Star
-                fill="currentColor"
-                className="inline-block mr-1 h-3 w-3 text-primary-hover"
-              />
-              Difficulty {question.difficulty}
-            </Badge>
+            {(() => {
+              let badgeText: string;
+              if (question.selection_frequency > 0) {
+                badgeText = `Correct Answer Rate ${question.selection_frequency}`;
+              } else {
+                badgeText = `Difficulty ${question.difficulty}`;
+              }
+
+              return (
+                <Badge
+                  variant="secondary"
+                  className="text-muted-foreground whitespace-nowrap"
+                >
+                  <Star
+                    fill="currentColor"
+                    className="inline-block mr-1 h-3 w-3 text-primary-hover"
+                  />
+                  {badgeText}
+                </Badge>
+              );
+            })()}
 
             {question.is_flagged && (
               <Badge variant="destructive">
