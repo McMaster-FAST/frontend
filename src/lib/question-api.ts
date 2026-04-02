@@ -1,7 +1,7 @@
 import { QuestionReportReason } from "@/types/QuestionReportReason";
 import { API_BASE_URL, fetchWithAuth, getJson } from "./api";
 import { useAuthFetch } from "@/hooks/useFetchWithAuth";
-import { debounce } from "lodash";
+import { debounce, get } from "lodash";
 
 export async function reportQuestion(
   questionId: string,
@@ -120,7 +120,6 @@ export async function getSavedQuestions(
   return getJson(response);
 }
 
-
 export async function setSavedForLater(
   courseCode: string,
   questionId: string,
@@ -155,4 +154,56 @@ export async function getQuestionById(
   );
 
   return getJson(response);
+}
+
+/**
+ *
+ * @param courseCode The course the questions were uploaded to
+ * @param authFetch
+ * @param uploadResultId The id returned on question upload
+ * @param interval How often to poll for updates
+ */
+export async function pollForUploadUpdates(
+  courseCode: string,
+  uploadResultId: string,
+  authFetch: ReturnType<typeof useAuthFetch>,
+  callback: (uploadResult: UploadProgress) => void,
+  interval: number = 2000,
+  maxFailures: number = 10,
+) {
+  let failedFetchCount = 0;
+
+  const timerId = setInterval(() => {
+    fetchUploadProgress(courseCode, authFetch, uploadResultId)
+      .then((uploadResult) => {
+        if (
+          Object.values(UploadCompletedStatus).includes(
+            uploadResult.result as UploadCompletedStatus,
+          )
+        ) {
+          clearInterval(timerId);
+        }
+        callback(uploadResult);
+      })
+      .catch(() => failedFetchCount++)
+      .finally(() => {
+        if (failedFetchCount >= maxFailures) {
+          clearInterval(timerId);
+        }
+      });
+  }, interval);
+}
+
+async function fetchUploadProgress(
+  courseCode: string,
+  authFetch: ReturnType<typeof useAuthFetch>,
+  uploadResultId: string,
+) {
+  const response = await authFetch(
+    `/api/courses/${courseCode}/upload-result/${uploadResultId}/`,
+    {
+      method: "GET",
+    },
+  );
+  return getJson(response) as Promise<UploadProgress>;
 }

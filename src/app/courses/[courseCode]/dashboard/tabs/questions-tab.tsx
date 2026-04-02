@@ -1,6 +1,6 @@
 "use client";
 
-import { uploadQuestions } from "@/lib/question-api";
+import { pollForUploadUpdates, uploadQuestions } from "@/lib/question-api";
 import { useRef, useState } from "react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { QuestionItem } from "@/components/macfast/questions-item/questions-item";
@@ -15,6 +15,8 @@ import { QuestionsFilter } from "@/components/macfast/questions-filter";
 import { useAuthFetch } from "@/hooks/useFetchWithAuth";
 import { useRouter } from "next/navigation";
 import MacFastPaginator from "@/components/macfast/macfast-paginator";
+import { Progress } from "@/components/ui/progress";
+import { Spinner } from "@/components/ui/spinner";
 
 interface QuestionsProps {
   course?: Course | null;
@@ -31,6 +33,7 @@ export function Questions({ course }: QuestionsProps) {
   const [commentsSheetOpen, setCommentsSheetOpen] = useState(false);
   // Pagination is 1-indexed
   const [pageNumber, setPageNumber] = useState<number>(1);
+  const [uploadResult, setUploadResult] = useState<UploadProgress | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const authFetch = useAuthFetch();
   const router = useRouter();
@@ -73,8 +76,13 @@ export function Questions({ course }: QuestionsProps) {
       if (!course) {
         throw new Error("Course information is missing. Please try again.");
       }
-      await uploadQuestions(file, course, authFetch);
-
+      const repsonse = await uploadQuestions(file, course, authFetch);
+      pollForUploadUpdates(
+        course.code,
+        repsonse.upload_result_id,
+        authFetch,
+        setUploadResult,
+      );
       await refetch();
     } catch (error) {
       console.error("Upload failed:", error);
@@ -115,6 +123,29 @@ export function Questions({ course }: QuestionsProps) {
           <AlertTitle>Error</AlertTitle>
           <AlertDescription>{error}</AlertDescription>
         </Alert>
+      )}
+      {uploadResult && (
+        <div className="flex flex-col gap-2">
+          <div className="inline-flex justify-between w-full">
+            <h2 className="font-semibold inline-flex gap-2 items-center">
+              Upload progress:{" "}
+              <span className="font-normal">{uploadResult?.result}</span>
+              {Object.values(UploadCompletedStatus).includes(
+                uploadResult?.result as UploadCompletedStatus,
+              ) ? null : (
+                <Spinner />
+              )}
+            </h2>
+            <span className="text-sm text-muted-foreground">
+              {uploadResult.success_count} succeeded,{" "}
+              {uploadResult.failure_count} failed
+            </span>
+          </div>
+          <Progress
+            className="h-2 w-full mb-2"
+            value={(uploadResult?.progress || 0) * 100}
+          />
+        </div>
       )}
 
       <div className="flex flex-row flex-0 gap-4 mb-6 items-center justify-between">
