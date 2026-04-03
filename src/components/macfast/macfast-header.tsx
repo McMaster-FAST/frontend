@@ -105,8 +105,8 @@ export function MacFastHeader() {
               className="hover:opacity-80 cursor-pointer"
               aria-label="Toggle theme"
             >
-              <Sun className="h-5 w-5 text-gold hidden dark:block" />
-              <Moon className="h-5 w-5  dark:hidden" />
+              <Sun className="h-5 w-5 hidden dark:block" />
+              <Moon className="h-5 w-5 dark:hidden" />
             </button>
           )}
 
