@@ -12,7 +12,6 @@ import {
   submitAnswer,
 } from "@/lib/adaptive-test-api";
 import { useAuthFetch } from "@/hooks/useFetchWithAuth";
-import { QuestionFlagDialog } from "@/components/macfast/report-question-dialog";
 import { resolveImages } from "@/lib/utils";
 import TestContinueDialog from "@/components/macfast/test-continue-dialog";
 
@@ -27,6 +26,9 @@ import {
 } from "@/lib/api";
 import { useCourseData } from "@/hooks/useCourseData";
 import Link from "next/link";
+
+import { ReportQuestionDialog } from "@/components/macfast/report-question-dialog";
+import { reportQuestion } from "@/lib/question-api";
 import SaveForLater from "@/components/macfast/save-for-later";
 import { QuestionPage } from "@/components/macfast/question-page";
 import { MacFastHeader } from "@/components/macfast/macfast-header";
@@ -262,8 +264,18 @@ function QuestionTestPage({ params: paramsPromise }: QuestionTestPageProps) {
     updateWithNewQuestion(skipQuestion(question.public_id, authFetch), sid);
   };
 
-  const handleQuestionFlag = async () => {
-    // Implement question flagging functionality here
+  const handleSaveForLater = async () => {
+    // Implement save for later functionality here
+  };
+
+  const handleReportQuestion = (reportAnswers: any) => {
+    reportQuestion(
+      question.public_id,
+      reportAnswers.reasons,
+      reportAnswers.additionalDetails,
+      reportAnswers.contact_consent,
+      authFetch,
+    );
   };
 
   useEffect(() => {
@@ -380,7 +392,7 @@ function QuestionTestPage({ params: paramsPromise }: QuestionTestPageProps) {
           className="w-full flex flex-row flex-2 justify-between items-center"
         >
           <div>
-            <QuestionFlagDialog onSubmit={handleQuestionFlag} />
+            <ReportQuestionDialog onSubmit={handleReportQuestion} />
           </div>
           <div className="inline-flex items-center gap-4">
             <SaveForLater
