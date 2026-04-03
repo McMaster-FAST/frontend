@@ -24,7 +24,7 @@ enum QuestionFlagReason {
   OTHER = "Other",
 }
 
-interface QuestionFlagDialogProps {
+interface ReportQuestionDialogProps {
   onSubmit?: (reasons: QuestionFlagReason[]) => void;
   disabled?: boolean;
 }
@@ -41,10 +41,10 @@ interface FormValidityState {
   additionalDetails: boolean;
 }
 
-export function QuestionFlagDialog({
+export function ReportQuestionDialog({
   onSubmit,
   disabled,
-}: QuestionFlagDialogProps) {
+}: ReportQuestionDialogProps) {
   const [open, setOpen] = useState(false);
   const [reportAnswers, setReportAnswers] = useState<ReportAnswers>({
     reasons: [],
