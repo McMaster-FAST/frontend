@@ -289,7 +289,7 @@ function QuestionTestPage({ params: paramsPromise }: QuestionTestPageProps) {
   }, [question.public_id]);
 
   return (
-    <QuestionPage courseCode={courseCode || ""}>
+    <QuestionPage>
       <QuestionPage.Header>
         <MacFastHeader />
       </QuestionPage.Header>
@@ -351,7 +351,7 @@ function QuestionTestPage({ params: paramsPromise }: QuestionTestPageProps) {
             )}
             {process.env.NODE_ENV !== "production" && devAnswerId && (
               <p className="text-xs text-muted-foreground/40 italic mt-1">
-                debug log:{" "}
+                Answer:{" "}
                 <SafeHtml
                   html={
                     question.options?.find((o) => o.public_id === devAnswerId)

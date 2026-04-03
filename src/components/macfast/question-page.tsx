@@ -6,11 +6,10 @@ import { ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 interface QuestionPageProps {
   children: React.ReactNode;
-  courseCode: string;
   onReturn?: () => void;
 }
 
-function QuestionPage({ children, courseCode, onReturn }: QuestionPageProps) {
+function QuestionPage({ children, onReturn }: QuestionPageProps) {
   const router = useRouter();
   let header, content, footer, title;
   for (const child of React.Children.toArray(children)) {
@@ -34,7 +33,7 @@ function QuestionPage({ children, courseCode, onReturn }: QuestionPageProps) {
         <Button
           className="gap-2"
           variant="tertiary"
-          onClick={onReturn ? onReturn : () => router.push(`/courses/${courseCode}/coursepage`)}
+          onClick={onReturn ? onReturn : () => router.back()}
         >
           <ArrowLeft/>
           Back to Course Page
