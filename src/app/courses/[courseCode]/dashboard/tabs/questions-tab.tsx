@@ -5,7 +5,7 @@ import { useRef, useState } from "react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { QuestionItem } from "@/components/macfast/questions-item/questions-item";
 import { Button } from "@/components/ui/button";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, XIcon } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import CommentsSheet from "@/components/macfast/comments/comments-sheet";
 import { useCourseQuestions } from "@/hooks/useCourseQuestions";
@@ -17,8 +17,9 @@ import { useRouter } from "next/navigation";
 import MacFastPaginator from "@/components/macfast/macfast-paginator";
 import { Progress } from "@/components/ui/progress";
 import { Spinner } from "@/components/ui/spinner";
-import { set } from "lodash";
 import { UploadCompletedStatus, UploadProgress } from "@/types/UploadResult";
+import { Card } from "@/components/ui/card";
+import { toast, Toaster } from "sonner";
 
 interface QuestionsProps {
   course?: Course | null;
@@ -79,12 +80,15 @@ export function Questions({ course }: QuestionsProps) {
         throw new Error("Course information is missing. Please try again.");
       }
       const repsonse = await uploadQuestions(file, course, authFetch);
-      pollForUploadUpdates(
-        course.code,
-        repsonse.upload_result_id,
-        authFetch,
-        setUploadResult,
-      );
+      setUploadResult(null);
+      setTimeout(() => {
+        pollForUploadUpdates(
+          course.code,
+          repsonse.upload_result_id,
+          authFetch,
+          setUploadResult,
+        );
+      }, 2000);
       await refetch();
     } catch (error) {
       console.error("Upload failed:", error);
@@ -121,9 +125,9 @@ export function Questions({ course }: QuestionsProps) {
   const uploadResultMessage = () => {
     switch (uploadResult?.result) {
       case UploadCompletedStatus.SUCCESS:
-        return "Upload completed successfully!";
+        return "Upload complete";
       case UploadCompletedStatus.FAILED:
-        return "Upload failed. Please check the file and try again.";
+        return "Upload failed";
       default:
         return (
           <>
@@ -134,6 +138,10 @@ export function Questions({ course }: QuestionsProps) {
     }
   };
 
+  const totalUploadCount = uploadResult
+    ? uploadResult.success_count + uploadResult.failure_count
+    : 0;
+
   return (
     <div className="flex flex-col h-full">
       {error && (
@@ -143,21 +151,29 @@ export function Questions({ course }: QuestionsProps) {
         </Alert>
       )}
       {uploadResult && (
-        <div className="flex flex-col gap-2">
-          <div className="inline-flex justify-between w-full">
-            <div className="inline-flex gap-2 items-center">
-              {uploadResultMessage()}
+        <Card className="w-full mb-6">
+          <div className="flex flex-col gap-2">
+            <div className="inline-flex justify-between w-full">
+              <div className="inline-flex gap-2 items-center">
+                {uploadResultMessage()}
+              </div>
+              <div>
+                <XIcon
+                  className="h-4 w-4 cursor-pointer top-0 ml-auto"
+                  onClick={() => setUploadResult(null)}
+                />
+                <div className="text-sm text-muted-foreground">
+                  <span>{uploadResult.success_count} questions uploaded </span>
+                  <span>({uploadResult.failure_count} failed)</span>
+                </div>
+              </div>
             </div>
-            <span className="text-sm text-muted-foreground">
-              {uploadResult.success_count} succeeded,{" "}
-              {uploadResult.failure_count} failed
-            </span>
+            <Progress
+              className="h-2 w-full mb-2"
+              value={uploadResult.progress * 100}
+            />
           </div>
-          <Progress
-            className="h-2 w-full mb-2"
-            value={(uploadResult?.progress || 0) * 100}
-          />
-        </div>
+        </Card>
       )}
 
       <div className="flex flex-row flex-0 gap-4 mb-6 items-center justify-between">

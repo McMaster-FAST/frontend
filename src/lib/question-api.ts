@@ -169,9 +169,9 @@ export async function pollForUploadUpdates(
   uploadResultId: string,
   authFetch: ReturnType<typeof useAuthFetch>,
   callback: (uploadResult: UploadProgress) => void,
-  interval: number = 2000,
+  interval: number = 1000,
   maxFailures: number = 3,
-  maxChecks: number = 10,
+  maxChecks: number = 10
 ) {
   // If we fail `maxFailures` times in a row stop polling
   // We reset the failure count if a call succeeds
