@@ -31,6 +31,8 @@ import SaveForLater from "@/components/macfast/save-for-later";
 import { QuestionPage } from "@/components/macfast/question-page";
 import { MacFastHeader } from "@/components/macfast/macfast-header";
 import { SafeHtml } from "@/components/macfast/safe-html";
+import { GamificationHUD } from "@/components/macfast/gamification-hud";
+import { Gamification } from "@/types/Gamification";
 import QuestionOption from "@/components/macfast/question-option/question-option";
 
 interface QuestionTestPageProps {
@@ -95,6 +97,7 @@ function QuestionTestPage({ params: paramsPromise }: QuestionTestPageProps) {
   const [isQuestionLoading, setIsQuestionLoading] = useState<boolean>(true);
   const [actions, setActions] = useState<ActionInfo[]>([]);
   const [notes, setNotes] = useState<JSX.Element[]>([]);
+  const [gamification, setGamification] = useState<Gamification | null>(null);
 
   const courseErrorMessage = useMemo(() => {
     if (courseLoading || !courseLoadError) return null;
@@ -203,12 +206,12 @@ function QuestionTestPage({ params: paramsPromise }: QuestionTestPageProps) {
       question: TestQuestion;
       continue_actions: ContinueAction[];
       suggested_actions: SuggestedAction[];
+      gamification: Gamification | null;
     }>,
     resolvedSubtopicId: string,
   ) => {
     questionPromise
-      .then(({ question, continue_actions, suggested_actions }) => {
-        console.log(suggested_actions);
+      .then(({ question, continue_actions, suggested_actions, gamification }) => {
         setQuestion(question);
         setActions(
           generateActionsForContinueActions(
@@ -217,6 +220,7 @@ function QuestionTestPage({ params: paramsPromise }: QuestionTestPageProps) {
           ),
         );
         setNotes(generateNoteFromSuggestedActions(suggested_actions));
+        if (gamification) setGamification(gamification);
       })
       .catch((err: Error) => {
         setError(err.message);
@@ -248,6 +252,16 @@ function QuestionTestPage({ params: paramsPromise }: QuestionTestPageProps) {
         setSubmitSuccess(true);
         setCorrectOptionId(data.correct_option_id);
         setSolution(data.explanation);
+        // Optimistically update counters we can derive from the answer result
+        const isCorrect = selectedOption === data.correct_option_id;
+        setGamification((prev) => {
+          if (!prev) return prev;
+          return {
+            ...prev,
+            questions_answered: prev.questions_answered + 1,
+            current_streak: isCorrect ? prev.current_streak + 1 : 0,
+          };
+        });
       })
       .catch((err) => setError(err.message));
   };
@@ -284,11 +298,18 @@ function QuestionTestPage({ params: paramsPromise }: QuestionTestPageProps) {
         <MacFastHeader />
       </QuestionPage.Header>
       <QuestionPage.Title>
-        <h1>{courseCode}</h1>
-        <ChevronsRight />
-        <h1>{unit_name}</h1>
-        <ChevronsRight />
-        <h1>{subtopic_name}</h1>
+        <div className="flex flex-col gap-3 w-full">
+          <div className="flex items-center gap-2 min-w-0">
+            <h1>{courseCode}</h1>
+            <ChevronsRight />
+            <h1>{unit_name}</h1>
+            <ChevronsRight />
+            <h1>{subtopic_name}</h1>
+          </div>
+          {gamification && (
+            <GamificationHUD gamification={gamification} />
+          )}
+        </div>
       </QuestionPage.Title>
       <QuestionPage.Content>
         <TestContinueDialog
