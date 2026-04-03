@@ -101,12 +101,11 @@ function CourseCard({ course, progress }: CourseCardProps) {
         {onResume && hasFullResumeTarget && (
           <Button className="font-bold gap-2 w-full" onClick={onResume}>
             <div className="flex min-w-0 items-center gap-1 text-left">
-              <span className="shrink-0">Resume</span>
+              <span className="shrink-0">Continue</span>
               <span className="truncate" title={target.subtopic_name}>
                 {`(${target.subtopic_name})`}
               </span>
             </div>
-            <Play className="h-4 w-4 shrink-0" />
           </Button>
         )}
         <Button

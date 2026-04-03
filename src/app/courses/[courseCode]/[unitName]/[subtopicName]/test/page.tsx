@@ -392,7 +392,7 @@ function QuestionTestPage({ params: paramsPromise }: QuestionTestPageProps) {
           </QuestionPage.AnswerBody>
           <QuestionPage.AnswerPlaceholder>
             {question?.content && !submitSuccess && (
-              <h2 className="font-poppins text-center font-semibold text-lg mt-6 mb-2">
+              <h2 className="font-poppins text-muted-foreground text-lg">
                 Submit an answer to see the solution!
               </h2>
             )}

@@ -36,7 +36,7 @@ function QuestionPage({ children, onReturn }: QuestionPageProps) {
           onClick={onReturn ? onReturn : () => router.back()}
         >
           <ArrowLeft/>
-          Back to Course Page
+          Back
         </Button>
       </div>
       <div className="flex flex-col gap-4 p-8 flex-1">
