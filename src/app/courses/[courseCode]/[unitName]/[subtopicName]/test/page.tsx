@@ -12,7 +12,7 @@ import {
   submitAnswer,
 } from "@/lib/adaptive-test-api";
 import { useAuthFetch } from "@/hooks/useFetchWithAuth";
-import { QuestionFlagDialog } from "@/components/macfast/report-question-dialog";
+import { ReportQuestionDialog } from "@/components/macfast/report-question-dialog";
 import { resolveImages } from "@/lib/utils";
 import TestContinueDialog from "@/components/macfast/test-continue-dialog";
 
@@ -405,7 +405,7 @@ function QuestionTestPage({ params: paramsPromise }: QuestionTestPageProps) {
           className="w-full flex flex-row flex-2 justify-between items-center"
         >
           <div>
-            <QuestionFlagDialog onSubmit={handleQuestionFlag} />
+            <ReportQuestionDialog onSubmit={handleQuestionFlag} />
           </div>
           <div className="inline-flex items-center gap-4">
             <SaveForLater

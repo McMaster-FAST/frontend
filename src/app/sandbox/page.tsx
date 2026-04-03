@@ -171,42 +171,6 @@ export default function Home() {
             ))}
           </TableBody>
         </Table>
-        <div className="h-[100px]"></div>
-        <CourseCard
-          course={{
-            code: "CS101",
-            name: "Introduction to Computer Science",
-            year: 2024,
-            semester: 1,
-          }}
-          progress={25}
-        />
-        <div className="h-[100px]"></div>
-        <UnitsAccordion
-          units={[
-            {
-              name: "Introduction",
-              number: "1",
-              unitAbilityScore: -0.1,
-              subtopics: [
-                {
-                  name: "What is Computer Science?",
-                  attempted: true,
-                  abilityScore: -0.1,
-                },
-              ],
-            },
-            {
-              name: "Programming Basics",
-              number: "2",
-              subtopics: [
-                { name: "Variables" },
-                { name: "Control Structures" },
-              ],
-            },
-          ]}
-        />
-        <div className="h-[100px]"></div>
         <Questions />
       </div>
     </main>
