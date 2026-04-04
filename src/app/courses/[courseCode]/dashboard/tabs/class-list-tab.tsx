@@ -42,7 +42,6 @@ export function ClassList({ courseCode }: ClassListProps) {
       </Alert>
     );
   }
-
   return (
     <div className="w-full h-full flex flex-col min-h-0">
       <Card className="w-full flex-1 flex flex-col min-h-0 border-light-gray shadow-sm">
@@ -77,9 +76,9 @@ export function ClassList({ courseCode }: ClassListProps) {
             </TableHeader>
 
             <TableBody>
-              {isLoading ? (
+              {false ? (
                 Array.from({ length: 5 }).map((_, i) => (
-                  <TableRow key={i}>
+                  <TableRow key={`loading-${i}`}>
                     <TableCell className="pl-6">
                       <Skeleton className="h-4 w-32" />
                     </TableCell>
@@ -88,8 +87,8 @@ export function ClassList({ courseCode }: ClassListProps) {
                     </TableCell>
                   </TableRow>
                 ))
-              ) : filteredStudents.length === 0 ? (
-                <TableRow>
+              ) : false ? (
+                <TableRow key="no-students">
                   <TableCell
                     colSpan={4}
                     className="h-32 text-center text-muted-foreground"
@@ -105,10 +104,10 @@ export function ClassList({ courseCode }: ClassListProps) {
                   </TableCell>
                 </TableRow>
               ) : (
-                filteredStudents.map((student) => (
-                  <>
+                <>
+                  {filteredStudents.map((student, index) => (
                     <TableRow
-                      key={student.id}
+                      key={`student-${index}`}
                       className="group transition-colors"
                     >
                       <TableCell className="font-medium pl-4 py-2">
@@ -139,18 +138,18 @@ export function ClassList({ courseCode }: ClassListProps) {
                         )}
                       </TableCell>
                     </TableRow>
-                    {emptyRowsCount > 0 &&
-                      Array.from({ length: emptyRowsCount }).map((_, index) => (
-                        <TableRow
-                          key={`empty-${index}`}
-                          className="h-10 hover:bg-transparent pointer-events-none"
-                        >
-                          <TableCell></TableCell>
-                          <TableCell></TableCell>
-                        </TableRow>
-                      ))}
-                  </>
-                ))
+                  ))}
+                  {emptyRowsCount > 0 &&
+                    Array.from({ length: emptyRowsCount }).map((_, index) => (
+                      <TableRow
+                        key={`empty-${index}`}
+                        className="h-10 hover:bg-transparent pointer-events-none"
+                      >
+                        <TableCell></TableCell>
+                        <TableCell></TableCell>
+                      </TableRow>
+                    ))}
+                </>
               )}
             </TableBody>
           </Table>
