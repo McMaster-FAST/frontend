@@ -1,6 +1,6 @@
 "use client";
 
-import { pollForUploadUpdates, uploadQuestions } from "@/lib/question-api";
+import { pollForParsingUpdates, uploadQuestions } from "@/lib/question-api";
 import { useRef, useState } from "react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { QuestionItem } from "@/components/macfast/questions-item/questions-item";
@@ -17,9 +17,13 @@ import { useRouter } from "next/navigation";
 import MacFastPaginator from "@/components/macfast/macfast-paginator";
 import { Progress } from "@/components/ui/progress";
 import { Spinner } from "@/components/ui/spinner";
-import { UploadCompletedStatus, UploadProgress } from "@/types/UploadResult";
+import {
+  UploadCompletedStatus,
+  UploadInProgressStatus,
+  UploadProgress,
+} from "@/types/UploadResult";
 import { Card } from "@/components/ui/card";
-import { toast, Toaster } from "sonner";
+import ErrorMessage from "@/components/macfast/error-message";
 
 interface QuestionsProps {
   course?: Course | null;
@@ -36,7 +40,7 @@ export function Questions({ course }: QuestionsProps) {
   const [commentsSheetOpen, setCommentsSheetOpen] = useState(false);
   // Pagination is 1-indexed
   const [pageNumber, setPageNumber] = useState<number>(1);
-  const [uploadResult, setUploadResult] = useState<UploadProgress | null>(null);
+  const [parsingResult, setParsingResult] = useState<UploadProgress | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const authFetch = useAuthFetch();
   const router = useRouter();
@@ -80,18 +84,22 @@ export function Questions({ course }: QuestionsProps) {
         throw new Error("Course information is missing. Please try again.");
       }
       const repsonse = await uploadQuestions(file, course, authFetch);
-      setUploadResult(null);
+      setParsingResult({
+        result: UploadInProgressStatus.RUNNING,
+        progress: 0,
+        success_count: 0,
+        failure_count: 0,
+      } as UploadProgress);
       setTimeout(() => {
-        pollForUploadUpdates(
+        pollForParsingUpdates(
           course.code,
           repsonse.upload_result_id,
           authFetch,
-          setUploadResult,
+          setParsingResult,
         );
       }, 2000);
       await refetch();
     } catch (error) {
-      console.error("Upload failed:", error);
       setError(
         error instanceof Error ? error.message : "Failed to upload questions",
       );
@@ -122,55 +130,57 @@ export function Questions({ course }: QuestionsProps) {
     router.push(`/courses/${course?.code}/question/${questionId}/edit`);
   };
 
-  const uploadResultMessage = () => {
-    switch (uploadResult?.result) {
+  const pasingResultMessage = () => {
+    let spinner = false;
+    let message = "";
+    switch (parsingResult?.result) {
       case UploadCompletedStatus.SUCCESS:
-        return "Upload complete";
+        message = "Parsing complete";
+        break;
       case UploadCompletedStatus.FAILED:
-        return "Upload failed";
-      default:
-        return (
-          <>
-            <span>Uploading questions</span>
-            <Spinner className="ml-2" />
-          </>
-        );
+        message = "Parsing failed";
+        break;
+      case UploadInProgressStatus.RUNNING:
+        spinner = true;
+        if (parsingResult.failure_count + parsingResult.success_count === 0) {
+          message = "Waiting for parser";
+        } else {
+          message = "Parsing questions";
+        }
+        break;
     }
+    return (
+      <>
+        <span>{message}</span>
+        {spinner && <Spinner className="mr-2" />}
+      </>
+    );
   };
-
-  const totalUploadCount = uploadResult
-    ? uploadResult.success_count + uploadResult.failure_count
-    : 0;
 
   return (
     <div className="flex flex-col h-full">
-      {error && (
-        <Alert variant="destructive" className="mb-6">
-          <AlertTitle>Error</AlertTitle>
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      )}
-      {uploadResult && (
+      {error && <ErrorMessage className="mb-6" title="Error" message={error} />}
+      {parsingResult && (
         <Card className="w-full mb-6">
           <div className="flex flex-col gap-2">
             <div className="inline-flex justify-between w-full">
               <div className="inline-flex gap-2 items-center">
-                {uploadResultMessage()}
+                {pasingResultMessage()}
               </div>
               <div>
                 <XIcon
                   className="h-4 w-4 cursor-pointer top-0 ml-auto"
-                  onClick={() => setUploadResult(null)}
+                  onClick={() => setParsingResult(null)}
                 />
                 <div className="text-sm text-muted-foreground">
-                  <span>{uploadResult.success_count} questions uploaded </span>
-                  <span>({uploadResult.failure_count} failed)</span>
+                  <span>{parsingResult.success_count} questions parsed </span>
+                  <span>({parsingResult.failure_count} failed)</span>
                 </div>
               </div>
             </div>
             <Progress
               className="h-2 w-full mb-2"
-              value={uploadResult.progress * 100}
+              value={parsingResult.progress * 100}
             />
           </div>
         </Card>

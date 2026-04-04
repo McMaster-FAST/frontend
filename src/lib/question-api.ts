@@ -164,7 +164,7 @@ export async function getQuestionById(
  * @param uploadResultId The id returned on question upload
  * @param interval How often to poll for updates
  */
-export async function pollForUploadUpdates(
+export async function pollForParsingUpdates(
   courseCode: string,
   uploadResultId: string,
   authFetch: ReturnType<typeof useAuthFetch>,
