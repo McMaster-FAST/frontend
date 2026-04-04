@@ -10,9 +10,9 @@ import { ChevronsRight } from "lucide-react";
 import { useAuthFetch } from "@/hooks/useFetchWithAuth";
 import { getQuestionByPublicId } from "@/lib/question-api";
 import { QuestionPage } from "@/components/macfast/question-page";
-import { ReportQuestionDialog } from "@/components/macfast/report-question-dialog";
 import { Checkbox } from "@/components/ui/checkbox";
 import { SafeHtml } from "@/components/macfast/safe-html";
+import { ReportQuestionDialog } from "@/components/macfast/report-question-dialog";
 
 interface QuestionPreviewPageProps {
   // If provided, will use this question data instead of fetching it. Useful for previewing unsaved changes.

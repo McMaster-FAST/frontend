@@ -16,8 +16,8 @@ import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { QuestionReportReason } from "@/types/QuestionReportReason";
 
-interface QuestionFlagDialogProps {
-  onSubmit?: (reportAnswers: ReportAnswers) => Promise<void> | void;
+interface ReportQuestionDialogProps {
+  onSubmit?: (reasons: ReportAnswers) => void;
   disabled?: boolean;
 }
 
@@ -36,7 +36,7 @@ interface FormValidityState {
 export function ReportQuestionDialog({
   onSubmit,
   disabled,
-}: QuestionFlagDialogProps) {
+}: ReportQuestionDialogProps) {
   const [open, setOpen] = useState(false);
   const [reportAnswers, setReportAnswers] = useState<ReportAnswers>({
     reasons: [],
