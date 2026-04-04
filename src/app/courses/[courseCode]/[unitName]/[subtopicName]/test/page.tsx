@@ -1,9 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { RadioGroup } from "@/components/ui/radio-group";
 import { ChevronsRight } from "lucide-react";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { JSX } from "react/jsx-runtime";
@@ -336,17 +334,17 @@ function QuestionTestPage({ params: paramsPromise }: QuestionTestPageProps) {
                 className="flex flex-col gap-3"
                 disabled={submitted}
               >
-                {question?.options.map((option) => 
-                    <QuestionOption
-                      key={option.public_id}
-                      option={option}
-                      correctOptionId={correctOptionId}
-                      submitted={submitted}
-                      isSubmitSuccess={submitSuccess}
-                      selectedOption={selectedOption}
-                      question={question}
-                    />
-                )}
+                {question?.options.map((option) => (
+                  <QuestionOption
+                    key={option.public_id}
+                    option={option}
+                    correctOptionId={correctOptionId}
+                    submitted={submitted}
+                    isSubmitSuccess={submitSuccess}
+                    selectedOption={selectedOption}
+                    question={question}
+                  />
+                ))}
               </RadioGroup>
             )}
           </QuestionPage.Options>

@@ -13,6 +13,8 @@ interface CourseBannerProps {
   variant?: "instructor" | "course" | "question-edit";
   level?: number;
   progressPercentage?: number; // 0-100
+  isXPLoading?: boolean;
+  xpLeft?: number;
 }
 
 export function CourseBanner({
@@ -22,6 +24,8 @@ export function CourseBanner({
   variant = "course",
   level = 0,
   progressPercentage = 0,
+  isXPLoading = false,
+  xpLeft = 100, //
 }: CourseBannerProps) {
   const isCourseVariant = variant === "course";
 
@@ -94,12 +98,21 @@ export function CourseBanner({
           </div>
 
           {isCourseVariant && (
-            <XpCircle
-              level={level}
-              percentage={progressPercentage}
-              isLoading={isLoading}
-              className="w-24 h-24 flex-shrink-0"
-            />
+            <div className="flex flex-col items-center gap-2 flex-shrink-0">
+              <XpCircle
+                level={level}
+                percentage={progressPercentage}
+                isLoading={isXPLoading || isLoading}
+                className="w-24 h-24"
+              />
+
+              {/* Only show the text if we aren't loading */}
+              {!(isXPLoading || isLoading) && (
+                <span className="text-xs font-semibold text-muted-foreground">
+                  {xpLeft} XP to next level
+                </span>
+              )}
+            </div>
           )}
         </div>
       </div>
