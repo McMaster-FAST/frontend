@@ -32,8 +32,8 @@ export async function fetchWithAuth(
   endpoint: string,
   options: RequestInit = {},
 ) {
-  const session = await getServerSession(authOptions);
-  const token = session?.accessToken;
+  const session = await auth();
+  const token = session?.id_token;
 
   const headers = new Headers(options.headers);
 

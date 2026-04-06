@@ -6,7 +6,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FileQuestion, Users } from "lucide-react";
 import { useCourseData } from "@/hooks/useCourseData";
 import { ClassList } from "./tabs/class-list-tab";
-import Link from "next/link";
 import { CourseBanner } from "@/components/macfast/course-banner/course-banner";
 
 function InstructorDashboardPage() {

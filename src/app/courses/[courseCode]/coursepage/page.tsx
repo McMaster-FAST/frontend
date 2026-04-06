@@ -4,28 +4,21 @@ import { MacFastHeader } from "@/components/macfast/macfast-header";
 import UnitsAccordion from "@/components/macfast/unit-accordion/unit-accordion";
 import {
   AlertCircle,
-  AlertTriangle,
-  ArrowRight,
   BookOpen,
   GraduationCap,
-  LayoutDashboard,
   LineChart,
   ListChecks,
 } from "lucide-react";
 import { useCourseData } from "@/hooks/useCourseData";
 import { useState } from "react";
-import { useSession } from "next-auth/react";
 import SavedQuestionsTab from "./tabs/saved-questions";
 import { UnitsAccordionSkeleton } from "@/components/macfast/unit-accordion/unit-accordion-skeleton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import Link from "next/link";
 import { CourseBanner } from "@/components/macfast/course-banner/course-banner";
 import { useCourseXP } from "@/hooks/useCourseXP";
 
 function CoursePage() {
   const { course, isLoading, error } = useCourseData();
-  const { data: session } = useSession();
-  const isAdmin = session?.user?.roles?.includes("admin");
   const { courseXP, isLoading: isXPLoading, error: xpError } = useCourseXP();
   const [openUnits, setOpenUnits] = useState<string>("");
 
