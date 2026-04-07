@@ -101,6 +101,7 @@ function QuestionTestPage({ params: paramsPromise }: QuestionTestPageProps) {
   const [notes, setNotes] = useState<JSX.Element[]>([]);
   const [devAnswerId, setDevAnswerId] = useState<string>("");
   const [gamification, setGamification] = useState<Gamification | null>(null);
+  const devAnswerRequestRef = useRef(0);
 
   const courseErrorMessage = useMemo(() => {
     if (courseLoading || !courseLoadError) return null;
@@ -226,6 +227,23 @@ function QuestionTestPage({ params: paramsPromise }: QuestionTestPageProps) {
           );
           setNotes(generateNoteFromSuggestedActions(suggested_actions));
           if (gamification) setGamification(gamification);
+
+          if (process.env.NODE_ENV !== "production" && question.public_id) {
+            const requestId = ++devAnswerRequestRef.current;
+            setDevAnswerId("");
+            authFetch(`/api/core/questions/${question.public_id}/answer/`)
+              .then((res) => res.json())
+              .then((data) => {
+                if (requestId === devAnswerRequestRef.current) {
+                  setDevAnswerId(data.correct_option_id ?? "");
+                }
+              })
+              .catch(() => {
+                if (requestId === devAnswerRequestRef.current) {
+                  setDevAnswerId("");
+                }
+              });
+          }
         },
       )
       .catch((err: Error) => {
@@ -307,15 +325,6 @@ function QuestionTestPage({ params: paramsPromise }: QuestionTestPageProps) {
     void handleNextQuestion();
     // eslint-disable-next-line react-hooks/exhaustive-deps -- run once when URL subtopic id becomes available
   }, [resolvedSubtopicId]);
-
-  useEffect(() => {
-    if (process.env.NODE_ENV === "production" || !question.public_id) return;
-    authFetch(`/api/core/questions/${question.public_id}/answer/`)
-      .then((res) => res.json())
-      .then((data) => setDevAnswerId(data.correct_option_id ?? ""))
-      .catch(() => {});
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [question.public_id]);
 
   return (
     <QuestionPage>
