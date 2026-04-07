@@ -1,7 +1,7 @@
 "use client";
 
 import { pollForParsingUpdates, uploadQuestions } from "@/lib/question-api";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { QuestionItem } from "@/components/macfast/questions-item/questions-item";
 import { Button } from "@/components/ui/button";
@@ -42,8 +42,16 @@ export function Questions({ course }: QuestionsProps) {
   const [pageNumber, setPageNumber] = useState<number>(1);
   const [parsingResult, setParsingResult] = useState<UploadProgress | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const stopPollingRef = useRef<(() => void) | null>(null);
   const authFetch = useAuthFetch();
   const router = useRouter();
+
+  useEffect(() => {
+    return () => {
+      stopPollingRef.current?.();
+      stopPollingRef.current = null;
+    };
+  }, []);
 
   const allSubtopics =
     course?.units.flatMap((unit) => unit.subtopics ?? []) || [];
@@ -84,6 +92,8 @@ export function Questions({ course }: QuestionsProps) {
         throw new Error("Course information is missing. Please try again.");
       }
       const repsonse = await uploadQuestions(file, course, authFetch);
+      stopPollingRef.current?.();
+      stopPollingRef.current = null;
       setParsingResult({
         result: UploadInProgressStatus.RUNNING,
         progress: 0,
@@ -91,11 +101,11 @@ export function Questions({ course }: QuestionsProps) {
         failure_count: 0,
       } as UploadProgress);
       setTimeout(() => {
-        pollForParsingUpdates(
+        stopPollingRef.current = pollForParsingUpdates(
           course.code,
           repsonse.upload_result_id,
           authFetch,
-          setParsingResult,
+          handleParsingUpdate,
         );
       }, 2000);
       await refetch();
@@ -157,6 +167,11 @@ export function Questions({ course }: QuestionsProps) {
     );
   };
 
+  const handleParsingUpdate = (uploadResult: UploadProgress) => {
+    setParsingResult(uploadResult);
+    void refetch();
+  };
+
   return (
     <div className="flex flex-col h-full">
       {error && <ErrorMessage className="mb-6" title="Error" message={error} />}
@@ -170,7 +185,11 @@ export function Questions({ course }: QuestionsProps) {
               <div>
                 <XIcon
                   className="h-4 w-4 cursor-pointer top-0 ml-auto"
-                  onClick={() => setParsingResult(null)}
+                  onClick={() => {
+                    stopPollingRef.current?.();
+                    stopPollingRef.current = null;
+                    setParsingResult(null);
+                  }}
                 />
                 <div className="text-sm text-muted-foreground">
                   <span>{parsingResult.success_count} questions parsed </span>

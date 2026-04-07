@@ -1,7 +1,6 @@
 import { QuestionReportReason } from "@/types/QuestionReportReason";
 import { API_BASE_URL, fetchWithAuth, getJson } from "./api";
 import { useAuthFetch } from "@/hooks/useFetchWithAuth";
-import { debounce, get } from "lodash";
 import { UploadCompletedStatus, UploadProgress } from "@/types/UploadResult";
 
 export async function reportQuestion(
@@ -164,7 +163,7 @@ export async function getQuestionById(
  * @param uploadResultId The id returned on question upload
  * @param interval How often to poll for updates
  */
-export async function pollForParsingUpdates(
+export function pollForParsingUpdates(
   courseCode: string,
   uploadResultId: string,
   authFetch: ReturnType<typeof useAuthFetch>,
@@ -173,13 +172,13 @@ export async function pollForParsingUpdates(
   maxFailures: number = 3,
   maxChecks: number = 10
 ) {
-  // If we fail `maxFailures` times in a row stop polling
-  // We reset the failure count if a call succeeds
-  // If we haven't heard success after `maxChecks` stop polling anyway
+  // If we fail `maxFailures` times in a row, stop polling.
+  // If we still only get RUNNING after `maxChecks`, stop polling anyway.
   let failedFetchCount = 0;
-  let sucessfullChecks = 0;
+  let checks = 0;
 
   const timerId = setInterval(() => {
+    checks++;
     fetchUploadProgress(courseCode, authFetch, uploadResultId)
       .then((uploadResult) => {
         if (
@@ -197,11 +196,13 @@ export async function pollForParsingUpdates(
         failedFetchCount++;
       })
       .finally(() => {
-        if (failedFetchCount >= maxFailures || sucessfullChecks >= maxChecks) {
+        if (failedFetchCount >= maxFailures || checks >= maxChecks) {
           clearInterval(timerId);
         }
       });
   }, interval);
+
+  return () => clearInterval(timerId);
 }
 
 async function fetchUploadProgress(
