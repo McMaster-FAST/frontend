@@ -66,25 +66,52 @@ export default function QuestionTab({
               </p>
             </div>
 
-            {/* Difficulty */}
-            <div className="flex flex-col gap-2">
-              <Label
-                htmlFor="difficulty"
-                className="text-md font-semibold text-foreground"
-              >
-                Difficulty
-              </Label>
-              <Input
-                id="difficulty"
-                className="w-1/4"
-                value={question?.difficulty ?? "0.0000"}
-                disabled
-                readOnly
-              />
-              <p className="text-xs text-muted-foreground">
-                The difficulty of the question as given on question upload.
-              </p>
-            </div>
+            {/* Correct Answer Rate / Difficulty */}
+            {(() => {
+              if (question && question.selection_frequency > 0) {
+                return (
+                  <div className="flex flex-col gap-2">
+                    <Label
+                      htmlFor="selection-frequency"
+                      className="text-md font-semibold text-foreground"
+                    >
+                      Correct Answer Rate
+                    </Label>
+                    <Input
+                      id="selection-frequency"
+                      className="w-1/4"
+                      value={question.selection_frequency}
+                      disabled
+                      readOnly
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      The percentage of students who answered this question correctly.
+                    </p>
+                  </div>
+                );
+              } else {
+                return (
+                  <div className="flex flex-col gap-2">
+                    <Label
+                      htmlFor="difficulty"
+                      className="text-md font-semibold text-foreground"
+                    >
+                      Difficulty
+                    </Label>
+                    <Input
+                      id="difficulty"
+                      className="w-1/4"
+                      value={question?.difficulty ?? "0.0000"}
+                      disabled
+                      readOnly
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      The difficulty of the question as given on question upload.
+                    </p>
+                  </div>
+                );
+              }
+            })()}
 
             {/* Unit */}
             <div className="flex flex-col gap-2">

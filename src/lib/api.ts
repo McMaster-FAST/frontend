@@ -2,7 +2,8 @@ import { useAuthFetch } from "@/hooks/useFetchWithAuth";
 import debounce from "lodash/debounce";
 import { auth } from "@/auth";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+export const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 export async function getJson(response: Response) {
   let json;
@@ -63,81 +64,8 @@ export async function ping() {
   return getJson(response);
 }
 
-interface CourseIdentifier extends Course {
-  code: string;
-  year: number;
-  semester: string;
-}
-export async function uploadQuestions(
-  file: File,
-  course: CourseIdentifier,
-  authFetch: typeof fetchWithAuth,
-) {
-  const formData = new FormData();
-  formData.append("file", file);
-  formData.append("create_required", "true");
-  formData.append("course_code", course.code);
-  formData.append("course_year", course.year.toString());
-  formData.append("course_semester", course.semester.toString());
-
-  const response = await authFetch(`/api/core/upload/`, {
-    method: "PUT",
-    body: formData,
-  });
-  return getJson(response);
-}
-
 export async function getAllQuestions() {
   const response = await fetch(`${API_BASE_URL}/api/core/questions/`);
-
-  return getJson(response);
-}
-
-export async function getSavedQuestions(
-  courseCode: string,
-  authFetch: ReturnType<typeof useAuthFetch>,
-) {
-  const response = await authFetch(`/api/core/saved-for-later/${courseCode}/`, {
-    method: "GET",
-  });
-
-  return getJson(response);
-}
-
-export const setSavedForLaterDebounced = () => debounce(setSavedForLater, 300);
-
-export async function setSavedForLater(
-  courseCode: string,
-  questionId: string,
-  saveForLater: boolean,
-  authFetch: ReturnType<typeof useAuthFetch>,
-) {
-  const response = await authFetch(`/api/core/saved-for-later/${courseCode}/`, {
-    method: saveForLater ? "POST" : "DELETE",
-    body: JSON.stringify({
-      question_public_id: questionId,
-    }),
-  });
-  if (!response.ok) {
-    throw new Error(
-      `Failed to ${saveForLater ? "save" : "unsave"} question for later: ${
-        response.statusText
-      }`,
-    );
-  }
-}
-
-export async function getQuestionById(
-  courseCode: string,
-  questionId: string,
-  authFetch: ReturnType<typeof useAuthFetch>,
-) {
-  const response = await authFetch(
-    `/api/courses/${courseCode}/questions/${questionId}/`,
-    {
-      method: "GET",
-    },
-  );
 
   return getJson(response);
 }
@@ -191,12 +119,23 @@ export async function getQuestionByPublicId(
     `/api/questions/${encodeURIComponent(publicId)}/`,
   );
 
-  if (!response.ok) {
-    throw new Error(`Failed to fetch question: ${response.status}`);
-  }
+  return getJson(response) as Promise<Question>;
+}
 
-  const data = await response.json();
-  return data as Question;
+export async function updateQuestion(
+  publicId: string,
+  fields: Partial<Pick<Question, "content" | "answer_explanation" | "is_flagged" | "is_active" | "is_verified">>,
+  authFetch: ReturnType<typeof useAuthFetch>,
+): Promise<Question> {
+  const response = await authFetch(
+    `/api/questions/${encodeURIComponent(publicId)}/`,
+    {
+      method: "PATCH",
+      body: JSON.stringify(fields),
+    },
+  );
+
+  return getJson(response) as Promise<Question>;
 }
 
 export async function uploadQuestionImage(

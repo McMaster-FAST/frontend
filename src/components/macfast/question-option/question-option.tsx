@@ -29,7 +29,7 @@ export default function QuestionOption({
   const userGotItRight = selectedOption === correctOptionId;
 
   let boxClasses =
-    "border-2 p-6 rounded-md items-center flex gap-2 w-full transition-all duration-200 ";
+    "border-2 p-6 rounded-md items-start flex gap-2 w-full transition-all duration-200 ";
 
   if (!isSubmitSuccess) {
     boxClasses +=
@@ -37,11 +37,11 @@ export default function QuestionOption({
     if (!submitted) boxClasses += "hover:bg-muted/50 ";
   } else {
     if (isCorrect) {
-      boxClasses += "border-primary-hover ";
+      boxClasses += "border-green-500 bg-green-50 dark:bg-green-950/40 ";
     } else if (isWrongSelection) {
-      boxClasses += "border-primary ";
+      boxClasses += "border-red-500 bg-red-50 dark:bg-red-950/40 ";
     } else {
-      boxClasses += "border-border opacity-50 ";
+      boxClasses += "border-border opacity-40 ";
     }
   }
 
@@ -59,34 +59,18 @@ export default function QuestionOption({
       />
 
       <div className={boxClasses}>
-        <div className="flex-1">
+        <div className="min-w-0 flex-1">
           <SafeHtml html={resolveImages(option.content, question.public_id)} />
         </div>
-
-        {/* Status Labels and Icons */}
-        {isSubmitSuccess && (
-          <div className="flex flex-shrink-0 items-center gap-3 ml-4">
-            {/* CORRECT OPTION BLOCK */}
-            {isCorrect && (
-              <div className="flex items-center gap-2 text-primary-hover">
-                <span className="text-xs font-bold uppercase tracking-wider">
-                  {userGotItRight ? "Great Job!" : "Correct"}
-                </span>
-                <CheckCircle2 className="h-6 w-6" />
-              </div>
-            )}
-
-            {/* WRONG SELECTION BLOCK */}
-            {isWrongSelection && (
-              <div className="flex items-center gap-2 text-primary">
-                <span className="text-xs font-bold uppercase tracking-wider">
-                  Incorrect
-                </span>
-                <XCircle className="h-6 w-6" />
-              </div>
-            )}
-          </div>
-        )}
+        <span className="ml-auto shrink-0">
+          {isSubmitSuccess && isCorrect ? (
+            <CheckCircle2 className="h-5 w-5 text-green-500" />
+          ) : isSubmitSuccess && isWrongSelection ? (
+            <XCircle className="h-5 w-5 text-red-500" />
+          ) : (
+            <span className="block h-5 w-5" />
+          )}
+        </span>
       </div>
     </Label>
   );

@@ -3,6 +3,7 @@ interface Question {
   serial_number: string;
   content: string;
   difficulty: number;
+  selection_frequency: number;
   is_flagged: boolean;
   is_active: boolean;
   is_verified: boolean;
@@ -32,4 +33,12 @@ interface SavedForLater {
   public_id: string;
   question: SavedForLaterQuestion;
   timestamp: string;
+}
+
+interface QuestionReportAggregate {
+  public_id: string;
+  content: string;
+  subtopic_name: string;
+  unit_name: string;
+  total_reports: number;
 }

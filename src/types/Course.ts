@@ -1,4 +1,5 @@
 interface Course {
+  public_id: string;
   code: string;
   name: string;
   description: string;

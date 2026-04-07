@@ -3,7 +3,7 @@ import SavedQuestionItemSkeleton from "@/components/macfast/saved-questions-item
 import { TabsContent } from "@/components/ui/tabs";
 import { useAuthFetch } from "@/hooks/useFetchWithAuth";
 import { useSavedForLaters } from "@/hooks/useSavedForLaters";
-import { setSavedForLater } from "@/lib/api";
+import { setSavedForLater } from "@/lib/question-api";
 
 interface SavedQuestionsTabProps {
   courseCode: string;

@@ -5,9 +5,9 @@ interface ErrorMessageProps {
   title?: string;
   message?: string;
 }
-function ErrorMessage({ title, message }: ErrorMessageProps) {
+function ErrorMessage({ title, message, ...props }: ErrorMessageProps & React.HTMLAttributes<HTMLDivElement>) {
   return (
-    <Alert variant="destructive">
+    <Alert variant="destructive" {...props}>
       <AlertCircle className="h-4 w-4" />
       {title && <AlertTitle>{title}</AlertTitle>}
       {message && <AlertDescription>{message}</AlertDescription>}

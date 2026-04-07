@@ -27,10 +27,14 @@ import {
 } from "@/lib/api";
 import { useCourseData } from "@/hooks/useCourseData";
 import Link from "next/link";
+
+import { reportQuestion } from "@/lib/question-api";
 import SaveForLater from "@/components/macfast/save-for-later";
 import { QuestionPage } from "@/components/macfast/question-page";
 import { MacFastHeader } from "@/components/macfast/macfast-header";
 import { SafeHtml } from "@/components/macfast/safe-html";
+import { GamificationHUD } from "@/components/macfast/gamification-hud";
+import { Gamification } from "@/types/Gamification";
 import QuestionOption from "@/components/macfast/question-option/question-option";
 
 interface QuestionTestPageProps {
@@ -95,6 +99,9 @@ function QuestionTestPage({ params: paramsPromise }: QuestionTestPageProps) {
   const [isQuestionLoading, setIsQuestionLoading] = useState<boolean>(true);
   const [actions, setActions] = useState<ActionInfo[]>([]);
   const [notes, setNotes] = useState<JSX.Element[]>([]);
+  const [devAnswerId, setDevAnswerId] = useState<string>("");
+  const [gamification, setGamification] = useState<Gamification | null>(null);
+  const devAnswerRequestRef = useRef(0);
 
   const courseErrorMessage = useMemo(() => {
     if (courseLoading || !courseLoadError) return null;
@@ -154,6 +161,7 @@ function QuestionTestPage({ params: paramsPromise }: QuestionTestPageProps) {
     setCorrectOptionId("");
     setSolution("");
     setError("");
+    setDevAnswerId("");
   };
 
   const generateActionsForContinueActions = (
@@ -203,21 +211,41 @@ function QuestionTestPage({ params: paramsPromise }: QuestionTestPageProps) {
       question: TestQuestion;
       continue_actions: ContinueAction[];
       suggested_actions: SuggestedAction[];
+      gamification: Gamification | null;
     }>,
     resolvedSubtopicId: string,
   ) => {
     questionPromise
-      .then(({ question, continue_actions, suggested_actions }) => {
-        console.log(suggested_actions);
-        setQuestion(question);
-        setActions(
-          generateActionsForContinueActions(
-            continue_actions,
-            resolvedSubtopicId,
-          ),
-        );
-        setNotes(generateNoteFromSuggestedActions(suggested_actions));
-      })
+      .then(
+        ({ question, continue_actions, suggested_actions, gamification }) => {
+          setQuestion(question);
+          setActions(
+            generateActionsForContinueActions(
+              continue_actions,
+              resolvedSubtopicId,
+            ),
+          );
+          setNotes(generateNoteFromSuggestedActions(suggested_actions));
+          if (gamification) setGamification(gamification);
+
+          if (process.env.NODE_ENV !== "production" && question.public_id) {
+            const requestId = ++devAnswerRequestRef.current;
+            setDevAnswerId("");
+            authFetch(`/api/core/questions/${question.public_id}/answer/`)
+              .then((res) => res.json())
+              .then((data) => {
+                if (requestId === devAnswerRequestRef.current) {
+                  setDevAnswerId(data.correct_option_id ?? "");
+                }
+              })
+              .catch(() => {
+                if (requestId === devAnswerRequestRef.current) {
+                  setDevAnswerId("");
+                }
+              });
+          }
+        },
+      )
       .catch((err: Error) => {
         setError(err.message);
       })
@@ -248,6 +276,16 @@ function QuestionTestPage({ params: paramsPromise }: QuestionTestPageProps) {
         setSubmitSuccess(true);
         setCorrectOptionId(data.correct_option_id);
         setSolution(data.explanation);
+        // Optimistically update counters we can derive from the answer result
+        const isCorrect = selectedOption === data.correct_option_id;
+        setGamification((prev) => {
+          if (!prev) return prev;
+          return {
+            ...prev,
+            questions_answered: prev.questions_answered + 1,
+            current_streak: isCorrect ? prev.current_streak + 1 : 0,
+          };
+        });
       })
       .catch((err) => setError(err.message));
   };
@@ -262,8 +300,18 @@ function QuestionTestPage({ params: paramsPromise }: QuestionTestPageProps) {
     updateWithNewQuestion(skipQuestion(question.public_id, authFetch), sid);
   };
 
-  const handleQuestionFlag = async () => {
-    // Implement question flagging functionality here
+  const handleSaveForLater = async () => {
+    // Implement save for later functionality here
+  };
+
+  const handleReportQuestion = (reportAnswers: any) => {
+    reportQuestion(
+      question.public_id,
+      reportAnswers.reasons,
+      reportAnswers.additionalDetails,
+      reportAnswers.contact_consent,
+      authFetch,
+    );
   };
 
   useEffect(() => {
@@ -284,11 +332,22 @@ function QuestionTestPage({ params: paramsPromise }: QuestionTestPageProps) {
         <MacFastHeader />
       </QuestionPage.Header>
       <QuestionPage.Title>
-        <h1>{courseCode}</h1>
-        <ChevronsRight />
-        <h1>{unit_name}</h1>
-        <ChevronsRight />
-        <h1>{subtopic_name}</h1>
+        <div className="flex w-full flex-col gap-3">
+          <div className="flex min-w-0 flex-wrap items-center gap-1.5 sm:gap-2">
+            <h1 className="max-w-full truncate">{courseCode}</h1>
+            <ChevronsRight className="h-4 w-4 shrink-0 text-muted-foreground" />
+            <h1 className="max-w-full truncate">{unit_name}</h1>
+            <ChevronsRight className="h-4 w-4 shrink-0 text-muted-foreground" />
+            <h1 className="min-w-0 wrap-break-word text-base leading-snug sm:text-lg md:text-xl">
+              {subtopic_name}
+            </h1>
+          </div>
+          {gamification && (
+            <div className="w-full overflow-x-auto">
+              <GamificationHUD gamification={gamification} />
+            </div>
+          )}
+        </div>
       </QuestionPage.Title>
       <QuestionPage.Content>
         <TestContinueDialog
@@ -335,6 +394,17 @@ function QuestionTestPage({ params: paramsPromise }: QuestionTestPageProps) {
                 ))}
               </RadioGroup>
             )}
+            {process.env.NODE_ENV !== "production" && devAnswerId && (
+              <p className="text-xs text-muted-foreground/40 italic mt-1">
+                Answer:{" "}
+                <SafeHtml
+                  html={
+                    question.options?.find((o) => o.public_id === devAnswerId)
+                      ?.content ?? devAnswerId
+                  }
+                />
+              </p>
+            )}
           </QuestionPage.Options>
         </QuestionPage.QuestionBody>
         <QuestionPage.Answer
@@ -367,8 +437,8 @@ function QuestionTestPage({ params: paramsPromise }: QuestionTestPageProps) {
           </QuestionPage.AnswerBody>
           <QuestionPage.AnswerPlaceholder>
             {question?.content && !submitSuccess && (
-              <h2 className="font-poppins font-semibold text-md mt-6 mb-2">
-                Submit an answer to see the solution.
+              <h2 className="font-poppins text-muted-foreground text-lg">
+                Submit an answer to see the solution!
               </h2>
             )}
           </QuestionPage.AnswerPlaceholder>
@@ -380,7 +450,7 @@ function QuestionTestPage({ params: paramsPromise }: QuestionTestPageProps) {
           className="w-full flex flex-row flex-2 justify-between items-center"
         >
           <div>
-            <ReportQuestionDialog onSubmit={handleQuestionFlag} />
+            <ReportQuestionDialog onSubmit={handleReportQuestion} />
           </div>
           <div className="inline-flex items-center gap-4">
             <SaveForLater

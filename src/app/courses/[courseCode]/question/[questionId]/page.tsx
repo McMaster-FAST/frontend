@@ -5,7 +5,7 @@ import { ReportQuestionDialog } from "@/components/macfast/report-question-dialo
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { MacFastHeader } from "@/components/macfast/macfast-header";
 import { useEffect, useState } from "react";
-import { getQuestionById, setSavedForLaterDebounced } from "@/lib/api";
+import { getQuestionById } from "@/lib/question-api";
 import { useAuthFetch } from "@/hooks/useFetchWithAuth";
 import React from "react";
 import { SafeHtml } from "@/components/macfast/safe-html";

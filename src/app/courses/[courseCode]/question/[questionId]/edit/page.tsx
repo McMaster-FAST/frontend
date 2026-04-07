@@ -5,27 +5,24 @@ import { useParams, useRouter } from "next/navigation";
 import { MacFastHeader } from "@/components/macfast/macfast-header";
 import { Button } from "@/components/ui/button";
 import {
-  AlertTriangle,
   ArrowLeft,
   Eye,
   List,
   MessageSquare,
   NotebookPen,
-  Pencil,
 } from "lucide-react";
 import { useAuthFetch } from "@/hooks/useFetchWithAuth";
 import { QuestionPage } from "@/components/macfast/question-page";
 import { isEqual } from "lodash";
 import ErrorMessage from "@/components/macfast/error-message";
-import { getQuestionByPublicId, uploadQuestionImage } from "@/lib/api";
+import { getQuestionByPublicId, uploadQuestionImage } from "@/lib/question-api";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useCourseData } from "@/hooks/useCourseData";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Badge } from "@/components/ui/badge";
 import CommentsSheet from "@/components/macfast/comments/comments-sheet";
 import OptionsTab from "./tabs/options-tab";
 import QuestionTab from "./tabs/question-tab";
 import QuestionPreviewPage from "../preview/page";
+import { updateQuestion } from "@/lib/api";
 import { CourseBanner } from "@/components/macfast/course-banner/course-banner";
 
 function dataUrlToFile(dataUrl: string, baseName: string): File | null {
@@ -117,8 +114,25 @@ export default function QuestionEditPage() {
       })),
     );
 
-    setQuestion(questionWithUploadedImages);
-    // do validation
+    // TODO: patch individual options via PATCH /api/questions/<id>/options/<option_id>/
+    
+    try {
+      const saved = await updateQuestion(
+        questionWithUploadedImages.public_id,
+        {
+          content: questionWithUploadedImages.content,
+          answer_explanation: questionWithUploadedImages.answer_explanation,
+          is_flagged: questionWithUploadedImages.is_flagged,
+          is_active: questionWithUploadedImages.is_active,
+          is_verified: questionWithUploadedImages.is_verified,
+        },
+        authFetch,
+      );
+      setQuestion(saved);
+      setQuestionCopy(structuredClone(saved));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to save question");
+    }
   };
 
   useEffect(() => {

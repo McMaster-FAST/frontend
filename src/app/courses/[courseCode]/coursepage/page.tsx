@@ -15,6 +15,7 @@ import SavedQuestionsTab from "./tabs/saved-questions";
 import { UnitsAccordionSkeleton } from "@/components/macfast/unit-accordion/unit-accordion-skeleton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { CourseBanner } from "@/components/macfast/course-banner/course-banner";
+import { StatisticsDashboard } from "@/components/macfast/statistics/statistics-dashboard";
 import { useCourseXP } from "@/hooks/useCourseXP";
 
 function CoursePage() {
@@ -149,9 +150,7 @@ function CoursePage() {
             value="statistics"
             className="mt-0 flex-1 overflow-y-auto min-h-0 pr-2"
           >
-            <div className="rounded-lg border border-dashed border-light-gray p-10 text-center text-muted-foreground">
-              Statistics Dashboard Coming Soon
-            </div>
+            <StatisticsDashboard />
           </TabsContent>
 
           <SavedQuestionsTab courseCode={course?.code || ""} />
