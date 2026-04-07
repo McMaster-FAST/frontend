@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -27,11 +28,20 @@ export function MacFastHeader() {
 
   return (
     <header className="z-50 sticky top-0 w-full border-b-3 border-gold bg-primary text-primary-foreground shadow-md">
-      <div className="flex h-16 items-center justify-between mx-auto px-24 w-full">
-        <div className="flex items-center gap-2">
+      <div className="flex h-16 items-center justify-between mx-auto px-3 md:px-6 lg:px-12 w-full">
+        <div className="flex items-center gap-4">
+          <Image
+            src="/images/mcmaster-logo.png"
+            alt="McMaster University"
+            width={48}
+            height={48}
+            className="h-11 w-11 object-contain shrink-0"
+            priority
+            unoptimized
+          />
           <Link
             href="/"
-            className="font-poppins text-xl font-bold tracking-tight hover:opacity-90 transition-opacity text-primary-foreground"
+            className="font-poppins text-3xl font-bold tracking-tight hover:opacity-90 transition-opacity text-primary-foreground"
           >
             MacFAST
           </Link>
@@ -88,6 +98,18 @@ export function MacFastHeader() {
             </DropdownMenu>
           )}
 
+          {!isLoading && (
+            <button
+              type="button"
+              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+              className="hover:opacity-80 cursor-pointer"
+              aria-label="Toggle theme"
+            >
+              <Sun className="h-5 w-5 hidden dark:block" />
+              <Moon className="h-5 w-5 dark:hidden" />
+            </button>
+          )}
+
           {isLoading ? (
             <div className="flex items-center gap-2">
               <Skeleton className="h-8 w-8 rounded-full bg-white/20" />
@@ -123,17 +145,6 @@ export function MacFastHeader() {
                     </p>
                   </div>
                 </DropdownMenuLabel>
-                <DropdownMenuSeparator />
-
-                <DropdownMenuItem
-                  className="cursor-pointer py-2"
-                  onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                >
-                  <span>Toggle theme</span>
-                  <Sun className="mr-2 h-4 w-4 hidden dark:block text-yellow-500" />
-                  <Moon className="mr-2 h-4 w-4 dark:hidden text-blue-500" />
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
                 <DropdownMenuItem
                   className="text-red-600 dark:text-red-400 cursor-pointer"
                   onClick={() => signOut({ redirectTo: "/" })}
