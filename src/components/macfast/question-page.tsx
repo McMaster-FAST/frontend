@@ -35,7 +35,7 @@ function QuestionPage({ children, onReturn }: QuestionPageProps) {
           variant="tertiary"
           onClick={onReturn ? onReturn : () => router.back()}
         >
-          <ArrowLeft/>
+          <ArrowLeft />
           Back
         </Button>
       </div>

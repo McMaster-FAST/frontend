@@ -87,6 +87,7 @@ export default function Home() {
               width={360}
               height={100}
               className="h-24 w-auto object-contain"
+              suppressHydrationWarning
               unoptimized
             />
           </a>
@@ -104,6 +105,7 @@ export default function Home() {
               width={480}
               height={100}
               className="h-24 w-auto object-contain"
+              suppressHydrationWarning
               unoptimized
             />
           </a>
@@ -116,6 +118,7 @@ export default function Home() {
               width={200}
               height={100}
               className="h-24 w-auto object-contain"
+              suppressHydrationWarning
               unoptimized
             />
           </div>

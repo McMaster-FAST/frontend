@@ -36,6 +36,7 @@ export function MacFastHeader() {
             width={48}
             height={48}
             className="h-11 w-11 object-contain shrink-0"
+            suppressHydrationWarning
             priority
             unoptimized
           />

@@ -28,7 +28,6 @@ import {
 import { useCourseData } from "@/hooks/useCourseData";
 import Link from "next/link";
 
-import { ReportQuestionDialog } from "@/components/macfast/report-question-dialog";
 import { reportQuestion } from "@/lib/question-api";
 import SaveForLater from "@/components/macfast/save-for-later";
 import { QuestionPage } from "@/components/macfast/question-page";
@@ -216,17 +215,19 @@ function QuestionTestPage({ params: paramsPromise }: QuestionTestPageProps) {
     resolvedSubtopicId: string,
   ) => {
     questionPromise
-      .then(({ question, continue_actions, suggested_actions, gamification }) => {
-        setQuestion(question);
-        setActions(
-          generateActionsForContinueActions(
-            continue_actions,
-            resolvedSubtopicId,
-          ),
-        );
-        setNotes(generateNoteFromSuggestedActions(suggested_actions));
-        if (gamification) setGamification(gamification);
-      })
+      .then(
+        ({ question, continue_actions, suggested_actions, gamification }) => {
+          setQuestion(question);
+          setActions(
+            generateActionsForContinueActions(
+              continue_actions,
+              resolvedSubtopicId,
+            ),
+          );
+          setNotes(generateNoteFromSuggestedActions(suggested_actions));
+          if (gamification) setGamification(gamification);
+        },
+      )
       .catch((err: Error) => {
         setError(err.message);
       })
@@ -322,16 +323,20 @@ function QuestionTestPage({ params: paramsPromise }: QuestionTestPageProps) {
         <MacFastHeader />
       </QuestionPage.Header>
       <QuestionPage.Title>
-        <div className="flex flex-col gap-3 w-full">
-          <div className="flex items-center gap-2 min-w-0">
-            <h1>{courseCode}</h1>
-            <ChevronsRight />
-            <h1>{unit_name}</h1>
-            <ChevronsRight />
-            <h1>{subtopic_name}</h1>
+        <div className="flex w-full flex-col gap-3">
+          <div className="flex min-w-0 flex-wrap items-center gap-1.5 sm:gap-2">
+            <h1 className="max-w-full truncate">{courseCode}</h1>
+            <ChevronsRight className="h-4 w-4 shrink-0 text-muted-foreground" />
+            <h1 className="max-w-full truncate">{unit_name}</h1>
+            <ChevronsRight className="h-4 w-4 shrink-0 text-muted-foreground" />
+            <h1 className="min-w-0 wrap-break-word text-base leading-snug sm:text-lg md:text-xl">
+              {subtopic_name}
+            </h1>
           </div>
           {gamification && (
-            <GamificationHUD gamification={gamification} />
+            <div className="w-full overflow-x-auto">
+              <GamificationHUD gamification={gamification} />
+            </div>
           )}
         </div>
       </QuestionPage.Title>

@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Slot, Slottable } from "@radix-ui/react-slot";
+import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 import { Spinner } from "./spinner";
@@ -52,6 +52,19 @@ function Button({
   children,
   ...props
 }: ButtonProps) {
+  if (asChild) {
+    return (
+      <Slot
+        data-slot="button"
+        data-size={size}
+        className={cn(buttonVariants({ variant, size }), className)}
+        {...props}
+      >
+        {children}
+      </Slot>
+    );
+  }
+
   const Comp = asChild ? Slot : "button";
   return (
     <Comp
