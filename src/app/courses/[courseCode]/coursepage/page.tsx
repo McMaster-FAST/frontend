@@ -47,7 +47,8 @@ function CoursePage() {
           className="w-full flex flex-col h-full"
           defaultValue="practiceProblems"
         >
-          <TabsList>
+          <div className="mb-2 flex flex-wrap items-center justify-between gap-3">
+            <TabsList>
             <TabsTrigger value="practiceProblems">
               <BookOpen />
               Practice Problems
@@ -67,7 +68,8 @@ function CoursePage() {
               <GraduationCap />
               Saved Questions
             </TabsTrigger>
-          </TabsList>
+            </TabsList>
+          </div>
           <TabsContent
             value="practiceProblems"
             className="mt-0 flex-1 overflow-y-auto min-h-0 pr-2"

@@ -14,17 +14,40 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { signIn, signOut, useSession } from "next-auth/react";
-import { ChevronDown, Loader2, LogOut, Moon, Sun, User } from "lucide-react";
+import { useParams, usePathname } from "next/navigation";
+import {
+  BookOpen,
+  ChevronDown,
+  LayoutDashboard,
+  Loader2,
+  LogOut,
+  Moon,
+  Sun,
+} from "lucide-react";
 import { useUserCourses } from "@/hooks/useUserCourses";
+import { useCourseRole } from "@/hooks/useCourseRole";
 import { useTheme } from "next-themes";
 
 export function MacFastHeader() {
   const { courses: userCourses, isLoading: isLoadingCourses } =
     useUserCourses();
+  const params = useParams();
+  const pathname = usePathname();
   const { data: session, status } = useSession();
+  const { canAccessInstructorDashboard } = useCourseRole();
   const { theme, setTheme } = useTheme();
   const isLoading = status === "loading";
   const isAuthenticated = status === "authenticated";
+  const rawCourseCode = params?.courseCode as string | undefined;
+  const courseCode = rawCourseCode ? decodeURIComponent(rawCourseCode) : null;
+  const isOnDashboardPage = /^\/courses\/[^/]+\/dashboard\/?$/.test(pathname || "");
+  const instructorLinkHref =
+    courseCode && isOnDashboardPage
+      ? `/courses/${encodeURIComponent(courseCode)}/coursepage`
+      : `/courses/${encodeURIComponent(courseCode || "")}/dashboard`;
+  const instructorLinkLabel = isOnDashboardPage
+    ? "Course Page"
+    : "Instructor Dashboard";
 
   return (
     <header className="z-50 sticky top-0 w-full border-b-3 border-gold bg-primary text-primary-foreground shadow-md">
@@ -49,6 +72,23 @@ export function MacFastHeader() {
         </div>
 
         <div className="flex items-center gap-4 w-full justify-end">
+          {isAuthenticated && canAccessInstructorDashboard && courseCode && (
+            <Button
+              variant="primary"
+              asChild
+              className="h-9 gap-1 text-primary-foreground hover:bg-white/10 hover:text-white focus:bg-white/10 focus:text-white"
+            >
+              <Link href={instructorLinkHref}>
+                {isOnDashboardPage ? (
+                  <BookOpen className="h-4 w-4" />
+                ) : (
+                  <LayoutDashboard className="h-4 w-4" />
+                )}
+                {instructorLinkLabel}
+              </Link>
+            </Button>
+          )}
+
           {isAuthenticated && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
