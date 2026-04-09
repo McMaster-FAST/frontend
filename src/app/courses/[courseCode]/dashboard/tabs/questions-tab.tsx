@@ -140,6 +140,14 @@ export function Questions({ course }: QuestionsProps) {
     router.push(`/courses/${course?.code}/question/${questionId}/edit`);
   };
 
+  const navigateToCreateQuestion = () => {
+    if (!course?.code) {
+      setError("Course information is missing. Please refresh and try again.");
+      return;
+    }
+    router.push(`/courses/${course.code}/question/new`);
+  };
+
   const pasingResultMessage = () => {
     let spinner = false;
     let message = "";
@@ -229,6 +237,14 @@ export function Questions({ course }: QuestionsProps) {
             disabled={isUploading}
           >
             {isUploading ? "Uploading..." : "Upload Questions"}
+          </Button>
+          <Button
+            variant="secondary"
+            size="default"
+            onClick={navigateToCreateQuestion}
+            disabled={!course?.code}
+          >
+            Create New Question
           </Button>
           <QuestionsFilter
             subtopics={allSubtopics}

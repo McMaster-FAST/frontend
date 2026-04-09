@@ -102,6 +102,7 @@ function QuestionTestPage({ params: paramsPromise }: QuestionTestPageProps) {
   const [devAnswerId, setDevAnswerId] = useState<string>("");
   const [gamification, setGamification] = useState<Gamification | null>(null);
   const devAnswerRequestRef = useRef(0);
+  const questionShownAtRef = useRef<number | null>(null);
 
   const courseErrorMessage = useMemo(() => {
     if (courseLoading || !courseLoadError) return null;
@@ -219,6 +220,7 @@ function QuestionTestPage({ params: paramsPromise }: QuestionTestPageProps) {
       .then(
         ({ question, continue_actions, suggested_actions, gamification }) => {
           setQuestion(question);
+          questionShownAtRef.current = question?.public_id ? Date.now() : null;
           setActions(
             generateActionsForContinueActions(
               continue_actions,
@@ -271,7 +273,11 @@ function QuestionTestPage({ params: paramsPromise }: QuestionTestPageProps) {
 
   const handleSubmit = async () => {
     setSubmitted(true);
-    submitAnswer(selectedOption, question.public_id, authFetch)
+    const elapsedSeconds =
+      questionShownAtRef.current != null
+        ? (Date.now() - questionShownAtRef.current) / 1000
+        : undefined;
+    submitAnswer(selectedOption, question.public_id, authFetch, elapsedSeconds)
       .then((data) => {
         setSubmitSuccess(true);
         setCorrectOptionId(data.correct_option_id);

@@ -68,6 +68,55 @@ export async function getQuestionByPublicId(
   return data as Question;
 }
 
+export async function createQuestion(
+  payload: {
+    serial_number: string;
+    content: string;
+    is_flagged: boolean;
+    is_active: boolean;
+    is_verified: boolean;
+    difficulty?: number;
+    subtopic?: string;
+  },
+  authFetch: ReturnType<typeof useAuthFetch>,
+): Promise<Question> {
+  const response = await authFetch("/api/questions/", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to create question: ${response.status}`);
+  }
+
+  const data = await response.json();
+  return data as Question;
+}
+
+export async function createQuestionOption(
+  questionPublicId: string,
+  payload: {
+    content: string;
+    is_answer: boolean;
+  },
+  authFetch: ReturnType<typeof useAuthFetch>,
+): Promise<QuestionOption> {
+  const response = await authFetch(
+    `/api/questions/${encodeURIComponent(questionPublicId)}/options/`,
+    {
+      method: "POST",
+      body: JSON.stringify(payload),
+    },
+  );
+
+  if (!response.ok) {
+    throw new Error(`Failed to create question option: ${response.status}`);
+  }
+
+  const data = await response.json();
+  return data as QuestionOption;
+}
+
 export async function uploadQuestionImage(
   file: File,
   authFetch: ReturnType<typeof useAuthFetch>,
