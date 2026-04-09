@@ -96,14 +96,34 @@ export async function submitAnswer(
   selected_option_id: string,
   question_id: string,
   authFetch: ReturnType<typeof useAuthFetch>,
+  time_spent?: number,
 ) {
-  return authFetch(`${API_BASE_URL}/submit-answer/`, {
+  const payload: Record<string, string | number> = {
+    question_id: question_id,
+    selected_option_id: selected_option_id,
+  };
+  if (typeof time_spent === "number" && Number.isFinite(time_spent)) {
+    payload.time_spent = Math.max(0, time_spent);
+  }
+
+  const res = await authFetch(`${API_BASE_URL}/submit-answer/`, {
     method: "POST",
-    body: JSON.stringify({
-      question_id: question_id,
-      selected_option_id: selected_option_id,
-    }),
-  }).then(getJson);
+    body: JSON.stringify(payload),
+  });
+
+  // Backward compatible fallback: older backend serializers reject unknown fields.
+  if (!res.ok && "time_spent" in payload) {
+    const retryRes = await authFetch(`${API_BASE_URL}/submit-answer/`, {
+      method: "POST",
+      body: JSON.stringify({
+        question_id: question_id,
+        selected_option_id: selected_option_id,
+      }),
+    });
+    return getJson(retryRes);
+  }
+
+  return getJson(res);
 }
 
 /**

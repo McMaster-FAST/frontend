@@ -150,7 +150,7 @@ function CoursePage() {
             value="statistics"
             className="mt-0 flex-1 overflow-y-auto min-h-0 pr-2"
           >
-            <StatisticsDashboard />
+            <StatisticsDashboard coursePublicId={course?.public_id} />
           </TabsContent>
 
           <SavedQuestionsTab courseCode={course?.code || ""} />
