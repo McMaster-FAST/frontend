@@ -42,7 +42,6 @@ export function ClassList({ courseCode }: ClassListProps) {
       </Alert>
     );
   }
-
   return (
     <div className="w-full h-full flex flex-col min-h-0">
       <Card className="w-full flex-1 flex flex-col min-h-0 border-light-gray shadow-sm">
@@ -63,23 +62,23 @@ export function ClassList({ courseCode }: ClassListProps) {
           />
         </CardHeader>
 
-        <CardContent className="p-0 border-t border-foreground flex-1 overflow-y-auto min-h-0">
+        <CardContent className="p-0 flex-1 overflow-y-auto min-h-0">
           <Table>
             <TableHeader className="bg-background">
               <TableRow className="hover:bg-transparent">
-                <TableHead className="w-[70%] pl-6 text-primary-hover uppercase font-bold">
-                  username
+                <TableHead className="w-[70%] pl-6 text-white font-bold">
+                  Username
                 </TableHead>
-                <TableHead className="w-[30%] text-primary-hover uppercase font-bold">
-                  role
+                <TableHead className="w-[30%] text-white font-bold">
+                  Role
                 </TableHead>
               </TableRow>
             </TableHeader>
 
             <TableBody>
-              {isLoading ? (
+              {false ? (
                 Array.from({ length: 5 }).map((_, i) => (
-                  <TableRow key={i}>
+                  <TableRow key={`loading-${i}`}>
                     <TableCell className="pl-6">
                       <Skeleton className="h-4 w-32" />
                     </TableCell>
@@ -88,8 +87,8 @@ export function ClassList({ courseCode }: ClassListProps) {
                     </TableCell>
                   </TableRow>
                 ))
-              ) : filteredStudents.length === 0 ? (
-                <TableRow>
+              ) : false ? (
+                <TableRow key="no-students">
                   <TableCell
                     colSpan={4}
                     className="h-32 text-center text-muted-foreground"
@@ -105,51 +104,53 @@ export function ClassList({ courseCode }: ClassListProps) {
                   </TableCell>
                 </TableRow>
               ) : (
-                filteredStudents.map((student) => (
-                  <TableRow
-                    key={student.id}
-                    className="group transition-colors"
-                  >
-                    <TableCell className="font-medium pl-4 py-2">
-                      <div className="flex items-center gap-3">
-                        <div>
-                          <p className="text-sm font-semibold text-foreground">
-                            {student.user_name}
-                          </p>
+                <>
+                  {filteredStudents.map((student, index) => (
+                    <TableRow
+                      key={`student-${index}`}
+                      className="group transition-colors"
+                    >
+                      <TableCell className="font-medium pl-4 py-2">
+                        <div className="flex items-center gap-3">
+                          <div>
+                            <p className="text-sm font-semibold text-foreground">
+                              {student.user_name}
+                            </p>
+                          </div>
                         </div>
-                      </div>
-                    </TableCell>
-                    <TableCell className="py-2 px-4">
-                      {student.is_instructor ? (
-                        <Badge className="bg-purple-50 text-purple-700 hover:bg-purple-100 border-purple-200">
-                          Instructor
-                        </Badge>
-                      ) : student.is_ta ? (
-                        <Badge className="bg-blue-50 text-blue-700 hover:bg-blue-100 border-blue-200">
-                          Teaching Assistant
-                        </Badge>
-                      ) : (
-                        <Badge
-                          variant="secondary"
-                          className="bg-background text-foreground hover:text-primary-hover"
-                        >
-                          Student
-                        </Badge>
-                      )}
-                    </TableCell>
-                  </TableRow>
-                ))
+                      </TableCell>
+                      <TableCell className="py-2 px-4">
+                        {student.is_instructor ? (
+                          <Badge className="bg-purple-50 text-purple-700 hover:bg-purple-100 border-purple-200">
+                            Instructor
+                          </Badge>
+                        ) : student.is_ta ? (
+                          <Badge className="bg-blue-50 text-blue-700 hover:bg-blue-100 border-blue-200">
+                            Teaching Assistant
+                          </Badge>
+                        ) : (
+                          <Badge
+                            variant="secondary"
+                            className="bg-background text-foreground hover:text-primary-hover"
+                          >
+                            Student
+                          </Badge>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                  {emptyRowsCount > 0 &&
+                    Array.from({ length: emptyRowsCount }).map((_, index) => (
+                      <TableRow
+                        key={`empty-${index}`}
+                        className="h-10 hover:bg-transparent pointer-events-none"
+                      >
+                        <TableCell></TableCell>
+                        <TableCell></TableCell>
+                      </TableRow>
+                    ))}
+                </>
               )}
-              {emptyRowsCount > 0 &&
-                Array.from({ length: emptyRowsCount }).map((_, index) => (
-                  <TableRow
-                    key={`empty-${index}`}
-                    className="h-10 hover:bg-transparent pointer-events-none"
-                  >
-                    <TableCell></TableCell>
-                    <TableCell></TableCell>
-                  </TableRow>
-                ))}
             </TableBody>
           </Table>
         </CardContent>

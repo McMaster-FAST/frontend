@@ -69,8 +69,8 @@ function TableHead({ className, ...props }: React.ComponentProps<"th">) {
   return (
     <th
       data-slot="table-head"
-      className={cn(
-        "border border-b-gold border-b-2 border-l-primary-border border-r-primary-border border-t-0",
+      className={cn( // The order of the border classes here is important
+        "border border-primary-border border-b-gold border-b-2",
         "text-background bg-primary h-10 px-[15px] text-left align-middle front-poppins font-medium whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
         className,
       )}
@@ -85,7 +85,7 @@ function TableCell({ className, ...props }: React.ComponentProps<"td">) {
       data-slot="table-cell"
       className={cn(
         "border-primary-border border",
-        "text-dark-gray align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
+        "p-2 text-dark-gray align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
         className,
       )}
       {...props}

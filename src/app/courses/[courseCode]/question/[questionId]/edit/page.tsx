@@ -5,23 +5,19 @@ import { useParams, useRouter } from "next/navigation";
 import { MacFastHeader } from "@/components/macfast/macfast-header";
 import { Button } from "@/components/ui/button";
 import {
-  AlertTriangle,
   ArrowLeft,
   Eye,
   List,
   MessageSquare,
   NotebookPen,
-  Pencil,
 } from "lucide-react";
 import { useAuthFetch } from "@/hooks/useFetchWithAuth";
 import { QuestionPage } from "@/components/macfast/question-page";
 import { isEqual } from "lodash";
 import ErrorMessage from "@/components/macfast/error-message";
-import { getQuestionByPublicId, uploadQuestionImage } from "@/lib/api";
+import { getQuestionByPublicId, uploadQuestionImage } from "@/lib/question-api";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useCourseData } from "@/hooks/useCourseData";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Badge } from "@/components/ui/badge";
 import CommentsSheet from "@/components/macfast/comments/comments-sheet";
 import OptionsTab from "./tabs/options-tab";
 import QuestionTab from "./tabs/question-tab";

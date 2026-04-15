@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { ChevronsRight } from "lucide-react";
 import { useAuthFetch } from "@/hooks/useFetchWithAuth";
-import { getQuestionByPublicId } from "@/lib/api";
+import { getQuestionByPublicId } from "@/lib/question-api";
 import { QuestionPage } from "@/components/macfast/question-page";
 import { Checkbox } from "@/components/ui/checkbox";
 import { SafeHtml } from "@/components/macfast/safe-html";
