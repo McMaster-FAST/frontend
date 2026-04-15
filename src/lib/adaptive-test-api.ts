@@ -4,6 +4,7 @@ import {
   ContinueAction,
   SuggestedAction,
 } from "@/types/actions/ContinueAction";
+import { Gamification } from "@/types/Gamification";
 
 const API_BASE_URL = "/api/core/adaptive-test";
 
@@ -39,13 +40,19 @@ function convertToTestQuestion(data: any): {
   question: TestQuestion;
   continue_actions: ContinueAction[];
   suggested_actions: SuggestedAction[];
+  gamification: Gamification | null;
 } {
   const question_data = data.question;
+  const gamification: Gamification | null = data.gamification ?? null;
+  const continue_actions = convertToContinueActions(data.continue_actions);
+  const suggested_actions = convertToSuggestedActions(data.suggested_actions);
+
   if (!question_data) {
     return {
       question: {} as TestQuestion,
-      continue_actions: convertToContinueActions(data.continue_actions),
-      suggested_actions: convertToSuggestedActions(data.suggested_actions),
+      continue_actions,
+      suggested_actions,
+      gamification,
     };
   }
   const options = question_data.options.map(
@@ -61,8 +68,9 @@ function convertToTestQuestion(data: any): {
       ...question_data,
       options: options,
     } as TestQuestion,
-    continue_actions: convertToContinueActions(data.continue_actions),
-    suggested_actions: convertToSuggestedActions(data.suggested_actions),
+    continue_actions,
+    suggested_actions,
+    gamification,
   };
 }
 
