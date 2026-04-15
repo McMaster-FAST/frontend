@@ -191,12 +191,23 @@ export async function getQuestionByPublicId(
     `/api/questions/${encodeURIComponent(publicId)}/`,
   );
 
-  if (!response.ok) {
-    throw new Error(`Failed to fetch question: ${response.status}`);
-  }
+  return getJson(response) as Promise<Question>;
+}
 
-  const data = await response.json();
-  return data as Question;
+export async function updateQuestion(
+  publicId: string,
+  fields: Partial<Pick<Question, "content" | "answer_explanation" | "is_flagged" | "is_active" | "is_verified">>,
+  authFetch: ReturnType<typeof useAuthFetch>,
+): Promise<Question> {
+  const response = await authFetch(
+    `/api/questions/${encodeURIComponent(publicId)}/`,
+    {
+      method: "PATCH",
+      body: JSON.stringify(fields),
+    },
+  );
+
+  return getJson(response) as Promise<Question>;
 }
 
 export async function uploadQuestionImage(
