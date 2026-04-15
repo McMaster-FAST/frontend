@@ -33,8 +33,8 @@ export function QuestionsFilter({
 }: QuestionsFilterProps) {
   const [open, setOpen] = useState(false);
   const [sliderValue, setSliderValue] = useState([
-    filters.min_difficulty ?? 0,
-    filters.max_difficulty ?? 1,
+    filters.min_selection_frequency ?? 0,
+    filters.max_selection_frequency ?? 1,
   ]);
 
   const debouncedFilterChange = useMemo(
@@ -44,8 +44,8 @@ export function QuestionsFilter({
         const maxVal = value[1] < 1 ? value[1] : undefined;
         onFilterChange({
           ...filters,
-          min_difficulty: minVal,
-          max_difficulty: maxVal,
+          min_selection_frequency: minVal,
+          max_selection_frequency: maxVal,
         });
       }, 300),
     [filters, onFilterChange],
@@ -118,7 +118,7 @@ export function QuestionsFilter({
           <div className="space-y-3">
             <div className="flex justify-between items-center">
               <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                Difficulty
+                Correct Answer Rate
               </Label>
               <span className="text-sm text-muted-foreground">
                 {sliderValue[0].toFixed(2)} - {sliderValue[1].toFixed(2)}
