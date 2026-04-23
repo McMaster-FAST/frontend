@@ -85,6 +85,7 @@ function QuestionPage({ params: paramsPromise }: QuestionPageProps) {
 
   const handleNextQuestion = async () => {
     resetState();
+    console.log({ course, unit, subtopic });
 
     getNextQuestion(course, unit, subtopic, authFetch)
       .then((nextQuestion) => {
@@ -193,7 +194,7 @@ function QuestionPage({ params: paramsPromise }: QuestionPageProps) {
             {!isQuestionLoading && question.content && (
               <div
                 id="question-card"
-                className="border p-4 rounded-lg shadow-md"
+                className="solution-html border p-4 rounded-lg shadow-md"
                 dangerouslySetInnerHTML={{
                   __html: DOMPurify.sanitize(question.content),
                 }}
@@ -245,22 +246,25 @@ function QuestionPage({ params: paramsPromise }: QuestionPageProps) {
                   <h1 className="font-poppins font-bold text-2xl">
                     The correct answer is:
                   </h1>
-                  <p className="font-poppins text-2xl">
-                    {
-                      question?.options.find(
-                        (option) => option.public_id === correctOptionId,
-                      )?.content
-                    }
-                  </p>
+                  <div
+                    className="font-poppins text-2xl"
+                    dangerouslySetInnerHTML={{
+                      __html:
+                        question?.options.find(
+                          (option) => option.public_id === correctOptionId,
+                        )?.content || "",
+                    }}
+                  />
                 </div>
 
                 <div>
                   <h2 className="font-poppins font-semibold text-lg">Why?</h2>
-                  <p
+                  <div
+                    className="solution-html"
                     dangerouslySetInnerHTML={{
                       __html: DOMPurify.sanitize(solution),
                     }}
-                  ></p>
+                  />
                 </div>
               </div>
             )}
