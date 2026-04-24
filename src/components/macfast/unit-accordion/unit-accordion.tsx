@@ -92,6 +92,13 @@ function UnitsAccordion({ tab, course, value, setValue }: UnitsAccordionProps) {
             <AccordionContent className="flex flex-col gap-4">
               {unit.subtopics?.map((subtopic, subIndex) => (
                 <div key={subIndex} className="w-full">
+                  {/*
+                    Hide navigation for subtopics without active questions so users
+                    don't enter an empty practice flow.
+                  */}
+                  {(() => {
+                    const hasQuestions = (subtopic.question_count ?? 0) > 0;
+                    return (
                   <div className="ml-2 whitespace-nowrap flex flex-row items-center font-poppins font-medium justify-between">
                     <div className="w-full flex-2">
                       <p>{subtopic.name}</p>
@@ -117,21 +124,34 @@ function UnitsAccordion({ tab, course, value, setValue }: UnitsAccordionProps) {
                             : "Unattempted"}
                         </span>
                         <div className="flex-0 flex justify-end">
-                          <Button variant="secondary" className="text-sm">
-                            <Link
-                              href={getEncodedTestURI(
-                                course.code,
-                                unit.name,
-                                subtopic.name,
-                              )}
+                          {hasQuestions ? (
+                            <Button variant="secondary" className="text-sm" asChild>
+                              <Link
+                                href={getEncodedTestURI(
+                                  course.code,
+                                  unit.name,
+                                  subtopic.name,
+                                )}
+                              >
+                                Practice
+                              </Link>
+                            </Button>
+                          ) : (
+                            <Button
+                              variant="secondary"
+                              className="text-sm"
+                              disabled
+                              aria-disabled
                             >
-                              Practice
-                            </Link>
-                          </Button>
+                              No questions
+                            </Button>
+                          )}
                         </div>
                       </>
                     )}
                   </div>
+                    );
+                  })()}
                   {tab === "learningObjectives" &&
                     subtopic.description &&
                     subtopic.description.length > 0 && (

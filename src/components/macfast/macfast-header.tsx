@@ -21,12 +21,9 @@ import {
   LayoutDashboard,
   Loader2,
   LogOut,
-  Moon,
-  Sun,
 } from "lucide-react";
 import { useUserCourses } from "@/hooks/useUserCourses";
 import { useCourseRole } from "@/hooks/useCourseRole";
-import { useTheme } from "next-themes";
 
 export function MacFastHeader() {
   const { courses: userCourses, isLoading: isLoadingCourses } =
@@ -35,7 +32,6 @@ export function MacFastHeader() {
   const pathname = usePathname();
   const { data: session, status } = useSession();
   const { canAccessInstructorDashboard } = useCourseRole();
-  const { theme, setTheme } = useTheme();
   const isLoading = status === "loading";
   const isAuthenticated = status === "authenticated";
   const rawCourseCode = params?.courseCode as string | undefined;
@@ -137,18 +133,6 @@ export function MacFastHeader() {
                 )}
               </DropdownMenuContent>
             </DropdownMenu>
-          )}
-
-          {!isLoading && (
-            <button
-              type="button"
-              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              className="hover:opacity-80 cursor-pointer"
-              aria-label="Toggle theme"
-            >
-              <Sun className="h-5 w-5 hidden dark:block" />
-              <Moon className="h-5 w-5 dark:hidden" />
-            </button>
           )}
 
           {isLoading ? (
