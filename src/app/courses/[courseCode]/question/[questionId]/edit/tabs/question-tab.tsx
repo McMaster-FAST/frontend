@@ -13,16 +13,34 @@ import { TabsContent } from "@/components/ui/tabs";
 interface QuestionTabProps {
   question: Question | null;
   setQuestion: React.Dispatch<React.SetStateAction<Question | null>>;
+  units?: Unit[];
+  selectedUnitPublicId?: string;
+  selectedSubtopicPublicId?: string;
+  onUnitChange?: (unitPublicId: string) => void;
+  onSubtopicChange?: (subtopicPublicId: string) => void;
+  allowDifficultySelection?: boolean;
 }
 
 export default function QuestionTab({
   question,
   setQuestion,
+  units,
+  selectedUnitPublicId,
+  selectedSubtopicPublicId,
+  onUnitChange,
+  onSubtopicChange,
+  allowDifficultySelection = false,
 }: QuestionTabProps) {
   const updateVerifiedStatus = (value: string) => {
     const isVerified = value === "true";
     setQuestion((prev) => (prev ? { ...prev, is_verified: isVerified } : prev));
   };
+
+  const availableUnits = units ?? [];
+  const selectedUnit =
+    availableUnits.find((unit) => unit.public_id === selectedUnitPublicId) ??
+    null;
+  const availableSubtopics = selectedUnit?.subtopics ?? [];
 
   return (
     <TabsContent value="question" className="flex-1 overflow-hidden">
@@ -66,25 +84,87 @@ export default function QuestionTab({
               </p>
             </div>
 
-            {/* Difficulty */}
-            <div className="flex flex-col gap-2">
-              <Label
-                htmlFor="difficulty"
-                className="text-md font-semibold text-foreground"
-              >
-                Difficulty
-              </Label>
-              <Input
-                id="difficulty"
-                className="w-1/4"
-                value={question?.difficulty ?? "0.0000"}
-                disabled
-                readOnly
-              />
-              <p className="text-xs text-muted-foreground">
-                The difficulty of the question as given on question upload.
-              </p>
-            </div>
+            {/* Correct Answer Rate / Difficulty */}
+            {(() => {
+              if (question && question.selection_frequency > 0) {
+                return (
+                  <div className="flex flex-col gap-2">
+                    <Label
+                      htmlFor="selection-frequency"
+                      className="text-md font-semibold text-foreground"
+                    >
+                      Correct Answer Rate
+                    </Label>
+                    <Input
+                      id="selection-frequency"
+                      className="w-1/4"
+                      value={question.selection_frequency}
+                      disabled
+                      readOnly
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      The percentage of students who answered this question correctly.
+                    </p>
+                  </div>
+                );
+              } else {
+                return (
+                  <div className="flex flex-col gap-2">
+                    <Label
+                      htmlFor="difficulty"
+                      className="text-md font-semibold text-foreground"
+                    >
+                      Difficulty
+                    </Label>
+                    {allowDifficultySelection ? (
+                      <Select
+                        value={Number(question?.difficulty ?? 0).toFixed(4)}
+                        onValueChange={(value) =>
+                          setQuestion((prev) =>
+                            prev
+                              ? { ...prev, difficulty: Number.parseFloat(value) }
+                              : prev,
+                          )
+                        }
+                      >
+                        <SelectTrigger id="difficulty" className="w-1/4 min-w-36">
+                          <SelectValue placeholder="Select difficulty" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {[
+                            "-3.0000",
+                            "-2.0000",
+                            "-1.0000",
+                            "0.0000",
+                            "1.0000",
+                            "2.0000",
+                            "3.0000",
+                          ].map((difficultyValue) => (
+                            <SelectItem
+                              key={difficultyValue}
+                              value={difficultyValue}
+                            >
+                              {difficultyValue}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    ) : (
+                      <Input
+                        id="difficulty"
+                        className="w-1/4"
+                        value={Number(question?.difficulty ?? 0).toFixed(4)}
+                        disabled
+                        readOnly
+                      />
+                    )}
+                    <p className="text-xs text-muted-foreground">
+                      Difficulty range is from -3.0000 to 3.0000.
+                    </p>
+                  </div>
+                );
+              }
+            })()}
 
             {/* Unit */}
             <div className="flex flex-col gap-2">
@@ -95,19 +175,32 @@ export default function QuestionTab({
                 Unit
               </Label>
               <Select
-                value={question?.unit || ""}
-                onValueChange={(val) =>
-                  setQuestion((prev) => (prev ? { ...prev, unit: val } : prev))
-                }
+                value={selectedUnitPublicId || question?.unit || ""}
+                onValueChange={(val) => {
+                  if (onUnitChange) {
+                    onUnitChange(val);
+                    return;
+                  }
+                  setQuestion((prev) => (prev ? { ...prev, unit: val } : prev));
+                }}
               >
                 <SelectTrigger id="unit">
                   <SelectValue placeholder="Select a unit" />
                 </SelectTrigger>
                 <SelectContent>
-                  {/* Replace with actual unit data map if dynamic */}
-                  <SelectItem value="unit-1">Unit 1</SelectItem>
-                  <SelectItem value="unit-2">Unit 2</SelectItem>
-                  <SelectItem value="unit-3">Unit 3</SelectItem>
+                  {availableUnits.length > 0 ? (
+                    availableUnits.map((unit) => (
+                      <SelectItem key={unit.public_id} value={unit.public_id}>
+                        {`Unit ${unit.number}: ${unit.name}`}
+                      </SelectItem>
+                    ))
+                  ) : (
+                    <>
+                      <SelectItem value="unit-1">Unit 1</SelectItem>
+                      <SelectItem value="unit-2">Unit 2</SelectItem>
+                      <SelectItem value="unit-3">Unit 3</SelectItem>
+                    </>
+                  )}
                 </SelectContent>
               </Select>
               <p className="text-xs text-muted-foreground">
@@ -124,20 +217,37 @@ export default function QuestionTab({
                 Subtopic
               </Label>
               <Select
-                value={question?.subtopic_name || ""}
-                onValueChange={(val) =>
+                value={selectedSubtopicPublicId || question?.subtopic_name || ""}
+                onValueChange={(val) => {
+                  if (onSubtopicChange) {
+                    onSubtopicChange(val);
+                    return;
+                  }
                   setQuestion((prev) =>
                     prev ? { ...prev, subtopic: val } : prev,
-                  )
-                }
+                  );
+                }}
               >
                 <SelectTrigger id="subtopic">
                   <SelectValue placeholder="Select a subtopic" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="subtopic-1">Subtopic 1</SelectItem>
-                  <SelectItem value="subtopic-2">Subtopic 2</SelectItem>
-                  <SelectItem value="subtopic-3">Subtopic 3</SelectItem>
+                  {availableSubtopics.length > 0 ? (
+                    availableSubtopics.map((subtopic) => (
+                      <SelectItem
+                        key={subtopic.public_id}
+                        value={subtopic.public_id}
+                      >
+                        {subtopic.name}
+                      </SelectItem>
+                    ))
+                  ) : (
+                    <>
+                      <SelectItem value="subtopic-1">Subtopic 1</SelectItem>
+                      <SelectItem value="subtopic-2">Subtopic 2</SelectItem>
+                      <SelectItem value="subtopic-3">Subtopic 3</SelectItem>
+                    </>
+                  )}
                 </SelectContent>
               </Select>
               <p className="text-xs text-muted-foreground">

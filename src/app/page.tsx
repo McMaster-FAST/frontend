@@ -41,7 +41,7 @@ export default function Home() {
 
       {/* Main Content */}
       <main className="flex-1 px-6 py-10 md:px-8 lg:px-28">
-        <div className="mx-auto">
+        <div className="mx-auto w-full max-w-7xl">
           <div className="mb-8 flex items-baseline justify-between">
             <h2 className="font-poppins text-2xl font-bold text-foreground">
               Your Courses
@@ -51,7 +51,7 @@ export default function Home() {
             </span>
           </div>
 
-          <div className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-6 pb-10">
+          <div className="grid w-full grid-cols-[repeat(auto-fit,minmax(320px,1fr))] gap-6 pb-10">
             {isLoading
               ? Array.from({ length: 5 }).map((_, index) => (
                   <CourseCardSkeleton key={`skeleton-${index}`} />
@@ -82,11 +82,12 @@ export default function Home() {
             className="transition-all duration-300 hover:scale-105 hover:opacity-100"
           >
             <Image
-              src="/sponsors/mcmaster-logo.png"
+              src="/sponsors/mcmaster-science.png"
               alt="McMaster University"
               width={360}
               height={100}
               className="h-24 w-auto object-contain"
+              suppressHydrationWarning
               unoptimized
             />
           </a>
@@ -104,6 +105,7 @@ export default function Home() {
               width={480}
               height={100}
               className="h-24 w-auto object-contain"
+              suppressHydrationWarning
               unoptimized
             />
           </a>
@@ -116,6 +118,7 @@ export default function Home() {
               width={200}
               height={100}
               className="h-24 w-auto object-contain"
+              suppressHydrationWarning
               unoptimized
             />
           </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,31 +14,77 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { signIn, signOut, useSession } from "next-auth/react";
-import { ChevronDown, Loader2, LogOut, Moon, Sun, User } from "lucide-react";
+import { useParams, usePathname } from "next/navigation";
+import {
+  BookOpen,
+  ChevronDown,
+  LayoutDashboard,
+  Loader2,
+  LogOut,
+} from "lucide-react";
 import { useUserCourses } from "@/hooks/useUserCourses";
-import { useTheme } from "next-themes";
+import { useCourseRole } from "@/hooks/useCourseRole";
 
 export function MacFastHeader() {
   const { courses: userCourses, isLoading: isLoadingCourses } =
     useUserCourses();
+  const params = useParams();
+  const pathname = usePathname();
   const { data: session, status } = useSession();
-  const { theme, setTheme } = useTheme();
+  const { canAccessInstructorDashboard } = useCourseRole();
   const isLoading = status === "loading";
   const isAuthenticated = status === "authenticated";
+  const rawCourseCode = params?.courseCode as string | undefined;
+  const courseCode = rawCourseCode ? decodeURIComponent(rawCourseCode) : null;
+  const isOnDashboardPage = /^\/courses\/[^/]+\/dashboard\/?$/.test(pathname || "");
+  const instructorLinkHref =
+    courseCode && isOnDashboardPage
+      ? `/courses/${encodeURIComponent(courseCode)}/coursepage`
+      : `/courses/${encodeURIComponent(courseCode || "")}/dashboard`;
+  const instructorLinkLabel = isOnDashboardPage
+    ? "Course Page"
+    : "Instructor Dashboard";
 
   return (
     <header className="z-50 sticky top-0 w-full border-b-3 border-gold bg-primary text-primary-foreground shadow-md">
-      <div className="flex h-16 items-center justify-between mx-auto px-24 w-full">
-        <div className="flex items-center gap-2">
+      <div className="flex h-16 items-center justify-between mx-auto px-3 md:px-6 lg:px-12 w-full">
+        <div className="flex items-center gap-4">
+          <Image
+            src="/images/mcmaster-logo.png"
+            alt="McMaster University"
+            width={48}
+            height={48}
+            className="h-11 w-11 object-contain shrink-0"
+            suppressHydrationWarning
+            priority
+            unoptimized
+          />
           <Link
             href="/"
-            className="font-poppins text-xl font-bold tracking-tight hover:opacity-90 transition-opacity text-primary-foreground"
+            className="font-poppins text-3xl font-bold tracking-tight hover:opacity-90 transition-opacity text-primary-foreground"
           >
             MacFAST
           </Link>
         </div>
 
         <div className="flex items-center gap-4 w-full justify-end">
+          {isAuthenticated && canAccessInstructorDashboard && courseCode && (
+            <Button
+              variant="primary"
+              asChild
+              className="h-9 gap-1 text-primary-foreground hover:bg-white/10 hover:text-white focus:bg-white/10 focus:text-white"
+            >
+              <Link href={instructorLinkHref}>
+                {isOnDashboardPage ? (
+                  <BookOpen className="h-4 w-4" />
+                ) : (
+                  <LayoutDashboard className="h-4 w-4" />
+                )}
+                {instructorLinkLabel}
+              </Link>
+            </Button>
+          )}
+
           {isAuthenticated && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -123,17 +170,6 @@ export function MacFastHeader() {
                     </p>
                   </div>
                 </DropdownMenuLabel>
-                <DropdownMenuSeparator />
-
-                <DropdownMenuItem
-                  className="cursor-pointer py-2"
-                  onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                >
-                  <span>Toggle theme</span>
-                  <Sun className="mr-2 h-4 w-4 hidden dark:block text-yellow-500" />
-                  <Moon className="mr-2 h-4 w-4 dark:hidden text-blue-500" />
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
                 <DropdownMenuItem
                   className="text-red-600 dark:text-red-400 cursor-pointer"
                   onClick={() => signOut({ redirectTo: "/" })}

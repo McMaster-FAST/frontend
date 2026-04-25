@@ -28,12 +28,25 @@ export function resolveImages(html: string, question_id: string) {
   const images = doc.querySelectorAll("img");
   images.forEach((img) => {
     const src = img.getAttribute("src");
-    if (src) {
-      img.setAttribute(
-        "src",
-        `${getHost()}/media/question_images/${question_id}_${src}`,
-      );
+    if (!src) return;
+
+    // Keep already-resolved or external sources untouched.
+    if (
+      src.startsWith("http://") ||
+      src.startsWith("https://") ||
+      src.startsWith("data:") ||
+      src.startsWith("blob:") ||
+      src.startsWith("/media/question_images/")
+    ) {
+      return;
     }
+
+    const normalizedSrc = src.startsWith("/") ? src.slice(1) : src;
+    const filename = normalizedSrc.startsWith(`${question_id}_`)
+      ? normalizedSrc
+      : `${question_id}_${normalizedSrc}`;
+
+    img.setAttribute("src", `${getHost()}/media/question_images/${filename}`);
   });
   return doc.body.innerHTML;
 }

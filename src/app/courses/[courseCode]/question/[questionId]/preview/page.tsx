@@ -8,11 +8,12 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { ChevronsRight } from "lucide-react";
 import { useAuthFetch } from "@/hooks/useFetchWithAuth";
-import { getQuestionByPublicId } from "@/lib/api";
+import { getQuestionByPublicId } from "@/lib/question-api";
 import { QuestionPage } from "@/components/macfast/question-page";
 import { Checkbox } from "@/components/ui/checkbox";
 import { SafeHtml } from "@/components/macfast/safe-html";
 import { ReportQuestionDialog } from "@/components/macfast/report-question-dialog";
+import { resolveImages } from "@/lib/utils";
 
 interface QuestionPreviewPageProps {
   // If provided, will use this question data instead of fetching it. Useful for previewing unsaved changes.
@@ -81,9 +82,14 @@ export default function QuestionPreviewPage({
           error={fetchError || ""}
           isLoading={isLoading}
         >
-          <div className="border p-4 rounded-lg shadow-md">
-            <SafeHtml html={question?.content || ""} />
-          </div>
+          {question?.content && (
+            <div className="solution-html border p-4 rounded-lg shadow-md">
+              <SafeHtml
+                html={resolveImages(question.content, question.public_id)}
+              />
+            </div>
+          )}
+          
           <QuestionPage.Options isLoading={isLoading}>
             <RadioGroup
               value={selectedOption}
@@ -97,7 +103,7 @@ export default function QuestionPreviewPage({
                         value={option.public_id || `option-${index}`}
                         className="cursor-pointer"
                       />
-                      <div className="border-2 p-6 rounded-md items-center flex gap-2 w-full">
+                      <div className="solution-html border-2 p-6 rounded-md items-center flex gap-2 w-full">
                         <SafeHtml html={option.content || ""} />
                       </div>
                     </div>

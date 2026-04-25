@@ -1,11 +1,11 @@
 "use client";
 
-import { uploadQuestions } from "@/lib/api";
-import { useRef, useState } from "react";
+import { pollForParsingUpdates, uploadQuestions } from "@/lib/question-api";
+import { useEffect, useRef, useState } from "react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { QuestionItem } from "@/components/macfast/questions-item/questions-item";
 import { Button } from "@/components/ui/button";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, XIcon } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import CommentsSheet from "@/components/macfast/comments/comments-sheet";
 import { useCourseQuestions } from "@/hooks/useCourseQuestions";
@@ -15,6 +15,15 @@ import { QuestionsFilter } from "@/components/macfast/questions-filter";
 import { useAuthFetch } from "@/hooks/useFetchWithAuth";
 import { useRouter } from "next/navigation";
 import MacFastPaginator from "@/components/macfast/macfast-paginator";
+import { Progress } from "@/components/ui/progress";
+import { Spinner } from "@/components/ui/spinner";
+import {
+  UploadCompletedStatus,
+  UploadInProgressStatus,
+  UploadProgress,
+} from "@/types/UploadResult";
+import { Card } from "@/components/ui/card";
+import ErrorMessage from "@/components/macfast/error-message";
 
 interface QuestionsProps {
   course?: Course | null;
@@ -31,9 +40,18 @@ export function Questions({ course }: QuestionsProps) {
   const [commentsSheetOpen, setCommentsSheetOpen] = useState(false);
   // Pagination is 1-indexed
   const [pageNumber, setPageNumber] = useState<number>(1);
+  const [parsingResult, setParsingResult] = useState<UploadProgress | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const stopPollingRef = useRef<(() => void) | null>(null);
   const authFetch = useAuthFetch();
   const router = useRouter();
+
+  useEffect(() => {
+    return () => {
+      stopPollingRef.current?.();
+      stopPollingRef.current = null;
+    };
+  }, []);
 
   const allSubtopics =
     course?.units.flatMap((unit) => unit.subtopics ?? []) || [];
@@ -73,11 +91,25 @@ export function Questions({ course }: QuestionsProps) {
       if (!course) {
         throw new Error("Course information is missing. Please try again.");
       }
-      await uploadQuestions(file, course, authFetch);
-
+      const repsonse = await uploadQuestions(file, course, authFetch);
+      stopPollingRef.current?.();
+      stopPollingRef.current = null;
+      setParsingResult({
+        result: UploadInProgressStatus.RUNNING,
+        progress: 0,
+        success_count: 0,
+        failure_count: 0,
+      } as UploadProgress);
+      setTimeout(() => {
+        stopPollingRef.current = pollForParsingUpdates(
+          course.code,
+          repsonse.upload_result_id,
+          authFetch,
+          handleParsingUpdate,
+        );
+      }, 2000);
       await refetch();
     } catch (error) {
-      console.error("Upload failed:", error);
       setError(
         error instanceof Error ? error.message : "Failed to upload questions",
       );
@@ -108,13 +140,77 @@ export function Questions({ course }: QuestionsProps) {
     router.push(`/courses/${course?.code}/question/${questionId}/edit`);
   };
 
+  const navigateToCreateQuestion = () => {
+    if (!course?.code) {
+      setError("Course information is missing. Please refresh and try again.");
+      return;
+    }
+    router.push(`/courses/${course.code}/question/new`);
+  };
+
+  const pasingResultMessage = () => {
+    let spinner = false;
+    let message = "";
+    switch (parsingResult?.result) {
+      case UploadCompletedStatus.SUCCESS:
+        message = "Parsing complete";
+        break;
+      case UploadCompletedStatus.FAILED:
+        message = "Parsing failed";
+        break;
+      case UploadInProgressStatus.RUNNING:
+        spinner = true;
+        if (parsingResult.failure_count + parsingResult.success_count === 0) {
+          message = "Waiting for parser";
+        } else {
+          message = "Parsing questions";
+        }
+        break;
+    }
+    return (
+      <>
+        <span>{message}</span>
+        {spinner && <Spinner className="mr-2" />}
+      </>
+    );
+  };
+
+  const handleParsingUpdate = (uploadResult: UploadProgress) => {
+    setParsingResult(uploadResult);
+    void refetch();
+  };
+
   return (
     <div className="flex flex-col h-full">
-      {error && (
-        <Alert variant="destructive" className="mb-6">
-          <AlertTitle>Error</AlertTitle>
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
+      {error && <ErrorMessage className="mb-6" title="Error" message={error} />}
+      {parsingResult && (
+        <Card className="w-full mb-6">
+          <div className="flex flex-col gap-2">
+            <div className="inline-flex justify-between w-full">
+              <div className="inline-flex gap-2 items-center">
+                {pasingResultMessage()}
+              </div>
+              <div>
+                <XIcon
+                  className="h-4 w-4 cursor-pointer top-0 ml-auto"
+                  onClick={() => {
+                    stopPollingRef.current?.();
+                    stopPollingRef.current = null;
+                    setParsingResult(null);
+                  }}
+                />
+                <div className="text-sm text-muted-foreground">
+                  <span>{parsingResult.success_count} questions parsed </span>
+                  <span>({parsingResult.failure_count} failed)</span>
+                </div>
+              </div>
+            </div>
+            <Progress
+              className="h-2 w-full mb-2"
+              value={parsingResult.progress * 100}
+            />
+          </div>
+        </Card>
       )}
 
       <div className="flex flex-row flex-0 gap-4 mb-6 items-center justify-between">
@@ -126,15 +222,12 @@ export function Questions({ course }: QuestionsProps) {
             setSearchQuery(query);
           }}
         />
-        <span className="text-sm text-muted-foreground">
-          Showing {questions.length} of {totalQuestions} questions
-        </span>
         <div className="flex flex-1 gap-3 justify-end ">
           <input
             type="file"
             ref={fileInputRef}
             onChange={handleFileChange}
-            accept=".docx"
+            accept=".docx, .csv"
             className="hidden"
           />
           <Button
@@ -144,6 +237,14 @@ export function Questions({ course }: QuestionsProps) {
             disabled={isUploading}
           >
             {isUploading ? "Uploading..." : "Upload Questions"}
+          </Button>
+          <Button
+            variant="secondary"
+            size="default"
+            onClick={navigateToCreateQuestion}
+            disabled={!course?.code}
+          >
+            Create New Question
           </Button>
           <QuestionsFilter
             subtopics={allSubtopics}
@@ -183,9 +284,7 @@ export function Questions({ course }: QuestionsProps) {
                       setSelectedQuestionId(question.public_id);
                       setCommentsSheetOpen(true);
                     }}
-                    onDelete={() =>
-                      console.log("Delete:", question.public_id)
-                    }
+                    onDelete={() => console.log("Delete:", question.public_id)}
                   />
                 ))}
 
@@ -199,6 +298,8 @@ export function Questions({ course }: QuestionsProps) {
         <MacFastPaginator
           pageNumber={pageNumber}
           totalPages={totalPages}
+          showingCount={questions.length}
+          totalCount={totalQuestions}
           onPageChange={setPageNumber}
           refetch={refetch}
         />

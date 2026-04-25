@@ -3,13 +3,30 @@
 import { Questions } from "@/app/courses/[courseCode]/dashboard/tabs/questions-tab";
 import { MacFastHeader } from "@/components/macfast/macfast-header";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { FileQuestion, Users } from "lucide-react";
+import { AlertTriangle, FileQuestion, Users } from "lucide-react";
 import { useCourseData } from "@/hooks/useCourseData";
+import { useCourseRole } from "@/hooks/useCourseRole";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { ClassList } from "./tabs/class-list-tab";
+import QuestionReportsTab from "./tabs/question-reports-tab";
 import { CourseBanner } from "@/components/macfast/course-banner/course-banner";
 
 function InstructorDashboardPage() {
-  const { course, isLoading, error } = useCourseData();
+  const { course, isLoading, error, courseCode } = useCourseData();
+  const { canAccessInstructorDashboard, isLoading: isRoleLoading } = useCourseRole();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!courseCode || isRoleLoading) return;
+    if (!canAccessInstructorDashboard) {
+      router.replace(`/courses/${encodeURIComponent(courseCode)}/coursepage`);
+    }
+  }, [canAccessInstructorDashboard, courseCode, isRoleLoading, router]);
+
+  if (isRoleLoading || !canAccessInstructorDashboard) {
+    return null;
+  }
 
   return (
     <div className="h-screen flex flex-col overflow-hidden bg-background font-poppins">
@@ -35,6 +52,10 @@ function InstructorDashboardPage() {
                 <Users />
                 Class List
               </TabsTrigger>
+              <TabsTrigger value="questionReports">
+                <AlertTriangle />
+                Question Reports
+              </TabsTrigger>
             </TabsList>
           </div>
 
@@ -50,6 +71,9 @@ function InstructorDashboardPage() {
             className="flex-1 flex flex-col min-h-0 mt-0"
           >
             {course?.code && <ClassList courseCode={course.code} />}
+          </TabsContent>
+          <TabsContent value="questionReports" className="flex-1 flex flex-col min-h-0 mt-0">
+            <QuestionReportsTab />
           </TabsContent>
         </Tabs>
       </main>

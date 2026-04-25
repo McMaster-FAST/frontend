@@ -15,6 +15,7 @@ import SavedQuestionsTab from "./tabs/saved-questions";
 import { UnitsAccordionSkeleton } from "@/components/macfast/unit-accordion/unit-accordion-skeleton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { CourseBanner } from "@/components/macfast/course-banner/course-banner";
+import { StatisticsDashboard } from "@/components/macfast/statistics/statistics-dashboard";
 import { useCourseXP } from "@/hooks/useCourseXP";
 
 function CoursePage() {
@@ -46,7 +47,8 @@ function CoursePage() {
           className="w-full flex flex-col h-full"
           defaultValue="practiceProblems"
         >
-          <TabsList>
+          <div className="mb-2 flex flex-wrap items-center justify-between gap-3">
+            <TabsList>
             <TabsTrigger value="practiceProblems">
               <BookOpen />
               Practice Problems
@@ -66,7 +68,8 @@ function CoursePage() {
               <GraduationCap />
               Saved Questions
             </TabsTrigger>
-          </TabsList>
+            </TabsList>
+          </div>
           <TabsContent
             value="practiceProblems"
             className="mt-0 flex-1 overflow-y-auto min-h-0 pr-2"
@@ -149,9 +152,7 @@ function CoursePage() {
             value="statistics"
             className="mt-0 flex-1 overflow-y-auto min-h-0 pr-2"
           >
-            <div className="rounded-lg border border-dashed border-light-gray p-10 text-center text-muted-foreground">
-              Statistics Dashboard Coming Soon
-            </div>
+            <StatisticsDashboard coursePublicId={course?.public_id} />
           </TabsContent>
 
           <SavedQuestionsTab courseCode={course?.code || ""} />

@@ -4,6 +4,7 @@ import {
   ContinueAction,
   SuggestedAction,
 } from "@/types/actions/ContinueAction";
+import { Gamification } from "@/types/Gamification";
 
 const API_BASE_URL = "/api/core/adaptive-test";
 
@@ -39,13 +40,19 @@ function convertToTestQuestion(data: any): {
   question: TestQuestion;
   continue_actions: ContinueAction[];
   suggested_actions: SuggestedAction[];
+  gamification: Gamification | null;
 } {
   const question_data = data.question;
+  const gamification: Gamification | null = data.gamification ?? null;
+  const continue_actions = convertToContinueActions(data.continue_actions);
+  const suggested_actions = convertToSuggestedActions(data.suggested_actions);
+
   if (!question_data) {
     return {
       question: {} as TestQuestion,
-      continue_actions: convertToContinueActions(data.continue_actions),
-      suggested_actions: convertToSuggestedActions(data.suggested_actions),
+      continue_actions,
+      suggested_actions,
+      gamification,
     };
   }
   const options = question_data.options.map(
@@ -61,8 +68,9 @@ function convertToTestQuestion(data: any): {
       ...question_data,
       options: options,
     } as TestQuestion,
-    continue_actions: convertToContinueActions(data.continue_actions),
-    suggested_actions: convertToSuggestedActions(data.suggested_actions),
+    continue_actions,
+    suggested_actions,
+    gamification,
   };
 }
 
@@ -88,14 +96,34 @@ export async function submitAnswer(
   selected_option_id: string,
   question_id: string,
   authFetch: ReturnType<typeof useAuthFetch>,
+  time_spent?: number,
 ) {
-  return authFetch(`${API_BASE_URL}/submit-answer/`, {
+  const payload: Record<string, string | number> = {
+    question_id: question_id,
+    selected_option_id: selected_option_id,
+  };
+  if (typeof time_spent === "number" && Number.isFinite(time_spent)) {
+    payload.time_spent = Math.max(0, time_spent);
+  }
+
+  const res = await authFetch(`${API_BASE_URL}/submit-answer/`, {
     method: "POST",
-    body: JSON.stringify({
-      question_id: question_id,
-      selected_option_id: selected_option_id,
-    }),
-  }).then(getJson);
+    body: JSON.stringify(payload),
+  });
+
+  // Backward compatible fallback: older backend serializers reject unknown fields.
+  if (!res.ok && "time_spent" in payload) {
+    const retryRes = await authFetch(`${API_BASE_URL}/submit-answer/`, {
+      method: "POST",
+      body: JSON.stringify({
+        question_id: question_id,
+        selected_option_id: selected_option_id,
+      }),
+    });
+    return getJson(retryRes);
+  }
+
+  return getJson(res);
 }
 
 /**
