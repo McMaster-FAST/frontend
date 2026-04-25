@@ -92,33 +92,6 @@ export function GamificationHUD({
         <span className="font-bold tabular-nums">{current_streak}</span>
       </div>
 
-      {/* Ability bar */}
-      <div
-        className="flex flex-col gap-1.5 min-w-[200px]"
-        title={`Skill level: ${abilityPct}% — ${confidenceLabel(ability_variance)}`}
-      >
-        <div className="flex justify-between text-sm leading-none text-muted-foreground">
-          <span>Skill</span>
-          <span>{abilityPct}%</span>
-        </div>
-        <div className="relative h-3 rounded-full bg-muted overflow-hidden">
-          <div
-            className={cn(
-              "h-full rounded-full transition-all duration-700",
-              barColor,
-            )}
-            style={{ width: `${abilityPct}%` }}
-          />
-          {/* Confidence indicator: overlay dims bar when variance is high */}
-          <div
-            className="absolute inset-0 bg-background rounded-full transition-opacity duration-700"
-            style={{
-              opacity: Math.min(ability_variance / 10, 0.55),
-            }}
-          />
-        </div>
-      </div>
-
       {/* Difficulty badge */}
       {diff && (
         <div

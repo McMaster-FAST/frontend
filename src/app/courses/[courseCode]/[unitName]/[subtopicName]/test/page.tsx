@@ -368,7 +368,7 @@ function QuestionTestPage({ params: paramsPromise }: QuestionTestPageProps) {
           }
         >
           {question.content && (
-            <div className="border p-4 rounded-lg shadow-md">
+            <div className="solution-html border p-4 rounded-lg shadow-md">
               <SafeHtml
                 html={resolveImages(question.content, question.public_id)}
               />

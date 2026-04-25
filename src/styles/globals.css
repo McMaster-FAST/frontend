@@ -216,3 +216,27 @@
 .text-button {
   @apply cursor-pointer text-primary-link hover:underline select-none text-primary;
 }
+.solution-html table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  font-size: inherit;
+  background: white;
+  border: 1px solid #d1d5db;
+}
+ 
+.solution-html td {
+  border: 1px solid #d1d5db;
+  padding: 0.65rem 0.9rem;
+  text-align: center;
+  vertical-align: middle;
+}
+ 
+.solution-html table tr:first-child td {
+  background: #f8fafc;
+  font-weight: 600;
+}
+ 
+.solution-html table td p {
+  margin: 0;
+}
