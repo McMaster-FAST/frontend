@@ -1,5 +1,7 @@
 # MacFAST
 
+Frontend for the MacFAST project built with Next.js, deployed on the university's network at https://macfast.ca.
+
 ## Getting Started
 
 ### Installation
