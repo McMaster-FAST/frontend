@@ -11,7 +11,7 @@ import { SafeHtmlInline } from "@/components/macfast/safe-html";
 import { Label } from "@/components/ui/label";
 import { TabsContent } from "@/components/ui/tabs";
 import { Check, CirclePlus, Trash2 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 interface OptionsTabProps {
   question: Question | null;
@@ -20,19 +20,12 @@ interface OptionsTabProps {
 
 export default function OptionsTab({ question, setQuestion }: OptionsTabProps) {
   const [currentOptionIndex, setCurrentOptionIndex] = useState<string>("");
-  const [answerIndex, setAnswerIndex] = useState<number>(0);
+  const answerIndex =
+    question?.options?.findIndex((option) => option.is_answer) ?? 0;
   const isIndexAnswer = (index: number) => {
-    return index === answerIndex;
+    return index === (answerIndex !== -1 ? answerIndex : 0);
   };
 
-  useEffect(() => {
-    if (question && question.options) {
-      const currentAnswerIndex = question.options.findIndex(
-        (option) => option.is_answer,
-      );
-      setAnswerIndex(currentAnswerIndex !== -1 ? currentAnswerIndex : 0);
-    }
-  }, [question]);
   const deleteQuestionOption = (optionIndex: number) => {
     setQuestion((prev) => {
       if (!prev || !prev.options) return prev;
@@ -41,16 +34,6 @@ export default function OptionsTab({ question, setQuestion }: OptionsTabProps) {
       );
       return { ...prev, options: updatedOptions };
     });
-    if (!question || !question.options) return;
-    if (answerIndex === optionIndex) {
-      if (answerIndex >= question.options.length) {
-        setAnswerIndex(question.options.length - 2);
-      } else if (answerIndex <= 0) {
-        setAnswerIndex(0);
-      } else {
-        setAnswerIndex(answerIndex - 1);
-      }
-    }
   };
 
   const setOptionAsAnswer = (optionIndex: number) => {
@@ -62,13 +45,13 @@ export default function OptionsTab({ question, setQuestion }: OptionsTabProps) {
       }));
       return { ...prev, options: updatedOptions };
     });
-    setAnswerIndex(optionIndex);
   };
 
   const addQuestionOption = () => {
     const newOption: QuestionOption = {
       public_id: "",
       content: "",
+      explanation: "",
       is_answer: false,
       selection_frequency: 0,
     };
@@ -102,17 +85,15 @@ export default function OptionsTab({ question, setQuestion }: OptionsTabProps) {
           students.
         </Label>
         <Accordion
-          value={`option-${currentOptionIndex}`}
-          onValueChange={(value) => {
-            setCurrentOptionIndex(value.charAt(value.length - 1));
-          }}
+          value={currentOptionIndex}
+          onValueChange={setCurrentOptionIndex}
           type="single"
           collapsible
         >
           {question?.options &&
             question.options.map((option, index) => {
               return (
-                <div key={index}>
+                <div key={option.public_id || `new-option-${index}`}>
                   <AccordionItem value={`option-${index}`}>
                     <div className="inline-flex items-center justify-between w-full">
                       <div className="inline-flex items-center gap-2">
@@ -170,12 +151,13 @@ export default function OptionsTab({ question, setQuestion }: OptionsTabProps) {
                           <h2 className="text-lg  font-semibold">
                             Explanation
                           </h2>
-                          <p className="text-xs text-muted-foreground m-1">This feature is still under development!</p>
                           <RichTextarea
                             className=""
-                            placeholder="TODO"
-                            value={""}
-                            // onChange={(html) => updateOption(index, { explanation: html })}
+                            placeholder="Option explanation..."
+                            value={option.explanation ?? ""}
+                            onChange={(html) =>
+                              updateOption(index, { explanation: html })
+                            }
                           />
                         </div>
                       </div>

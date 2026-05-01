@@ -2,16 +2,20 @@ interface Question {
   public_id: string;
   serial_number: string;
   content: string;
-  difficulty: number;
-  selection_frequency: number;
+  difficulty: number | string;
+  selection_frequency: number | string;
   is_flagged: boolean;
   is_active: boolean;
   is_verified: boolean;
+  images?: string[];
   options: QuestionOption[];
   course: string;
-  unit: string;
+  unit?: string;
+  unit_name?: string;
+  unit_public_id?: string;
   subtopic_name: string;
-  // TODO: Get this from the backend
+  subtopic_public_id?: string;
+  saved_for_later?: boolean;
   answer_explanation: string;
 }
 

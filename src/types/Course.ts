@@ -7,5 +7,7 @@ interface Course {
   year: number;
   semester: string;
   units: Unit[];
+  correct_questions?: number;
+  total_questions?: number;
   resume_target?: ResumeTarget;
 }

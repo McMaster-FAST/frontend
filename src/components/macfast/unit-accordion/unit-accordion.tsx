@@ -41,13 +41,8 @@ function UnitsAccordion({ tab, course, value, setValue }: UnitsAccordionProps) {
         const attemptedCount =
           unit.subtopics?.filter((sub) => sub.user_ability !== null).length ||
           0;
-
-        // TODO replace with actual XP from backend (no endpoint rn)
-        const rawTotalXp = 780;
-
-        // TOODO: replace with actual completion percentage from backend (no endpoint rn)
-        const correctQuestions = 840;
-        const totalQuestions = 2000;
+        const correctQuestions = unit.correct_questions ?? 0;
+        const totalQuestions = unit.total_questions ?? 0;
 
         return (
           <AccordionItem value={`unit-${index}`} key={index}>
@@ -68,7 +63,7 @@ function UnitsAccordion({ tab, course, value, setValue }: UnitsAccordionProps) {
                 )}
               </div>
 
-              <div className="flex items-center gap-4 flex-shrink-0">
+              <div className="flex items-center gap-4 shrink-0">
                 {tab === "practiceProblems" && (
                   <span
                     className={`text-sm font-normal text-foreground hidden sm:inline-block ${

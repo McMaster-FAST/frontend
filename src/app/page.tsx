@@ -57,11 +57,22 @@ export default function Home() {
                   <CourseCardSkeleton key={`skeleton-${index}`} />
                 ))
               : userCourses.map((course, index) => (
+                  (() => {
+                    const correctQuestions = course.correct_questions ?? 0;
+                    const totalQuestions = course.total_questions ?? 0;
+                    const progress =
+                      totalQuestions > 0
+                        ? Math.round((correctQuestions / totalQuestions) * 100)
+                        : 0;
+
+                    return (
                   <CourseCard
                     key={course.code || index}
                     course={course}
-                    progress={50}
+                    progress={progress}
                   />
+                    );
+                  })()
                 ))}
           </div>
         </div>

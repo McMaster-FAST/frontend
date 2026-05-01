@@ -68,6 +68,22 @@ export async function getQuestionByPublicId(
   return data as Question;
 }
 
+export async function deleteQuestion(
+  publicId: string,
+  authFetch: ReturnType<typeof useAuthFetch>,
+): Promise<void> {
+  const response = await authFetch(
+    `/api/questions/${encodeURIComponent(publicId)}/`,
+    {
+      method: "DELETE",
+    },
+  );
+
+  if (!response.ok) {
+    throw new Error(`Failed to delete question: ${response.status}`);
+  }
+}
+
 export async function createQuestion(
   payload: {
     serial_number: string;
@@ -97,6 +113,7 @@ export async function createQuestionOption(
   questionPublicId: string,
   payload: {
     content: string;
+    explanation?: string;
     is_answer: boolean;
   },
   authFetch: ReturnType<typeof useAuthFetch>,
@@ -115,6 +132,70 @@ export async function createQuestionOption(
 
   const data = await response.json();
   return data as QuestionOption;
+}
+
+export async function updateQuestionOption(
+  questionPublicId: string,
+  optionPublicId: string,
+  payload: {
+    content?: string;
+    explanation?: string;
+    is_answer?: boolean;
+  },
+  authFetch: ReturnType<typeof useAuthFetch>,
+): Promise<QuestionOption> {
+  const response = await authFetch(
+    `/api/questions/${encodeURIComponent(
+      questionPublicId,
+    )}/options/${encodeURIComponent(optionPublicId)}/`,
+    {
+      method: "PATCH",
+      body: JSON.stringify(payload),
+    },
+  );
+
+  return getJson(response) as Promise<QuestionOption>;
+}
+
+export async function deleteQuestionOption(
+  questionPublicId: string,
+  optionPublicId: string,
+  authFetch: ReturnType<typeof useAuthFetch>,
+): Promise<void> {
+  const response = await authFetch(
+    `/api/questions/${encodeURIComponent(
+      questionPublicId,
+    )}/options/${encodeURIComponent(optionPublicId)}/`,
+    {
+      method: "DELETE",
+    },
+  );
+
+  if (!response.ok) {
+    throw new Error(`Failed to delete question option: ${response.status}`);
+  }
+}
+
+export async function getCourseUnits(
+  courseCode: string,
+  authFetch: ReturnType<typeof useAuthFetch>,
+): Promise<Unit[]> {
+  const response = await authFetch(
+    `/api/courses/${encodeURIComponent(courseCode)}/units/`,
+  );
+
+  return getJson(response) as Promise<Unit[]>;
+}
+
+export async function getUnitSubtopics(
+  unitPublicId: string,
+  authFetch: ReturnType<typeof useAuthFetch>,
+): Promise<Subtopic[]> {
+  const response = await authFetch(
+    `/api/units/${encodeURIComponent(unitPublicId)}/subtopics/`,
+  );
+
+  return getJson(response) as Promise<Subtopic[]>;
 }
 
 export async function uploadQuestionImage(
@@ -217,9 +298,9 @@ export function pollForParsingUpdates(
   uploadResultId: string,
   authFetch: ReturnType<typeof useAuthFetch>,
   callback: (uploadResult: UploadProgress) => void,
-  interval: number = 1000,
+  interval: number = 5000,
   maxFailures: number = 3,
-  maxChecks: number = 10
+  maxChecks: number = 20,
 ) {
   // If we fail `maxFailures` times in a row, stop polling.
   // If we still only get RUNNING after `maxChecks`, stop polling anyway.

@@ -1,6 +1,7 @@
 interface QuestionOption {
   public_id: string;
   content: string;
+  explanation?: string;
   is_answer: boolean;
   selection_frequency: number;
 }

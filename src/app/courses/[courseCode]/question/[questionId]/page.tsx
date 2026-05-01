@@ -6,6 +6,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { MacFastHeader } from "@/components/macfast/macfast-header";
 import { useEffect, useState } from "react";
 import { getQuestionById } from "@/lib/question-api";
+import { submitAnswer } from "@/lib/adaptive-test-api";
 import { useAuthFetch } from "@/hooks/useFetchWithAuth";
 import React from "react";
 import { SafeHtml } from "@/components/macfast/safe-html";
@@ -32,12 +33,32 @@ function SingleQuestionPage({ params: paramsPromise }: QuestionPageProps) {
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [solution, setSolution] = useState<string | null>(null);
   const [correctOptionId, setCorrectOptionId] = useState<string | null>(null);
+  const [error, setError] = useState("");
   const authFetch = useAuthFetch();
 
   useEffect(() => {
     if (!courseCode || !questionId) return;
     getQuestionById(courseCode, questionId, authFetch).then(setQuestion);
-  }, [courseCode, questionId]);
+  }, [courseCode, questionId, authFetch]);
+
+  const handleSubmit = async () => {
+    if (!selectedOption || !question.public_id) return;
+
+    setSubmitted(true);
+    setError("");
+
+    submitAnswer(selectedOption, question.public_id, authFetch)
+      .then((data) => {
+        setSubmitSuccess(true);
+        setCorrectOptionId(data.correct_option_id);
+        setSolution(data.explanation);
+      })
+      .catch((err) => {
+        setSubmitted(false);
+        setSubmitSuccess(false);
+        setError(err instanceof Error ? err.message : "Failed to submit answer.");
+      });
+  };
 
   return (
     <QuestionPage>
@@ -50,7 +71,7 @@ function SingleQuestionPage({ params: paramsPromise }: QuestionPageProps) {
         <h1>Saved Question</h1>
       </QuestionPage.Title>
       <QuestionPage.Content>
-        <QuestionPage.QuestionBody error={""} isLoading={!question.content}>
+        <QuestionPage.QuestionBody error={error} isLoading={!question.content}>
           {question.content && (
             <div className="border p-4 rounded-lg shadow-md">
               <SafeHtml html={question.content} />
@@ -123,7 +144,7 @@ function SingleQuestionPage({ params: paramsPromise }: QuestionPageProps) {
             <Button
               variant="primary"
               disabled={!selectedOption || submitted}
-              onClick={() => {}}
+              onClick={handleSubmit}
             >
               Submit
             </Button>
