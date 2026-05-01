@@ -8,8 +8,10 @@ import {
   AlertDialogDescription,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { ContinueAction } from "@/types/actions/ContinueAction";
 import ActionInfo from "@/types/actions/ContinueActionInfo";
 import * as AlertDialogPrimitive from "@radix-ui/react-alert-dialog";
+import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 import { useRouter } from "next/navigation";
 import { JSX } from "react/jsx-runtime";
 
@@ -26,14 +28,29 @@ export default function TestContinueDialog({
   ...props
 }: TestContinueDialogProps) {
   const router = useRouter();
+  const isEndOfTest = actions?.some(
+    (action) =>
+      action.type === ContinueAction.USE_SKIPPED_QUESTIONS ||
+      action.type === ContinueAction.REPEAT_QUESTIONS ||
+      action.type === ContinueAction.RESTART_SESSION,
+  );
 
   return (
     <AlertDialog {...props}>
       <AlertDialogContent>
-        <AlertDialogTitle>End of Test</AlertDialogTitle>
-        <AlertDialogDescription>
-          There are no appropriate questions.
-        </AlertDialogDescription>
+        {isEndOfTest ? (
+          <>
+            <AlertDialogTitle>End of Test</AlertDialogTitle>
+            <AlertDialogDescription>
+              There are no appropriate questions.
+            </AlertDialogDescription>
+          </>
+        ) : (
+          <VisuallyHidden.Root>
+            <AlertDialogTitle>Continue Test</AlertDialogTitle>
+          </VisuallyHidden.Root>
+        )}
+   
         {notes &&
           notes.map((note, index) => (
             <AlertDialogDescription key={index}>{note}</AlertDialogDescription>
