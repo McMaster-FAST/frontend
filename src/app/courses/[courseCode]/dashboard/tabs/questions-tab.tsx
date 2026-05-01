@@ -1,7 +1,7 @@
 "use client";
 
 import { pollForParsingUpdates, uploadQuestions } from "@/lib/question-api";
-import { useEffect, useRef, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { QuestionItem } from "@/components/macfast/questions-item/questions-item";
 import { Button } from "@/components/ui/button";
@@ -19,6 +19,7 @@ import { Progress } from "@/components/ui/progress";
 import { Spinner } from "@/components/ui/spinner";
 import {
   UploadCompletedStatus,
+  UploadFailure,
   UploadInProgressStatus,
   UploadProgress,
 } from "@/types/UploadResult";
@@ -41,6 +42,7 @@ export function Questions({ course }: QuestionsProps) {
   // Pagination is 1-indexed
   const [pageNumber, setPageNumber] = useState<number>(1);
   const [parsingResult, setParsingResult] = useState<UploadProgress | null>(null);
+  const [showFailures, setShowFailures] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const stopPollingRef = useRef<(() => void) | null>(null);
   const authFetch = useAuthFetch();
@@ -190,25 +192,55 @@ export function Questions({ course }: QuestionsProps) {
               <div className="inline-flex gap-2 items-center">
                 {pasingResultMessage()}
               </div>
-              <div>
+              <div className="flex flex-col items-end gap-1">
                 <XIcon
-                  className="h-4 w-4 cursor-pointer top-0 ml-auto"
+                  className="h-4 w-4 cursor-pointer ml-auto"
                   onClick={() => {
                     stopPollingRef.current?.();
                     stopPollingRef.current = null;
                     setParsingResult(null);
+                    setShowFailures(false);
                   }}
                 />
                 <div className="text-sm text-muted-foreground">
                   <span>{parsingResult.success_count} questions parsed </span>
-                  <span>({parsingResult.failure_count} failed)</span>
+                  {parsingResult.failure_count > 0 ? (
+                    <button
+                      className="underline underline-offset-2 text-destructive hover:opacity-70 transition-opacity"
+                      onClick={() => setShowFailures((v) => !v)}
+                    >
+                      ({parsingResult.failure_count} failed)
+                    </button>
+                  ) : (
+                    <span>(0 failed)</span>
+                  )}
                 </div>
               </div>
             </div>
             <Progress
-              className="h-2 w-full mb-2"
+              className="h-2 w-full"
               value={parsingResult.progress * 100}
             />
+            {showFailures && parsingResult.failures && parsingResult.failures.length > 0 && (
+              <ScrollArea className="max-h-48 rounded-md border mt-1">
+                <div className="p-2 flex flex-col gap-1">
+                  {parsingResult.failures.map((f: UploadFailure) => (
+                    <div
+                      key={f.question_identifier}
+                      className="flex flex-col gap-0.5 px-2 py-1.5 rounded-sm bg-destructive/10 text-xs"
+                    >
+                      <span className="font-medium text-destructive">{f.question_identifier}</span>
+                      <span className="text-muted-foreground">{f.error_message.split("\n").map((line, index) => (
+                        <Fragment key={index}>
+                          {line}
+                          {index < f.error_message.split("\n").length - 1 && <br />}
+                        </Fragment>
+                      ))}</span>
+                    </div>
+                  ))}
+                </div>
+              </ScrollArea>
+            )}
           </div>
         </Card>
       )}
