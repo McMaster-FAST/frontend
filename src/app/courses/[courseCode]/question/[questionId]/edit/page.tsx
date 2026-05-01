@@ -4,18 +4,20 @@ import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { MacFastHeader } from "@/components/macfast/macfast-header";
 import { Button } from "@/components/ui/button";
-import {
-  ArrowLeft,
-  Eye,
-  List,
-  MessageSquare,
-  NotebookPen,
-} from "lucide-react";
+import { ArrowLeft, Eye, List, MessageSquare, NotebookPen } from "lucide-react";
 import { useAuthFetch } from "@/hooks/useFetchWithAuth";
 import { QuestionPage } from "@/components/macfast/question-page";
 import { isEqual } from "lodash";
 import ErrorMessage from "@/components/macfast/error-message";
-import { getQuestionByPublicId, uploadQuestionImage } from "@/lib/question-api";
+import {
+  createQuestionOption,
+  deleteQuestionOption as deleteQuestionOptionApi,
+  getCourseUnits,
+  getQuestionByPublicId,
+  getUnitSubtopics,
+  updateQuestionOption,
+  uploadQuestionImage,
+} from "@/lib/question-api";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useCourseData } from "@/hooks/useCourseData";
 import CommentsSheet from "@/components/macfast/comments/comments-sheet";
@@ -71,6 +73,7 @@ export default function QuestionEditPage() {
   const authFetch = useAuthFetch();
   const { course, isLoading, error: courseError } = useCourseData();
 
+  const courseCode = decodeURIComponent(params.courseCode as string);
   const questionId = decodeURIComponent(params.questionId as string);
   const [question, setQuestion] = useState<Question | null>(null);
   const [questionCopy, setQuestionCopy] = useState<Question | null>(null);
@@ -78,9 +81,20 @@ export default function QuestionEditPage() {
   const [error, setError] = useState<string | null>(null);
   const [areCommentsOpen, setAreCommentsOpen] = useState(false);
   const [isPreview, setIsPreview] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [units, setUnits] = useState<Unit[]>([]);
+  const [selectedUnitPublicId, setSelectedUnitPublicId] = useState("");
+  const [selectedSubtopicPublicId, setSelectedSubtopicPublicId] = useState("");
+  const [originalSubtopicPublicId, setOriginalSubtopicPublicId] = useState("");
+  const [subtopicsByUnit, setSubtopicsByUnit] = useState<
+    Record<string, Subtopic[]>
+  >({});
 
   const hasChanges = () => {
-    return !isEqual(question, questionCopy);
+    return (
+      !isEqual(question, questionCopy) ||
+      selectedSubtopicPublicId !== originalSubtopicPublicId
+    );
   };
 
   const handleCancel = () => {
@@ -89,8 +103,34 @@ export default function QuestionEditPage() {
   };
 
   const handleSave = async () => {
+    setError(null);
     if (!question) {
       setError("Question data is missing");
+      return;
+    }
+    if (!question.content?.trim()) {
+      setError("Question content is required.");
+      return;
+    }
+    if (!question.options || question.options.length < 2) {
+      setError("Please provide at least 2 options.");
+      return;
+    }
+    if (question.options.some((option) => !option.content?.trim())) {
+      setError("All options must have content.");
+      return;
+    }
+    if (!question.options.some((option) => option.is_answer)) {
+      setError("Please mark one option as the correct answer.");
+      return;
+    }
+    const difficultyNumber = Number(question.difficulty);
+    if (!Number.isFinite(difficultyNumber)) {
+      setError("Difficulty must be a valid number.");
+      return;
+    }
+    if (difficultyNumber < -3 || difficultyNumber > 3) {
+      setError("Difficulty must be between -3 and 3.");
       return;
     }
 
@@ -114,10 +154,9 @@ export default function QuestionEditPage() {
       })),
     );
 
-    // TODO: patch individual options via PATCH /api/questions/<id>/options/<option_id>/
-    
+    setIsSaving(true);
     try {
-      const saved = await updateQuestion(
+      await updateQuestion(
         questionWithUploadedImages.public_id,
         {
           content: questionWithUploadedImages.content,
@@ -125,13 +164,88 @@ export default function QuestionEditPage() {
           is_flagged: questionWithUploadedImages.is_flagged,
           is_active: questionWithUploadedImages.is_active,
           is_verified: questionWithUploadedImages.is_verified,
+          difficulty: difficultyNumber,
+          ...(selectedSubtopicPublicId
+            ? { subtopic: selectedSubtopicPublicId }
+            : {}),
         },
         authFetch,
       );
+
+      const currentOptionIds = new Set(
+        questionWithUploadedImages.options
+          .map((option) => option.public_id)
+          .filter(Boolean),
+      );
+      const deletedOptions =
+        questionCopy?.options.filter(
+          (option) =>
+            option.public_id && !currentOptionIds.has(option.public_id),
+        ) ?? [];
+
+      await Promise.all(
+        deletedOptions.map((option) =>
+          deleteQuestionOptionApi(
+            questionWithUploadedImages.public_id,
+            option.public_id,
+            authFetch,
+          ),
+        ),
+      );
+
+      const savedOptions = await Promise.all(
+        questionWithUploadedImages.options.map((option) => {
+          const payload = {
+            content: option.content,
+            explanation: option.explanation ?? "",
+            is_answer: option.is_answer,
+          };
+
+          if (option.public_id) {
+            return updateQuestionOption(
+              questionWithUploadedImages.public_id,
+              option.public_id,
+              payload,
+              authFetch,
+            );
+          }
+
+          return createQuestionOption(
+            questionWithUploadedImages.public_id,
+            payload,
+            authFetch,
+          );
+        }),
+      );
+
+      const refreshedQuestion = await getQuestionByPublicId(
+        questionWithUploadedImages.public_id,
+        authFetch,
+      );
+      const explanationByOptionId = new Map(
+        savedOptions.map((savedOption, index) => [
+          savedOption.public_id,
+          questionWithUploadedImages.options[index]?.explanation,
+        ]),
+      );
+      const saved = {
+        ...refreshedQuestion,
+        options: (refreshedQuestion.options?.length
+          ? refreshedQuestion.options
+          : savedOptions
+        ).map((option) => ({
+          ...option,
+          explanation: explanationByOptionId.get(option.public_id),
+        })),
+      };
+
       setQuestion(saved);
       setQuestionCopy(structuredClone(saved));
+      setOriginalSubtopicPublicId(selectedSubtopicPublicId);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to save question");
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -151,7 +265,106 @@ export default function QuestionEditPage() {
       .finally(() => {
         setIsQuestionLoading(false);
       });
-  }, [questionId]);
+  }, [authFetch, questionId]);
+
+  useEffect(() => {
+    getCourseUnits(courseCode, authFetch)
+      .then(setUnits)
+      .catch((error) => {
+        setError(
+          error instanceof Error
+            ? error.message
+            : "Failed to load course units",
+        );
+      });
+  }, [authFetch, courseCode]);
+
+  useEffect(() => {
+    if (!question || selectedUnitPublicId || units.length === 0) return;
+
+    if (question.unit_public_id) {
+      setSelectedUnitPublicId(question.unit_public_id);
+      return;
+    }
+
+    const matchedUnit = units.find((unit) => {
+      const unitNumber = String(unit.number);
+      const questionUnit = String(question.unit ?? question.unit_name ?? "");
+      return (
+        unit.public_id === questionUnit ||
+        unit.name === questionUnit ||
+        unitNumber === questionUnit ||
+        `Unit ${unitNumber}` === questionUnit
+      );
+    });
+
+    if (matchedUnit) {
+      setSelectedUnitPublicId(matchedUnit.public_id);
+    }
+  }, [question, selectedUnitPublicId, units]);
+
+  useEffect(() => {
+    if (!selectedUnitPublicId || subtopicsByUnit[selectedUnitPublicId]) return;
+
+    getUnitSubtopics(selectedUnitPublicId, authFetch)
+      .then((subtopics) => {
+        setSubtopicsByUnit((prev) => ({
+          ...prev,
+          [selectedUnitPublicId]: subtopics,
+        }));
+      })
+      .catch((error) => {
+        setError(
+          error instanceof Error
+            ? error.message
+            : "Failed to load unit subtopics",
+        );
+      });
+  }, [authFetch, selectedUnitPublicId, subtopicsByUnit]);
+
+  useEffect(() => {
+    if (
+      !question ||
+      !selectedUnitPublicId ||
+      selectedSubtopicPublicId ||
+      !subtopicsByUnit[selectedUnitPublicId]
+    ) {
+      return;
+    }
+
+    const currentQuestionSubtopic =
+      question.subtopic_public_id ?? question.subtopic_name;
+    const matchedSubtopic = subtopicsByUnit[selectedUnitPublicId].find(
+      (subtopic) => subtopic.name === question.subtopic_name,
+    );
+    const matchedSubtopicById =
+      question.subtopic_public_id &&
+      subtopicsByUnit[selectedUnitPublicId].find(
+        (subtopic) => subtopic.public_id === question.subtopic_public_id,
+      );
+
+    const resolvedSubtopic =
+      matchedSubtopicById ??
+      matchedSubtopic ??
+      subtopicsByUnit[selectedUnitPublicId].find(
+        (subtopic) => subtopic.public_id === currentQuestionSubtopic,
+      );
+
+    if (resolvedSubtopic) {
+      setSelectedSubtopicPublicId(resolvedSubtopic.public_id);
+      setOriginalSubtopicPublicId(resolvedSubtopic.public_id);
+    }
+  }, [
+    question,
+    selectedSubtopicPublicId,
+    selectedUnitPublicId,
+    subtopicsByUnit,
+  ]);
+
+  const unitsWithLoadedSubtopics = units.map((unit) => ({
+    ...unit,
+    subtopics: subtopicsByUnit[unit.public_id] ?? unit.subtopics ?? [],
+  }));
 
   if (isPreview) {
     return (
@@ -187,7 +400,7 @@ export default function QuestionEditPage() {
       <CourseBanner
         course={course}
         isLoading={isLoading}
-        error={error}
+        error={courseError || error}
         variant="question-edit"
       />
 
@@ -215,7 +428,44 @@ export default function QuestionEditPage() {
               Options
             </TabsTrigger>
           </TabsList>
-          <QuestionTab question={question} setQuestion={setQuestion} />
+          <QuestionTab
+            question={question}
+            setQuestion={setQuestion}
+            units={unitsWithLoadedSubtopics}
+            selectedUnitPublicId={selectedUnitPublicId}
+            selectedSubtopicPublicId={selectedSubtopicPublicId}
+            onUnitChange={(unitPublicId) => {
+              const selectedUnit = units.find(
+                (unit) => unit.public_id === unitPublicId,
+              );
+              setSelectedUnitPublicId(unitPublicId);
+              setSelectedSubtopicPublicId("");
+              setQuestion((prev) =>
+                prev
+                  ? {
+                      ...prev,
+                      unit: selectedUnit?.name ?? "",
+                      subtopic_name: "",
+                    }
+                  : prev,
+              );
+            }}
+            onSubtopicChange={(subtopicPublicId) => {
+              const selectedSubtopic = subtopicsByUnit[
+                selectedUnitPublicId
+              ]?.find((subtopic) => subtopic.public_id === subtopicPublicId);
+              setSelectedSubtopicPublicId(subtopicPublicId);
+              setQuestion((prev) =>
+                prev
+                  ? {
+                      ...prev,
+                      subtopic_name: selectedSubtopic?.name ?? "",
+                    }
+                  : prev,
+              );
+            }}
+            allowDifficultySelection
+          />
           <OptionsTab question={question} setQuestion={setQuestion} />
         </Tabs>
         <CommentsSheet
@@ -242,13 +492,13 @@ export default function QuestionEditPage() {
           <div className="flex gap-4">
             <Button
               variant="secondary"
-              disabled={!hasChanges()}
+              disabled={isSaving || !hasChanges()}
               onClick={handleCancel}
             >
               Cancel
             </Button>
-            <Button disabled={!hasChanges()} onClick={handleSave}>
-              Save Changes
+            <Button disabled={isSaving || !hasChanges()} onClick={handleSave}>
+              {isSaving ? "Saving..." : "Save Changes"}
             </Button>
           </div>
         </div>

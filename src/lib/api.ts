@@ -124,7 +124,17 @@ export async function getQuestionByPublicId(
 
 export async function updateQuestion(
   publicId: string,
-  fields: Partial<Pick<Question, "content" | "answer_explanation" | "is_flagged" | "is_active" | "is_verified">>,
+  fields: Partial<
+    Pick<
+      Question,
+      | "content"
+      | "answer_explanation"
+      | "is_flagged"
+      | "is_active"
+      | "is_verified"
+      | "difficulty"
+    >
+  > & { subtopic?: string },
   authFetch: ReturnType<typeof useAuthFetch>,
 ): Promise<Question> {
   const response = await authFetch(

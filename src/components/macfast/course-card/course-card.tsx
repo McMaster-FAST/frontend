@@ -37,8 +37,8 @@ function CourseCard({ course, progress }: CourseCardProps) {
   }
 
   const onResume = () => {
-    if (!target) {
-      throw new Error("No resume target available for this course.");
+    if (!hasFullResumeTarget) {
+      return;
     }
 
     const courseCode = target.course_code?.trim();
@@ -98,16 +98,20 @@ function CourseCard({ course, progress }: CourseCardProps) {
       </CardContent>
 
       <CardFooter className="flex flex-col gap-2 border-t border-dark-gray-50 bg-dark-gray-50/50 p-4">
-        {onResume && hasFullResumeTarget && (
-          <Button className="font-bold gap-2 w-full" onClick={onResume}>
-            <div className="flex min-w-0 items-center gap-1 text-left">
-              <span className="shrink-0">Resume</span>
+        <Button
+          className="font-bold gap-2 w-full disabled:pointer-events-auto disabled:cursor-not-allowed disabled:hover:cursor-not-allowed"
+          onClick={onResume}
+          disabled={!hasFullResumeTarget}
+        >
+          <div className="flex min-w-0 items-center gap-1 text-left">
+            <span className="shrink-0">Resume</span>
+            {hasFullResumeTarget && target?.subtopic_name && (
               <span className="truncate" title={target.subtopic_name}>
                 {`(${target.subtopic_name})`}
               </span>
-            </div>
-          </Button>
-        )}
+            )}
+          </div>
+        </Button>
         <Button
           variant="secondary"
           className="font-bold w-full"

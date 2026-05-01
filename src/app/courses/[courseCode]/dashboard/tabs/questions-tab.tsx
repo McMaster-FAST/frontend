@@ -1,11 +1,15 @@
 "use client";
 
-import { pollForParsingUpdates, uploadQuestions } from "@/lib/question-api";
+import {
+  deleteQuestion,
+  pollForParsingUpdates,
+  uploadQuestions,
+} from "@/lib/question-api";
 import { Fragment, useEffect, useRef, useState } from "react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { QuestionItem } from "@/components/macfast/questions-item/questions-item";
 import { Button } from "@/components/ui/button";
-import { AlertCircle, XIcon } from "lucide-react";
+import { AlertCircle, CirclePlus, Upload, XIcon } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import CommentsSheet from "@/components/macfast/comments/comments-sheet";
 import { useCourseQuestions } from "@/hooks/useCourseQuestions";
@@ -13,7 +17,7 @@ import { QuestionItemSkeleton } from "@/components/macfast/questions-item/questi
 import { SearchBar } from "@/components/macfast/search-bar";
 import { QuestionsFilter } from "@/components/macfast/questions-filter";
 import { useAuthFetch } from "@/hooks/useFetchWithAuth";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import MacFastPaginator from "@/components/macfast/macfast-paginator";
 import { Progress } from "@/components/ui/progress";
 import { Spinner } from "@/components/ui/spinner";
@@ -31,7 +35,9 @@ interface QuestionsProps {
 }
 
 export function Questions({ course }: QuestionsProps) {
-  const [searchQuery, setSearchQuery] = useState("");
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
+  const [searchQuery, setSearchQuery] = useState(searchParams.get("q") ?? "");
   const [filters, setFilters] = useState<QuestionFilters>({});
   const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -41,7 +47,9 @@ export function Questions({ course }: QuestionsProps) {
   const [commentsSheetOpen, setCommentsSheetOpen] = useState(false);
   // Pagination is 1-indexed
   const [pageNumber, setPageNumber] = useState<number>(1);
-  const [parsingResult, setParsingResult] = useState<UploadProgress | null>(null);
+  const [parsingResult, setParsingResult] = useState<UploadProgress | null>(
+    null,
+  );
   const [showFailures, setShowFailures] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const stopPollingRef = useRef<(() => void) | null>(null);
@@ -126,7 +134,10 @@ export function Questions({ course }: QuestionsProps) {
 
   const getFetchErrorDetails = () => {
     if (!questionsError) return null;
-    const err = questionsError as any;
+    const err = questionsError as {
+      status?: number | string;
+      message?: string;
+    };
     const status = err.status || "Unknown";
     const message = err.message || "Failed to load questions";
     return { status, message };
@@ -148,6 +159,35 @@ export function Questions({ course }: QuestionsProps) {
       return;
     }
     router.push(`/courses/${course.code}/question/new`);
+  };
+
+  const handleDeleteQuestion = async (questionId: string) => {
+    try {
+      setError(null);
+      await deleteQuestion(questionId, authFetch);
+      await refetch();
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Failed to delete question.",
+      );
+    }
+  };
+
+  const updateSearchQuery = (query: string) => {
+    setPageNumber(1);
+    setSearchQuery(query);
+
+    const nextParams = new URLSearchParams(searchParams.toString());
+    if (query.trim()) {
+      nextParams.set("q", query);
+    } else {
+      nextParams.delete("q");
+    }
+    const nextQueryString = nextParams.toString();
+    const nextUrl = nextQueryString
+      ? `${pathname}?${nextQueryString}`
+      : pathname;
+    router.replace(nextUrl, { scroll: false });
   };
 
   const pasingResultMessage = () => {
@@ -221,40 +261,47 @@ export function Questions({ course }: QuestionsProps) {
               className="h-2 w-full"
               value={parsingResult.progress * 100}
             />
-            {showFailures && parsingResult.failures && parsingResult.failures.length > 0 && (
-              <ScrollArea className="max-h-48 rounded-md border mt-1">
-                <div className="p-2 flex flex-col gap-1">
-                  {parsingResult.failures.map((f: UploadFailure) => (
-                    <div
-                      key={f.question_identifier}
-                      className="flex flex-col gap-0.5 px-2 py-1.5 rounded-sm bg-destructive/10 text-xs"
-                    >
-                      <span className="font-medium text-destructive">{f.question_identifier}</span>
-                      <span className="text-muted-foreground">{f.error_message.split("\n").map((line, index) => (
-                        <Fragment key={index}>
-                          {line}
-                          {index < f.error_message.split("\n").length - 1 && <br />}
-                        </Fragment>
-                      ))}</span>
-                    </div>
-                  ))}
-                </div>
-              </ScrollArea>
-            )}
+            {showFailures &&
+              parsingResult.failures &&
+              parsingResult.failures.length > 0 && (
+                <ScrollArea className="max-h-48 rounded-md border mt-1">
+                  <div className="p-2 flex flex-col gap-1">
+                    {parsingResult.failures.map((f: UploadFailure) => (
+                      <div
+                        key={f.question_identifier}
+                        className="flex flex-col gap-0.5 px-2 py-1.5 rounded-sm bg-destructive/10 text-xs"
+                      >
+                        <span className="font-medium text-destructive">
+                          {f.question_identifier}
+                        </span>
+                        <span className="text-muted-foreground">
+                          {f.error_message.split("\n").map((line, index) => (
+                            <Fragment key={index}>
+                              {line}
+                              {index <
+                                f.error_message.split("\n").length - 1 && (
+                                <br />
+                              )}
+                            </Fragment>
+                          ))}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </ScrollArea>
+              )}
           </div>
         </Card>
       )}
 
-      <div className="flex flex-row flex-0 gap-4 mb-6 items-center justify-between">
+      <div className="mb-6 flex flex-col gap-3 lg:flex-row lg:items-center lg:gap-4">
         <SearchBar
-          className=""
+          className="w-full lg:flex-1 lg:min-w-0"
           placeholder="Search questions..."
-          onSearch={(query) => {
-            setPageNumber(1);
-            setSearchQuery(query);
-          }}
+          value={searchQuery}
+          onSearch={updateSearchQuery}
         />
-        <div className="flex flex-1 gap-3 justify-end ">
+        <div className="flex w-full flex-wrap items-center justify-end gap-2 lg:w-auto lg:flex-nowrap lg:gap-3">
           <input
             type="file"
             ref={fileInputRef}
@@ -265,17 +312,21 @@ export function Questions({ course }: QuestionsProps) {
           <Button
             variant="secondary"
             size="default"
+            className="gap-2"
             onClick={handleUploadClick}
             disabled={isUploading}
           >
+            <Upload className="h-5 w-5" />
             {isUploading ? "Uploading..." : "Upload Questions"}
           </Button>
           <Button
             variant="secondary"
             size="default"
+            className="gap-2"
             onClick={navigateToCreateQuestion}
             disabled={!course?.code}
           >
+            <CirclePlus className="h-5 w-5" />
             Create New Question
           </Button>
           <QuestionsFilter
@@ -316,7 +367,9 @@ export function Questions({ course }: QuestionsProps) {
                       setSelectedQuestionId(question.public_id);
                       setCommentsSheetOpen(true);
                     }}
-                    onDelete={() => console.log("Delete:", question.public_id)}
+                    onDelete={() =>
+                      void handleDeleteQuestion(question.public_id)
+                    }
                   />
                 ))}
 
