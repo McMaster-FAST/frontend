@@ -151,7 +151,6 @@ export default function OptionsTab({ question, setQuestion }: OptionsTabProps) {
                           <h2 className="text-lg  font-semibold">
                             Explanation
                           </h2>
-                          <p className="text-xs text-muted-foreground m-1">This feature is still under development!</p>
                           <RichTextarea
                             className=""
                             placeholder="Option explanation..."

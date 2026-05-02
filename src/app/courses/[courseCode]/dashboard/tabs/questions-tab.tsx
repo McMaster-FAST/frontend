@@ -344,7 +344,7 @@ export function Questions({ course }: QuestionsProps) {
         <Alert variant="destructive" className="mb-6">
           <AlertCircle className="h-4 w-4" />
           <AlertTitle>
-            Unable to load questions
+            Error {fetchError.status}: Unable to load questions
           </AlertTitle>
           <AlertDescription>
             {fetchError.message}. Please try refreshing the page.
