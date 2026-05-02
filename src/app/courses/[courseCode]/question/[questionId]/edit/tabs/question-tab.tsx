@@ -41,6 +41,12 @@ export default function QuestionTab({
     availableUnits.find((unit) => unit.public_id === selectedUnitPublicId) ??
     null;
   const availableSubtopics = selectedUnit?.subtopics ?? [];
+  const difficultyInput = String(question?.difficulty ?? "");
+  const difficultyNumber = Number(question?.difficulty);
+  const isDifficultyOutOfRange =
+    difficultyInput.trim().length > 0 &&
+    Number.isFinite(difficultyNumber) &&
+    (difficultyNumber < -3 || difficultyNumber > 3);
 
   return (
     <TabsContent value="question" className="flex-1 overflow-hidden">
@@ -98,12 +104,13 @@ export default function QuestionTab({
                     <Input
                       id="selection-frequency"
                       className="w-1/4"
-                      value={question.selection_frequency}
+                      value={Number(question.selection_frequency).toFixed(4)}
                       disabled
                       readOnly
                     />
                     <p className="text-xs text-muted-foreground">
-                      The percentage of students who answered this question correctly.
+                      The percentage of students who answered this question
+                      correctly.
                     </p>
                   </div>
                 );
@@ -117,38 +124,21 @@ export default function QuestionTab({
                       Difficulty
                     </Label>
                     {allowDifficultySelection ? (
-                      <Select
-                        value={Number(question?.difficulty ?? 0).toFixed(4)}
-                        onValueChange={(value) =>
+                      <Input
+                        id="difficulty"
+                        type="number"
+                        min={-3}
+                        max={3}
+                        step="0.0001"
+                        className="w-1/4 min-w-36"
+                        value={difficultyInput}
+                        onChange={(event) => {
+                          const { value } = event.target;
                           setQuestion((prev) =>
-                            prev
-                              ? { ...prev, difficulty: Number.parseFloat(value) }
-                              : prev,
-                          )
-                        }
-                      >
-                        <SelectTrigger id="difficulty" className="w-1/4 min-w-36">
-                          <SelectValue placeholder="Select difficulty" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {[
-                            "-3.0000",
-                            "-2.0000",
-                            "-1.0000",
-                            "0.0000",
-                            "1.0000",
-                            "2.0000",
-                            "3.0000",
-                          ].map((difficultyValue) => (
-                            <SelectItem
-                              key={difficultyValue}
-                              value={difficultyValue}
-                            >
-                              {difficultyValue}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                            prev ? { ...prev, difficulty: value } : prev,
+                          );
+                        }}
+                      />
                     ) : (
                       <Input
                         id="difficulty"
@@ -161,6 +151,11 @@ export default function QuestionTab({
                     <p className="text-xs text-muted-foreground">
                       Difficulty range is from -3.0000 to 3.0000.
                     </p>
+                    {isDifficultyOutOfRange && (
+                      <p className="text-xs text-destructive">
+                        Difficulty must be between -3 and 3.
+                      </p>
+                    )}
                   </div>
                 );
               }
@@ -217,7 +212,9 @@ export default function QuestionTab({
                 Subtopic
               </Label>
               <Select
-                value={selectedSubtopicPublicId || question?.subtopic_name || ""}
+                value={
+                  selectedSubtopicPublicId || question?.subtopic_name || ""
+                }
                 onValueChange={(val) => {
                   if (onSubtopicChange) {
                     onSubtopicChange(val);

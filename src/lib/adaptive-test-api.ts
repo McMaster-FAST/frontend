@@ -150,10 +150,26 @@ export async function resetSkippedQuestions(
   subtopic_id: string,
   authFetch: ReturnType<typeof useAuthFetch>,
 ) {
-  const response = await authFetch(
+  await authFetch(
     `/api/adaptive-test/question-metrics/${subtopic_id}/reset/`,
-    {
-      method: "POST",
-    },
+    { method: "POST" },
   );
+}
+
+export async function repeatQuestions(
+  subtopic_id: string,
+  authFetch: ReturnType<typeof useAuthFetch>,
+) {
+  await authFetch(`/api/test-sessions/${subtopic_id}/repeat-questions/`, {
+    method: "POST",
+  });
+}
+
+export async function restartSession(
+  subtopic_id: string,
+  authFetch: ReturnType<typeof useAuthFetch>,
+) {
+  await authFetch(`/api/test-sessions/${subtopic_id}/restart-session/`, {
+    method: "POST",
+  });
 }

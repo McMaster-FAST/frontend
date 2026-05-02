@@ -1,6 +1,8 @@
 import { JSX } from "react/jsx-dev-runtime";
+import { ContinueAction } from "./ContinueAction";
 
 export default interface ActionInfo {
-    caption: JSX.Element;
-    action: (() => (void | Promise<void>));
+  type: ContinueAction;
+  caption: JSX.Element;
+  action: () => void | Promise<void>;
 }

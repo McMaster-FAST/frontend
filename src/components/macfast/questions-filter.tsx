@@ -68,9 +68,16 @@ export function QuestionsFilter({
   };
 
   const handleSubtopicChange = (value: string) => {
-    const newVal = value === "all" ? null : value;
+    const selectedSubtopic = subtopics.find((subtopic) => subtopic.public_id === value);
+    const newVal = value === "all" ? null : selectedSubtopic?.name ?? null;
     onFilterChange({ ...filters, subtopic_name: newVal });
   };
+
+  const selectedSubtopicValue =
+    filters.subtopic_name == null
+      ? "all"
+      : subtopics.find((subtopic) => subtopic.name === filters.subtopic_name)
+          ?.public_id ?? "all";
 
   const clearFilters = () => {
     onFilterChange({});
@@ -147,7 +154,7 @@ export function QuestionsFilter({
               Subtopic
             </Label>
             <Select
-              value={filters.subtopic_name ?? "all"}
+              value={selectedSubtopicValue}
               onValueChange={handleSubtopicChange}
             >
               <SelectTrigger className="h-8 w-full">
@@ -156,7 +163,7 @@ export function QuestionsFilter({
               <SelectContent>
                 <SelectItem value="all">All Subtopics</SelectItem>
                 {subtopics.map((sub) => (
-                  <SelectItem key={sub.name} value={sub.name}>
+                  <SelectItem key={sub.public_id} value={sub.public_id}>
                     {sub.name}
                   </SelectItem>
                 ))}

@@ -7,7 +7,9 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { JSX } from "react/jsx-runtime";
 import {
   getNextQuestion,
+  repeatQuestions,
   resetSkippedQuestions,
+  restartSession,
   skipQuestion,
   submitAnswer,
 } from "@/lib/adaptive-test-api";
@@ -169,43 +171,65 @@ function QuestionTestPage({ params: paramsPromise }: QuestionTestPageProps) {
     continue_actions: ContinueAction[],
     subtopic_id: string,
   ): ActionInfo[] => {
-    return continue_actions.flatMap((action) => {
+    const mappedActions: ActionInfo[] = [];
+    continue_actions.forEach((action) => {
       switch (action) {
         case ContinueAction.INCREMENT_WINDOW_UPPERBOUND:
-          return [
-            {
+          mappedActions.push({
+              type: ContinueAction.INCREMENT_WINDOW_UPPERBOUND,
               caption: <span>See harder questions</span>,
               action: async () => {
                 await updateSelWindowUpperBound(subtopic_id, authFetch);
                 handleNextQuestion();
               },
-            },
-          ];
+            });
+          break;
         case ContinueAction.DECREMENT_WINDOW_LOWERBOUND:
-          return [
-            {
+          mappedActions.push({
+              type: ContinueAction.DECREMENT_WINDOW_LOWERBOUND,
               caption: <span>See easier questions</span>,
               action: async () => {
                 await updateSelWindowLowerBound(subtopic_id, authFetch);
                 handleNextQuestion();
               },
-            },
-          ];
+            });
+          break;
         case ContinueAction.USE_SKIPPED_QUESTIONS:
-          return [
-            {
+          mappedActions.push({
+              type: ContinueAction.USE_SKIPPED_QUESTIONS,
               caption: <span>Use recently skipped questions</span>,
               action: async () => {
                 await resetSkippedQuestions(subtopic_id, authFetch);
                 resetState();
                 handleNextQuestion();
               },
-            },
-          ];
+            });
+          break;
+        case ContinueAction.REPEAT_QUESTIONS:
+          mappedActions.push({
+              type: ContinueAction.REPEAT_QUESTIONS,
+              caption: <span>Try questions again</span>,
+              action: async () => {
+                await repeatQuestions(subtopic_id, authFetch);
+                handleNextQuestion();
+              },
+            });
+          break;
+        case ContinueAction.RESTART_SESSION:
+          mappedActions.push({
+              type: ContinueAction.RESTART_SESSION,
+              caption: <span>Restart subtopic</span>,
+              action: async () => {
+                await restartSession(subtopic_id, authFetch);
+                handleNextQuestion();
+              },
+            });
+          break;
         default:
-          return [];
+          break;
       }
     });
+    return mappedActions;
   };
   const updateWithNewQuestion = (
     questionPromise: Promise<{
@@ -368,7 +392,7 @@ function QuestionTestPage({ params: paramsPromise }: QuestionTestPageProps) {
           }
         >
           {question.content && (
-            <div className="border p-4 rounded-lg shadow-md">
+            <div className="solution-html border p-4 rounded-lg shadow-md">
               <SafeHtml
                 html={resolveImages(question.content, question.public_id)}
               />

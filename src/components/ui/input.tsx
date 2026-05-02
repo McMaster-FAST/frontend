@@ -9,16 +9,42 @@ interface InputProps extends React.ComponentProps<"input"> {
   error?: boolean;
   label?: string;
   errorMessage?: string;
+  /** Use inside InputGroup (or similar flex rows): avoids wrapper divs so flex-1 / min-width work. */
+  omitWrapper?: boolean;
 }
 
-function Input({ 
-    className, 
+function Input({
+    className,
     type,
     label,
     errorMessage,
     error,
-    ...props 
+    omitWrapper,
+    ...props
 }: InputProps) {
+  const inputClassName = cn(
+    error ? "ring ring-[3px] ring-primary/30" : "focus-visible:ring-input-ring/30",
+    "file:text-foreground placeholder:text-placeholder font-medium selection:bg-primary selection:text-primary-foreground dark:bg-input/30 border-input h-[40px] w-full min-w-0 rounded-md border bg-transparent px-3 py-1 transition-[color,box-shadow] outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50",
+    "focus-visible:border-ring focus-visible:ring-[3px]",
+    "aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
+    className,
+  );
+
+  if (
+    omitWrapper &&
+    !label &&
+    !(error && errorMessage)
+  ) {
+    return (
+      <input
+        type={type}
+        data-slot="input"
+        className={inputClassName}
+        {...props}
+      />
+    );
+  }
+
   return (
     <div className="flex flex-col gap-[8px] font-poppins">
       {label && <Label className="text-md px-1">{label}</Label>}
@@ -26,13 +52,7 @@ function Input({
       <input
         type={type}
         data-slot="input"
-        className={cn(
-          error ? "ring ring-[3px] ring-primary/30" : "focus-visible:ring-input-ring/30",
-          "file:text-foreground placeholder:text-placeholder font-medium selection:bg-primary selection:text-primary-foreground dark:bg-input/30 border-input h-[40px] w-full min-w-0 rounded-md border bg-transparent px-3 py-1 transition-[color,box-shadow] outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50",
-          "focus-visible:border-ring focus-visible:ring-[3px]",
-          "aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
-          className
-        )}
+        className={inputClassName}
         {...props}
         />
         {error && <AlertTriangle className="-translate-x-10 text-primary" />}
