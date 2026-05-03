@@ -271,6 +271,28 @@ export default function QuestionTab({
             }
           />
         </div>
+
+        <div className="flex flex-col gap-3">
+          <div>
+            <h2 className="text-lg font-semibold text-foreground">
+              Answer explanation
+            </h2>
+            <p className="text-sm text-muted-foreground">
+              Shown after a student submits an answer (alongside the correct
+              option). You can also add per-option explanations on the Options
+              tab—those apply to each choice separately.
+            </p>
+          </div>
+          <RichTextarea
+            value={question?.answer_explanation ?? ""}
+            placeholder="Explain why the correct answer is right..."
+            onChange={(answer_explanation) =>
+              setQuestion((prev) =>
+                prev ? { ...prev, answer_explanation } : prev,
+              )
+            }
+          />
+        </div>
       </div>
     </TabsContent>
   );

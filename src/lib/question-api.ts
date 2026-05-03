@@ -16,7 +16,7 @@ export async function reportQuestion(
       report_reasons: reasons.map(
         (reason: QuestionReportReason) =>
           QuestionReportReason[
-            reason.toString() as keyof typeof QuestionReportReason
+          reason.toString() as keyof typeof QuestionReportReason
           ],
       ),
       additional_details: additionalDetails,
@@ -88,6 +88,7 @@ export async function createQuestion(
   payload: {
     serial_number: string;
     content: string;
+    answer_explanation?: string;
     is_flagged: boolean;
     is_active: boolean;
     is_verified: boolean;
@@ -264,8 +265,7 @@ export async function setSavedForLater(
   });
   if (!response.ok) {
     throw new Error(
-      `Failed to ${saveForLater ? "save" : "unsave"} question for later: ${
-        response.statusText
+      `Failed to ${saveForLater ? "save" : "unsave"} question for later: ${response.statusText
       }`,
     );
   }
