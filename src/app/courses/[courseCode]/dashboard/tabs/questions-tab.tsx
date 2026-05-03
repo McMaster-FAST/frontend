@@ -266,9 +266,9 @@ export function Questions({ course }: QuestionsProps) {
               parsingResult.failures.length > 0 && (
                 <ScrollArea className="max-h-48 rounded-md border mt-1">
                   <div className="p-2 flex flex-col gap-1">
-                    {parsingResult.failures.map((f: UploadFailure) => (
+                    {parsingResult.failures.map((f: UploadFailure, index) => (
                       <div
-                        key={f.question_identifier}
+                        key={`${index}-${f.question_identifier}`}
                         className="flex flex-col gap-0.5 px-2 py-1.5 rounded-sm bg-destructive/10 text-xs"
                       >
                         <span className="font-medium text-destructive">
