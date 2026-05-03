@@ -80,7 +80,12 @@ export default function NewQuestionPage() {
       is_verified: false,
       options: [
         { public_id: "", content: "", is_answer: true, selection_frequency: 0 },
-        { public_id: "", content: "", is_answer: false, selection_frequency: 0 },
+        {
+          public_id: "",
+          content: "",
+          is_answer: false,
+          selection_frequency: 0,
+        },
       ],
       course: course?.code || courseCode,
       unit: "",
@@ -91,7 +96,9 @@ export default function NewQuestionPage() {
   );
 
   const [question, setQuestion] = useState<Question | null>(initialQuestion);
-  const [questionCopy, setQuestionCopy] = useState<Question | null>(initialQuestion);
+  const [questionCopy, setQuestionCopy] = useState<Question | null>(
+    initialQuestion,
+  );
   const [error, setError] = useState<string | null>(null);
   const [isPreview, setIsPreview] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -152,17 +159,28 @@ export default function NewQuestionPage() {
             authFetch,
             `new-question-${now}-option-${index + 1}`,
           ),
+          explanation: await uploadEmbeddedImagesInHtml(
+            option.explanation ?? "",
+            authFetch,
+            `new-question-${now}-option-${index + 1}-explanation`,
+          ),
         })),
+      );
+      tempQuestion.answer_explanation = await uploadEmbeddedImagesInHtml(
+        tempQuestion.answer_explanation ?? "",
+        authFetch,
+        `new-question-${now}-answer-explanation`,
       );
 
       const createdQuestion = await createQuestion(
         {
           serial_number: `manual-${courseCode}-${now}`,
           content: tempQuestion.content,
+          answer_explanation: tempQuestion.answer_explanation,
           is_flagged: tempQuestion.is_flagged,
           is_active: tempQuestion.is_active,
           is_verified: tempQuestion.is_verified,
-          difficulty: tempQuestion.difficulty,
+          difficulty: Number(tempQuestion.difficulty),
           subtopic: selectedSubtopicPublicId,
         },
         authFetch,
@@ -174,6 +192,7 @@ export default function NewQuestionPage() {
             createdQuestion.public_id,
             {
               content: option.content,
+              explanation: option.explanation ?? "",
               is_answer: option.is_answer,
             },
             authFetch,
@@ -192,7 +211,9 @@ export default function NewQuestionPage() {
       setQuestionCopy(structuredClone(fullQuestion));
       router.replace(`/courses/${encodeURIComponent(courseCode)}/dashboard`);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to create question");
+      setError(
+        err instanceof Error ? err.message : "Failed to create question",
+      );
     } finally {
       setIsSaving(false);
     }
