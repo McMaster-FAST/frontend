@@ -151,8 +151,19 @@ export default function QuestionEditPage() {
           authFetch,
           `${questionWithUploadedImages.public_id}-option-${index + 1}`,
         ),
+        explanation: await uploadEmbeddedImagesInHtml(
+          option.explanation ?? "",
+          authFetch,
+          `${questionWithUploadedImages.public_id}-option-${index + 1}-explanation`,
+        ),
       })),
     );
+    questionWithUploadedImages.answer_explanation =
+      await uploadEmbeddedImagesInHtml(
+        questionWithUploadedImages.answer_explanation ?? "",
+        authFetch,
+        `${questionWithUploadedImages.public_id}-answer-explanation`,
+      );
 
     setIsSaving(true);
     try {
