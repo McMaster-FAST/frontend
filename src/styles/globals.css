@@ -216,6 +216,7 @@
 .text-button {
   @apply cursor-pointer text-primary-link hover:underline select-none text-primary;
 }
+
 .solution-html table {
   width: 100%;
   border-collapse: collapse;

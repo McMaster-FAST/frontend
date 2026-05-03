@@ -91,20 +91,6 @@ export function GamificationHUD({
         />
         <span className="font-bold tabular-nums">{current_streak}</span>
       </div>
-
-      {/* Difficulty badge */}
-      {diff && (
-        <div
-          className={cn(
-            "flex items-center gap-2 px-4 py-2 rounded-full border font-semibold transition-all duration-300",
-            diff.classes,
-          )}
-          title={`This question is ${diff.label} relative to your current level`}
-        >
-          {diff.icon}
-          <span>{diff.label}</span>
-        </div>
-      )}
     </div>
   );
 }
